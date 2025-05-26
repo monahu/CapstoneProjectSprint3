@@ -1,9 +1,11 @@
 import Navbar from './Navbar'
 import { useState, useRef } from 'react'
+import { useNavigate } from 'react-router'
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
+  const navigate = useNavigate()
 
   const userName = useRef(null)
   const email = useRef(null)
@@ -24,11 +26,16 @@ const Login = () => {
       <div className='flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='sm:mx-auto sm:w-full sm:max-w-md'>
-          <img
-            alt='RestJAM'
-            src='logo.png'
-            className='mx-auto h-10 w-auto'
-          />
+          <button
+            onClick={() => navigate('/')}
+            className='btn btn-ghost w-full'
+          >
+            <img
+              alt='RestJAM'
+              src='logo.png'
+              className='mx-auto h-10 w-auto'
+            />
+          </button>
           <h2 className='mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900'>
             {isSignInForm ? 'Log in' : 'Sign up'} to your account
           </h2>

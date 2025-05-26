@@ -1,11 +1,26 @@
 import { createBrowserRouter, RouterProvider } from 'react-router'
 import Login from './Login'
 import Browse from './Browse'
+import Home from './Home'
 const Body = () => {
   const appRouter = createBrowserRouter([
     {
       path: '/',
       element: <Browse />,
+      children: [
+        {
+          index: true, // this is for "/"
+          element: <Home />,
+        },
+        /* {
+          path: 'create-profile',
+          element: <CreateProfile />,
+        },
+        {
+          path: 'explore',
+          element: <Explore />,
+        }, */
+      ],
     },
     {
       path: '/login',

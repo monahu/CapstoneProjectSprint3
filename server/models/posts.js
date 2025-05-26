@@ -1,7 +1,7 @@
 const postSchema = new mongoose.Schema({
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
+        ref: "Users",
         required: true,
         unique: true,
     },

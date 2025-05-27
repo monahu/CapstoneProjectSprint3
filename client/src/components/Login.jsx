@@ -1,11 +1,11 @@
 import Navbar from './Navbar'
 import { useState, useRef } from 'react'
-import { useNavigate } from 'react-router'
+import { Link } from 'react-router'
+import Footer from './Footer'
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
-  const navigate = useNavigate()
 
   const userName = useRef(null)
   const email = useRef(null)
@@ -20,14 +20,13 @@ const Login = () => {
   }
 
   return (
-    <>
+    <div className='min-h-screen'>
       <Navbar />
-
       <div className='flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='sm:mx-auto sm:w-full sm:max-w-md'>
-          <button
-            onClick={() => navigate('/')}
+          <Link
+            to={'/'}
             className='btn btn-ghost w-full'
           >
             <img
@@ -35,7 +34,7 @@ const Login = () => {
               src='logo.png'
               className='mx-auto h-10 w-auto'
             />
-          </button>
+          </Link>
           <h2 className='mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900'>
             {isSignInForm ? 'Log in' : 'Sign up'} to your account
           </h2>
@@ -278,12 +277,13 @@ const Login = () => {
             onClick={toggleSignInForm}
           >
             {isSignInForm
-              ? 'New to RestJAM? Sign Up Now'
-              : 'Already registered? Login In Now.'}
+              ? 'New to RestJAM? 👉Sign Up👈 Now'
+              : 'Already registered? 👉Login In👈 Now.'}
           </p>
         </div>
       </div>
-    </>
+      <Footer navigationList={[]} />
+    </div>
   )
 }
 

@@ -5,12 +5,8 @@ import {
   DialogPanel,
   TransitionChild,
 } from '@headlessui/react'
+import { Link } from 'react-router'
 
-const navigationList = [
-  { name: 'Dashboard', href: '#', icon: House, current: true },
-  { name: 'Create', href: '#', icon: SquarePen, current: false },
-  { name: 'Profile', href: '#', icon: Settings, current: false },
-]
 const explore = {
   name: 'Explore',
   href: '#',
@@ -19,7 +15,7 @@ const explore = {
 }
 const tags = [{ id: 1, name: 'tag1', genre: 'normal', current: false }]
 
-const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
+const Sidebar = ({ sidebarOpen, setSidebarOpen, navigationList }) => {
   // const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
@@ -104,8 +100,8 @@ const SidebarContent = ({ navigationList, tags, explore }) => {
               >
                 {navigationList.map((item) => (
                   <li key={item.name}>
-                    <a
-                      href={item.href}
+                    <Link
+                      to={item.href}
                       className={classNames(
                         item.current
                           ? 'bg-gray-50 text-indigo-600'
@@ -123,7 +119,7 @@ const SidebarContent = ({ navigationList, tags, explore }) => {
                         )}
                       />
                       {item.name}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>

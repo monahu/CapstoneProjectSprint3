@@ -7,6 +7,10 @@ import { useNavigate } from "react-router";
 import { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
+import { APP_CONFIG } from "../utils/constants/app";
+import { ROUTES } from "../utils/constants/app";
+import { UI_TEXT } from "../utils/constants/ui";
+import { NAVIGATION } from "../utils/constants/navigation";
 
 const Navbar = ({ setSidebarOpen }) => {
   const location = useLocation();
@@ -20,18 +24,18 @@ const Navbar = ({ setSidebarOpen }) => {
       .then(() => {})
       .catch((error) => {
         console.error("sign out error", error);
-        navigate("/error");
+        navigate(ROUTES.ERROR);
       });
     console.log("Signing out");
   };
 
   // Navigation items for the user dropdown menu
-  const userNavigation = [
-    { name: "Your Profile", href: "/profile" },
-    { name: "Sign out", href: "#", action: handleSignOut },
-  ];
-  const hideLogoRoutes = ["/login", "/signup"];
-
+  const userNavigation = NAVIGATION.userDropdown.map((item) => ({
+    ...item,
+    action: item.hasAction ? handleSignOut : undefined,
+  }));
+  const hideLogoRoutes = NAVIGATION.hideLogoRoutes;
+  const protectedRoutes = NAVIGATION.protectedRoutes;
   // checking authentication
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -45,26 +49,34 @@ const Navbar = ({ setSidebarOpen }) => {
             photoURL,
           })
         );
-        navigate("/");
+        // Only redirect to home if user is on login page
+        if (location.pathname === ROUTES.LOGIN) {
+          navigate(ROUTES.HOME);
+        }
       } else {
         // no user logged in
         dispatch(removeUser());
-        navigate("/login");
+        // Don't redirect to login automatically - let users access home page
+        // Only redirect if they're trying to access protected routes
+
+        if (protectedRoutes.includes(location.pathname)) {
+          navigate(ROUTES.LOGIN);
+        }
       }
     });
     // Unsubscribe onAuthStateChanged when component unmount
     return () => unsubscribe();
-  }, []);
+  }, [location.pathname]);
 
   return (
     <div className="sticky top-0 z-40 flex h-16 items-center gap-x-4 bg-white px-4 shadow sm:px-6 lg:px-8 border-b  border-gray-200">
       {hideLogoRoutes.includes(location.pathname) && (
         <div className="flex-1 hidden md:block">
           <Link
-            to={"/"}
+            to={ROUTES.HOME}
             className="bg-transparent border-none text-xl text-black font-bold"
           >
-            RestJAM
+            {APP_CONFIG.name}
           </Link>
         </div>
       )}
@@ -100,9 +112,9 @@ const Navbar = ({ setSidebarOpen }) => {
             <button className="text-gray-400 hover:text-gray-500">
               <a
                 className="btn"
-                href="/login"
+                href={ROUTES.LOGIN}
               >
-                Login/Signup
+                {UI_TEXT.login.loginSignup}
               </a>
             </button>
           </>

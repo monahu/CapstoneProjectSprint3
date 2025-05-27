@@ -6,22 +6,10 @@ import {
   PasswordField,
   ConfirmPasswordField,
 } from "./FormFields";
+import { UI_TEXT } from "../../utils/constants/ui";
+import { FORM_CONFIG } from "../../utils/constants/form";
 
 const LoginForm = ({ isSignInForm, onSubmit }) => {
-  const initialValues = {
-    email: "",
-    password: "",
-    ...(isSignInForm
-      ? {}
-      : {
-          userName: "",
-          firstName: "",
-          lastName: "",
-          phone: "",
-          confirmPassword: "",
-        }),
-  };
-
   const handleSubmit = (values, { setSubmitting }) => {
     if (onSubmit) {
       onSubmit(values);
@@ -32,7 +20,11 @@ const LoginForm = ({ isSignInForm, onSubmit }) => {
   return (
     <Formik
       key={isSignInForm ? "signin" : "signup"}
-      initialValues={initialValues}
+      initialValues={
+        isSignInForm
+          ? FORM_CONFIG.initialValues.signIn
+          : FORM_CONFIG.initialValues.signUp
+      }
       validationSchema={getValidationSchema(isSignInForm)}
       onSubmit={handleSubmit}
     >
@@ -51,7 +43,7 @@ const LoginForm = ({ isSignInForm, onSubmit }) => {
                 href="#"
                 className="font-semibold text-indigo-600 hover:text-indigo-500"
               >
-                Forgot password?
+                {UI_TEXT.login.forgotPassword}
               </a>
             </div>
           </div>
@@ -63,10 +55,10 @@ const LoginForm = ({ isSignInForm, onSubmit }) => {
               className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
             >
               {isSubmitting
-                ? "Processing..."
+                ? UI_TEXT.login.processing
                 : isSignInForm
-                  ? "Log In"
-                  : "Sign Up"}
+                  ? UI_TEXT.buttons.logIn
+                  : UI_TEXT.buttons.signUp}
             </button>
           </div>
         </Form>

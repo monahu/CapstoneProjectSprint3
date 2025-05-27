@@ -13,23 +13,27 @@ import {
 import { useDispatch } from "react-redux";
 import { addUser } from "../../utils/userSlice";
 
+import { APP_CONFIG, ROUTES } from "../../utils/constants/app";
+import { AUTH_CONFIG } from "../../utils/constants/auth";
+import { UI_TEXT } from "../../utils/constants/ui";
+import { FORM_CONFIG } from "../../utils/constants/form";
+
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true);
   const [errorMessage, setErrorMessage] = useState(null);
   const dispatch = useDispatch();
 
   const handleFormSubmit = (formData) => {
-    // Handle form submission logic after validation here
+    const { email, password } = formData;
 
-    console.log("Form submitted:", formData);
     if (!isSignInForm) {
-      createUserWithEmailAndPassword(auth, formData.email, formData.password)
+      // Sign Up
+      createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed up
           const user = userCredential.user;
           updateProfile(user, {
             displayName: formData.userName,
-            photoURL: `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 150) + 1}`,
+            photoURL: `${AUTH_CONFIG.avatarBaseUrl}${Math.floor(Math.random() * AUTH_CONFIG.maxAvatarNumber) + 1}`,
             email: formData.email,
           })
             .then(() => {
@@ -38,42 +42,36 @@ const Login = () => {
               const { uid, email, displayName, photoURL } = auth.currentUser;
               dispatch(
                 addUser({
-                  uid: uid,
-                  email: email,
-                  displayName: displayName,
+                  uid,
+                  email,
+                  displayName,
                   photoURL,
                 })
               );
             })
             .catch((error) => {
-              // An error occurred
-              setErrorMessage(error);
+              setErrorMessage(error.message);
             });
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMessage(errorCode + "-" + errorMessage);
-          // ..
+          setErrorMessage(`${error.code}: ${error.message}`);
         });
     } else {
-      signInWithEmailAndPassword(auth, formData.email, formData.password)
+      // Sign In
+      signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          // Signed in
           const user = userCredential.user;
           console.log("User signed in:", user);
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMessage(errorCode + "-" + errorMessage);
+          setErrorMessage(`${error.code}: ${error.message}`);
         });
     }
   };
 
   const toggleSignInForm = () => {
     setIsSignInForm(!isSignInForm);
-    setErrorMessage(null); // Clear error when switching forms
+    setErrorMessage(null);
   };
 
   return (
@@ -83,21 +81,24 @@ const Login = () => {
         {/* sub title */}
         <div className="sm:mx-auto sm:w-full sm:max-w-md">
           <Link
-            to={"/"}
+            to={ROUTES.HOME}
             className="w-full bg-transparent border-none"
           >
             <img
-              alt="RestJAM"
-              src="logo.png"
+              alt={APP_CONFIG.name}
+              src={APP_CONFIG.logo}
               className="mx-auto h-10 w-auto"
             />
           </Link>
           <h2 className="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
-            {isSignInForm ? "Log in" : "Sign up"} to your account
+            {isSignInForm ? UI_TEXT.login.signIn : UI_TEXT.login.signUp}{" "}
+            {UI_TEXT.login.toAccount}
           </h2>
         </div>
         {/* form card */}
-        <div className="mt-10 lg:max-w-[600px] sm:mx-auto sm:w-full sm:max-w-[480px]">
+        <div
+          className={`mt-10 lg:max-w-[${FORM_CONFIG.maxWidth.lg}] sm:mx-auto sm:w-full sm:max-w-[${FORM_CONFIG.maxWidth.sm}]`}
+        >
           <div className="bg-white px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
             {errorMessage && (
               <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
@@ -108,7 +109,6 @@ const Login = () => {
               isSignInForm={isSignInForm}
               onSubmit={handleFormSubmit}
             />
-
             {isSignInForm && <ContinueWithButtons />}
           </div>
 
@@ -117,12 +117,12 @@ const Login = () => {
             onClick={toggleSignInForm}
           >
             {isSignInForm
-              ? "New to RestJAM? 👉Sign Up👈 Now"
-              : "Already registered? 👉Login In👈 Now."}
+              ? UI_TEXT.login.newToApp
+              : UI_TEXT.login.alreadyRegistered}
           </p>
         </div>
       </div>
-      <Footer navigationList={[]} />
+      <Footer />
     </div>
   );
 };

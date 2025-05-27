@@ -14,11 +14,15 @@ const Body = () => {
           element: <Home />,
         },
         /* {
-          path: 'create-profile',
-          element: <CreateProfile />,
+          path: "create",
+          element: <Create />,
         },
         {
-          path: 'explore',
+          path: "profile",
+          element: <Profile />,
+        },
+        {
+          path: "explore",
           element: <Explore />,
         }, */
       ],

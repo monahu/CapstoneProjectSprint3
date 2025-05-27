@@ -1,28 +1,42 @@
 import * as Yup from "yup";
+import { AUTH_CONFIG, VALIDATION_MESSAGES } from "./constants/auth";
 
 export const getValidationSchema = (isSignInForm) => {
   return Yup.object({
     email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
+      .email(VALIDATION_MESSAGES.email.invalid)
+      .required(VALIDATION_MESSAGES.email.required),
     password: Yup.string()
-      .min(6, "Password must be at least 6 characters")
-      .required("Password is required"),
+      .min(
+        AUTH_CONFIG.minPasswordLength,
+        VALIDATION_MESSAGES.password.minLength
+      )
+      .required(VALIDATION_MESSAGES.password.required),
     ...(isSignInForm
       ? {}
       : {
           userName: Yup.string()
-            .min(3, "Username must be at least 3 characters")
-            .required("Username is required"),
-          firstName: Yup.string().required("First name is required"),
-          lastName: Yup.string().required("Last name is required"),
+            .min(
+              AUTH_CONFIG.minUsernameLength,
+              VALIDATION_MESSAGES.username.minLength
+            )
+            .required(VALIDATION_MESSAGES.username.required),
+          firstName: Yup.string().required(
+            VALIDATION_MESSAGES.name.firstNameRequired
+          ),
+          lastName: Yup.string().required(
+            VALIDATION_MESSAGES.name.lastNameRequired
+          ),
           phone: Yup.string().matches(
-            /^\d{3}\s?\d{3}\s?\d{4}$/,
-            "Invalid phone number format"
+            VALIDATION_MESSAGES.phone.pattern,
+            VALIDATION_MESSAGES.phone.invalidFormat
           ),
           confirmPassword: Yup.string()
-            .oneOf([Yup.ref("password")], "Passwords must match")
-            .required("Please confirm your password"),
+            .oneOf(
+              [Yup.ref("password")],
+              VALIDATION_MESSAGES.password.mustMatch
+            )
+            .required(VALIDATION_MESSAGES.password.confirmRequired),
         }),
   });
 };

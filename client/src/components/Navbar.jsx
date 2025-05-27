@@ -1,23 +1,27 @@
-import { Bell, ChevronDown, Menu as MenuIcon, Search } from 'lucide-react'
+import { ChevronDown, Menu as MenuIcon, Search } from 'lucide-react'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { useLocation, useNavigate } from 'react-router'
+import { Link, useLocation } from 'react-router'
 
-const Navbar = ({ setSidebarOpen, userNavigation }) => {
-  const user = false
+const Navbar = ({ setSidebarOpen }) => {
   const location = useLocation()
-  const navigate = useNavigate()
+  const user = false
+  // Navigation items for the user dropdown menu
+  const userNavigation = [
+    { name: 'Your Profile', href: '/profile' },
+    { name: 'Sign out', href: '#' },
+  ]
   const hideLogoRoutes = ['/login', '/signup']
 
   return (
     <div className='sticky top-0 z-40 flex h-16 items-center gap-x-4 bg-white px-4 shadow sm:px-6 lg:px-8 border-b  border-gray-200'>
       {hideLogoRoutes.includes(location.pathname) && (
         <div className='flex-1 hidden md:block'>
-          <button
+          <Link
+            to={'/'}
             className='btn btn-ghost text-xl'
-            onClick={() => navigate('/')}
           >
             RestJAM
-          </button>
+          </Link>
         </div>
       )}
       {/* Mobile sidebar button */}
@@ -76,12 +80,12 @@ const Navbar = ({ setSidebarOpen, userNavigation }) => {
             <MenuItems className='absolute right-0 mt-2 w-32 origin-top-right rounded-md bg-white py-2 shadow ring-1 ring-black/5 focus:outline-none'>
               {userNavigation.map((item) => (
                 <MenuItem key={item.name}>
-                  <a
-                    href={item.href}
+                  <Link
+                    to={item.href}
                     className='block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50'
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 </MenuItem>
               ))}
             </MenuItems>

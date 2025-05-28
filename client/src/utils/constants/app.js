@@ -7,7 +7,6 @@ export const APP_CONFIG = {
 export const ROUTES = {
   HOME: "/",
   LOGIN: "/login",
-  BROWSE: "/browse",
   PROFILE: "/profile",
   CREATE: "/create",
   EDIT: "/edit",

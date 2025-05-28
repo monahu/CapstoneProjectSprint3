@@ -1,8 +1,4 @@
 export const FORM_CONFIG = {
-  maxWidth: {
-    sm: "480px",
-    lg: "600px",
-  },
   validation: {
     password: {
       minLength: 8,
@@ -20,38 +16,42 @@ export const FORM_CONFIG = {
   },
   fields: {
     signUp: [
-      "userName",
-      "firstName",
-      "lastName",
-      "email",
-      "password",
-      "confirmPassword",
-      "phone",
+      'userName',
+      'firstName',
+      'lastName',
+      'email',
+      'password',
+      'confirmPassword',
+      'phone',
     ],
-    signIn: ["email", "password"],
+    signIn: ['email', 'password'],
   },
   initialValues: {
     signUp: {
-      userName: "",
-      firstName: "",
-      lastName: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-      phone: "",
+      userName: '',
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+      confirmPassword: '',
+      phone: '',
     },
     signIn: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
   },
-};
+  /*   maxWidth: {
+    sm: "480px",
+    lg: "600px",
+  }, */
+}
 
 export const FORM_PLACEHOLDERS = {
-  username: "Username",
-  firstName: "enter your first name...",
-  lastName: "enter your last name...",
-  phone: "xxx xxx xxxx",
-  confirmPassword: "Confirm your password",
-  search: "Search",
-};
+  username: 'Username',
+  firstName: 'enter your first name...',
+  lastName: 'enter your last name...',
+  phone: 'xxx xxx xxxx',
+  confirmPassword: 'Confirm your password',
+  search: 'Search',
+}

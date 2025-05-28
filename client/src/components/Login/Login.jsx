@@ -75,9 +75,9 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-screen bg-white'>
+    <div className='min-h-screen  bg-white '>
       <Navbar />
-      <div className='flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8'>
+      <div className='flex min-h-full flex-1 flex-col justify-center py-12 sm:px-6 lg:px-8 gradient-bg'>
         {/* sub title */}
         <div className='sm:mx-auto sm:w-full sm:max-w-md'>
           <Link

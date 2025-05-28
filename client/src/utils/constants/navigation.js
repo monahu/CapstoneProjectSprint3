@@ -7,6 +7,7 @@ export const NAVIGATION = {
     { name: UI_TEXT.buttons.signOut, href: "#", hasAction: true },
   ],
   hideLogoRoutes: [ROUTES.LOGIN],
+  protectedRoutes: [ROUTES.PROFILE, ROUTES.CREATE, ROUTES.EXPLORE, ROUTES.EDIT],
   sidebar: [
     { name: "Home", href: ROUTES.HOME, icon: "House", current: true },
     { name: "Create", href: ROUTES.CREATE, icon: "SquarePen", current: false },

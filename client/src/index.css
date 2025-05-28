@@ -1,2 +1,10 @@
 @import "tailwindcss";
 @plugin "daisyui";
+
+.gradient-bg {
+    background: radial-gradient(circle,
+            rgba(224, 202, 211, 0.1) 18%,
+            rgba(204, 198, 217, 0.1) 42%,
+            rgba(148, 187, 233, 0.1) 87%);
+    color: #000;
+}

@@ -1,13 +1,17 @@
-import Body from "./components/Body";
-import { Provider } from "react-redux";
-import appStore from "./utils/appStore";
+import Body from './components/Body'
+import { Provider } from 'react-redux'
+import { ApolloProvider } from '@apollo/client'
+import apolloClient from './utils/apolloClient'
+import appStore from './utils/appStore'
 
 function App() {
   return (
-    <Provider store={appStore}>
-      <Body />
-    </Provider>
-  );
+    <ApolloProvider client={apolloClient}>
+      <Provider store={appStore}>
+        <Body />
+      </Provider>
+    </ApolloProvider>
+  )
 }
 
-export default App;
+export default App

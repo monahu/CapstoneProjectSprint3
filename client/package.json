@@ -10,11 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@apollo/client": "^3.13.8",
     "@headlessui/react": "^2.2.4",
     "@tailwindcss/vite": "^4.1.7",
     "daisyui": "^5.0.37",
     "firebase": "^11.8.1",
     "formik": "^2.4.6",
+    "graphql": "^16.11.0",
     "lucide-react": "^0.511.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

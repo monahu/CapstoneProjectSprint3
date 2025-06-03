@@ -40,13 +40,24 @@ const Navbar = ({ setSidebarOpen }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        const { uid, email, displayName, photoURL } = user
+        const {
+          uid,
+          email,
+          displayName,
+          photoURL,
+          firstName,
+          lastName,
+          phone,
+        } = user
         dispatch(
           addUser({
-            uid: uid,
-            email: email,
-            displayName: displayName,
+            uid,
+            email,
+            displayName,
             photoURL,
+            firstName,
+            lastName,
+            phone,
           })
         )
         // Only redirect to home if user is on login page
@@ -56,7 +67,6 @@ const Navbar = ({ setSidebarOpen }) => {
       } else {
         // no user logged in
         dispatch(removeUser())
-        // Don't redirect to login automatically - let users access home page
         // Only redirect if they're trying to access protected routes
 
         if (protectedRoutes.includes(location.pathname)) {

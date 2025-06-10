@@ -1,122 +1,60 @@
 import { ChevronDown, Menu as MenuIcon, Search } from 'lucide-react'
 import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/react'
-import { Link, useLocation } from 'react-router'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
-import { auth } from '../utils/firebase'
-import { useNavigate } from 'react-router'
-import { useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import { addUser, removeUser } from '../utils/userSlice'
+import { Link } from 'react-router'
 import { APP_CONFIG } from '../utils/constants/app'
 import { ROUTES } from '../utils/constants/app'
 import { UI_TEXT } from '../utils/constants/ui'
-import { NAVIGATION } from '../utils/constants/navigation'
+import { useNavbar } from '../hooks/useNavbar'
+import SearchForm from './SearchForm'
 
 const Navbar = ({ setSidebarOpen }) => {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-
-  const user = useSelector((store) => store.user)
-
-  const handleSignOut = () => {
-    signOut(auth)
-      .then(() => {})
-      .catch((error) => {
-        console.error('sign out error', error)
-        navigate(ROUTES.ERROR)
-      })
-    console.log('Signing out')
-  }
-
-  // Navigation items for the user dropdown menu
-  const userNavigation = NAVIGATION.userDropdown.map((item) => ({
-    ...item,
-    action: item.hasAction ? handleSignOut : undefined,
-  }))
-  const hideLogoRoutes = NAVIGATION.hideLogoRoutes
-  const protectedRoutes = NAVIGATION.protectedRoutes
-  // checking authentication
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        const {
-          uid,
-          email,
-          displayName,
-          photoURL,
-          firstName,
-          lastName,
-          phone,
-        } = user
-        dispatch(
-          addUser({
-            uid,
-            email,
-            displayName,
-            photoURL,
-            firstName,
-            lastName,
-            phone,
-          })
-        )
-        // Only redirect to home if user is on login page
-        if (location.pathname === ROUTES.LOGIN) {
-          navigate(ROUTES.HOME)
-        }
-      } else {
-        // no user logged in
-        dispatch(removeUser())
-        // Only redirect if they're trying to access protected routes
-
-        if (protectedRoutes.includes(location.pathname)) {
-          navigate(ROUTES.LOGIN)
-        }
-      }
-    })
-    // Unsubscribe onAuthStateChanged when component unmount
-    return () => unsubscribe()
-  }, [])
+  // manage navigation bar behavior state
+  const { user, userNavigation, hideLogoRoutes, location } = useNavbar()
 
   return (
     <div className='sticky top-0 z-40 flex h-16 items-center gap-x-4 bg-white px-4 shadow sm:px-6 lg:px-8 border-b  border-gray-200'>
       {hideLogoRoutes.includes(location.pathname) && (
-        <div className='flex-1 hidden md:block'>
+        <div className='flex-1'>
           <Link
             to={ROUTES.HOME}
-            className='bg-transparent border-none text-xl text-black font-bold'
+            className='flex items-center hover:opacity-80 transition-opacity'
           >
-            {APP_CONFIG.name}
+            <img
+              alt={APP_CONFIG.name}
+              src={APP_CONFIG.logo}
+              className='h-12 w-auto'
+            />
           </Link>
         </div>
       )}
       {/* Mobile sidebar button */}
-      <button
-        onClick={() => setSidebarOpen(true)}
-        className='-m-2.5 p-2.5 text-gray-700 lg:hidden'
-      >
-        <MenuIcon className='size-6' />
-      </button>
-      {/* Search */}
-      <form
-        action='#'
-        method='GET'
-        className='grid flex-1 grid-cols-1'
-      >
-        <input
-          name='search'
-          type='search'
-          placeholder='Search'
-          aria-label='Search'
-          className='col-start-1 row-start-1 block size-full bg-white pl-8 text-base text-gray-900 outline-hidden placeholder:text-gray-400 sm:text-sm/6'
-        />
-        <Search
-          aria-hidden='true'
-          className='pointer-events-none col-start-1 row-start-1 size-5 self-center text-gray-400'
-        />
-      </form>
+      {!hideLogoRoutes.includes(location.pathname) && (
+        <>
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className='-m-2.5 p-2.5 text-gray-700 lg:hidden'
+          >
+            <MenuIcon className='size-6' />
+          </button>
+          <div className='flex-1 md:hidden mx-auto'>
+            <Link
+              to={ROUTES.HOME}
+              className='flex items-center hover:opacity-80 transition-opacity'
+            >
+              <img
+                alt={APP_CONFIG.name}
+                src={APP_CONFIG.logo}
+                className='h-9 w-auto'
+              />
+            </Link>
+          </div>
+          {/* Search */}
+          <SearchForm className='hidden md:grid' />
+        </>
+      )}
+
       {/* Right controls */}
-      <div className='flex items-center gap-x-4'>
+      <div className='flex items-center gap-x-4 ms-auto'>
         {!user && (
           <>
             <button className='text-gray-400 hover:text-gray-500'>

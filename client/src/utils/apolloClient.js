@@ -3,19 +3,19 @@ import {
   InMemoryCache,
   createHttpLink,
   from,
-} from "@apollo/client"
-import { setContext } from "@apollo/client/link/context"
-import { onError } from "@apollo/client/link/error"
-import { auth } from "./firebase"
+} from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
+import { onError } from '@apollo/client/link/error'
+import { auth } from './firebase'
 
 // HTTP link for GraphQL endpoint
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || "http://localhost:4000/graphql",
+  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:3500/graphql',
 })
 
 // Auth link to include Firebase token
 const authLink = setContext(async (_, { headers }) => {
-  let token = ""
+  let token = ''
 
   try {
     const currentUser = auth.currentUser
@@ -23,19 +23,19 @@ const authLink = setContext(async (_, { headers }) => {
       token = await currentUser.getIdToken()
     }
   } catch (error) {
-    console.error("Error getting auth token:", error)
+    console.error('Error getting auth token:', error)
   }
 
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : "",
+      authorization: token ? `Bearer ${token}` : '',
     },
   }
 })
 
-const isDevelopmentMode = import.meta.env.VITE_APP_MODE === "development"
-const hasBackend = import.meta.env.VITE_HAS_BACKEND === "true"
+const isDevelopmentMode = import.meta.env.VITE_APP_MODE === 'development'
+const hasBackend = import.meta.env.VITE_HAS_BACKEND === 'true'
 
 // Error link for handling GraphQL errors
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -52,13 +52,13 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
     // In development without backend, just log and continue
     if (isDevelopmentMode && !hasBackend) {
-      console.log("🚧 Backend not ready - this is expected in development")
+      console.log('🚧 Backend not ready - this is expected in development')
       return
     }
 
     // Handle 401 errors - redirect to login
     if (networkError.statusCode === 401) {
-      window.location.href = "/login"
+      window.location.href = '/login'
     }
   }
 })
@@ -81,10 +81,10 @@ const client = new ApolloClient({
   } */),
   defaultOptions: {
     watchQuery: {
-      errorPolicy: "all",
+      errorPolicy: 'all',
     },
     query: {
-      errorPolicy: "all",
+      errorPolicy: 'all',
     },
   },
 })

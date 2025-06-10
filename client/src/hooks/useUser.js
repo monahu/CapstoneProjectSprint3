@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from '@apollo/client'
 import { useSelector } from 'react-redux'
 import {
-  SYNC_USER_MUTATION,
+  SYNC_USER,
   GET_USER_PROFILE,
   UPDATE_USER_PROFILE,
 } from '../utils/graphql/user'
@@ -22,7 +22,7 @@ export const useUserProfile = () => {
 }
 
 export const useSyncUser = () => {
-  const [syncUser, { loading, error }] = useMutation(SYNC_USER_MUTATION)
+  const [syncUser, { loading, error }] = useMutation(SYNC_USER)
   return { syncUser, loading, error }
 }
 

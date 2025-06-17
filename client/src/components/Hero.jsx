@@ -12,7 +12,7 @@ const Hero = ({
 }) => {
   return (
     <div
-      className={`hero rounded-2xl  ${className}`}
+      className={`hero rounded-2xl ${className}`}
       style={{
         backgroundImage: `url(${heroImage})`,
       }}

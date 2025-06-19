@@ -7,3 +7,5 @@ const postResolvers = {
   Mutation: postMutations,
   Post: postFieldResolvers,
 };
+
+module.exports = postResolvers;

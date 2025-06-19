@@ -19,3 +19,23 @@ const postQueries = {
       .skip(offset)
       .populate("userId", "displayName photoURL")
   },
+  
+  /**
+   * Get a single post by its ID
+   */
+  post: async (_, { id }) => {
+    return await Post.findById(id).populate("userId", "displayName photoURL")
+  },
+
+  /**
+   * Get all posts created by the current authenticated user
+   */
+  myPosts: async (_, __, { user, currentUser }) => {
+    if (!user || !currentUser) {
+      throw new Error("Authentication required")
+    }
+
+    return await Post.find({ userId: currentUser._id })
+      .sort({ createdAt: -1 })
+      .populate("userId", "displayName photoURL")
+  },

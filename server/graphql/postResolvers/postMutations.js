@@ -56,3 +56,55 @@ const postMutations = {
 
     return savedPost
   },
+  
+  /**
+   * Update an existing post
+   * Only the post owner can update their posts
+   */
+  updatePost: async (_, { id, input }, { user, currentUser }) => {
+    requireAuthAndCurrentUser(user, currentUser)
+    await checkPostOwnership(id, currentUser) // Throws error if not owner
+    return await Post.findByIdAndUpdate(id, input, { new: true })
+  },
+
+  /**
+   * Delete a post and all associated data
+   * Only the post owner can delete their posts
+   */
+  deletePost: async (_, { id }, { user, currentUser }) => {
+    requireAuthAndCurrentUser(user, currentUser)
+
+    await checkPostOwnership(id, currentUser) // Throws error if not owner
+
+    // Delete post and all associated records in parallel
+    await Promise.all([
+      Post.findByIdAndDelete(id),
+      WantToGo.deleteMany({ postId: id }),
+      Like.deleteMany({ postId: id }),
+      PostsTags.deleteMany({ postId: id }),
+    ])
+    return id
+  },
+
+  /**
+   * Toggle user's "want to go" status for a post
+   * Any authenticated user can want to go to any post
+   */
+  toggleWantToGo: async (_, { postId }, { user, currentUser }) => {
+    requireAuthAndCurrentUser(user, currentUser)
+
+    const existing = await WantToGo.findOne({
+      userId: currentUser._id,
+      postId: postId,
+    })
+
+    if (existing) {
+      // Remove existing want to go
+      await WantToGo.findByIdAndDelete(existing._id)
+    } else {
+      // Add new want to go
+      await new WantToGo({ userId: currentUser._id, postId: postId }).save()
+    }
+
+    return await Post.findById(postId)
+  },

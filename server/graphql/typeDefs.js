@@ -59,15 +59,7 @@ const typeDefs = `#graphql
     id: ID!
     postId: ID!
     userId: ID!
-    post: Post{
-      title: String
-      placeName: String
-      location: String
-      imageUrl: String
-      createdAt: Date
-      rating: Rating
-      tags: [Tag]
-    }
+    post: Post
   }
 
   type Tag {
@@ -145,6 +137,6 @@ const typeDefs = `#graphql
     addTagToPost(postId: ID!, tagName: String!): Post!
     removeTagFromPost(postId: ID!, tagName: String!): Post!
   }
-`;
+`
 
-module.exports = typeDefs;
+module.exports = typeDefs

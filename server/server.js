@@ -1,27 +1,27 @@
-require('dotenv').config()
-const express = require('express')
-const mongoose = require('mongoose')
-const connectDB = require('./config/database')
-const { ApolloServer } = require('@apollo/server')
-const { expressMiddleware } = require('@apollo/server/express4')
-const cookieParser = require('cookie-parser')
-const { smartAuth } = require('./middleware/auth')
-const { merge } = require('lodash')
-const cors = require('cors')
-const rateLimit = require('express-rate-limit')
+require("dotenv").config()
+const express = require("express")
+const mongoose = require("mongoose")
+const connectDB = require("./config/database")
+const { ApolloServer } = require("@apollo/server")
+const { expressMiddleware } = require("@apollo/server/express4")
+const cookieParser = require("cookie-parser")
+const { smartAuth } = require("./middleware/auth")
+const { merge } = require("lodash")
+const cors = require("cors")
+const rateLimit = require("express-rate-limit")
 
 // Utilities
-const { createGraphQLContext } = require('./utils/graphqlContext')
-const { ensureDefaultRatings } = require('./utils/dbSeed')
+const { createGraphQLContext } = require("./utils/graphqlContext")
+const { ensureDefaultRatings } = require("./utils/dbSeed")
 
 // GraphQL imports
-/* const typeDefs = require('./graphql/typeDefs')
-const userResolvers = require('./graphql/userResolvers')
-const postResolvers = require('./graphql/postResolvers/index')
-const dateResolvers = require('./graphql/dateResolvers') */
+const typeDefs = require("./graphql/typeDefs")
+const userResolvers = require("./graphql/userResolvers")
+const postResolvers = require("./graphql/postResolvers/index")
+const dateResolvers = require("./graphql/dateResolver")
 
 // Combine all resolvers
-// const resolvers = merge(userResolvers, postResolvers, dateResolvers)
+const resolvers = merge(userResolvers, postResolvers, dateResolvers)
 
 const app = express()
 
@@ -31,10 +31,10 @@ app.use(cookieParser())
 app.use(cors())
 
 // Create Apollo Server
-/* const server = new ApolloServer({
+const server = new ApolloServer({
   typeDefs,
   resolvers,
-}) */
+})
 
 // Rate limiting for GraphQL endpoint
 const limiter = rateLimit({
@@ -46,26 +46,26 @@ const limiter = rateLimit({
 async function startServer() {
   try {
     // Start Apollo Server
-    /*  await server.start()
-    console.log('🚀 Apollo Server started') */
+    await server.start()
+    console.log("🚀 Apollo Server started")
 
     // Connect to database
     await connectDB()
-    console.log('📊 Database connected')
+    console.log("📊 Database connected")
 
     // Ensure default data exists
-    // await ensureDefaultRatings()
+    await ensureDefaultRatings()
 
     // Mount Apollo middleware with authentication
-    /* app.use(
-      '/graphql',
+    app.use(
+      "/graphql",
       limiter,
       smartAuth,
       expressMiddleware(server, {
         context: createGraphQLContext,
       })
     )
-    console.log('🔗 GraphQL middleware mounted') */
+    console.log("🔗 GraphQL middleware mounted")
 
     // Start HTTP server
     const PORT = process.env.PORT || 3500
@@ -75,17 +75,17 @@ async function startServer() {
     })
 
     // Graceful shutdown handlers
-    /*     async function gracefulShutdown(signal) {
+    async function gracefulShutdown(signal) {
       console.log(`🛑 ${signal} received, shutting down gracefully`)
       await server.stop()
       await mongoose.connection.close()
       process.exit(0)
     }
 
-    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'))
-    process.on('SIGINT', () => gracefulShutdown('SIGINT')) */
+    process.on("SIGTERM", () => gracefulShutdown("SIGTERM"))
+    process.on("SIGINT", () => gracefulShutdown("SIGINT"))
   } catch (error) {
-    console.error('❌ Failed to start server:', error)
+    console.error("❌ Failed to start server:", error)
     process.exit(1)
   }
 }
@@ -94,8 +94,8 @@ async function startServer() {
 startServer()
 
 app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.message)
+  console.error("❌ Error:", err.message)
   res
     .status(err.status || 500)
-    .json({ error: err.message || 'Internal Server Error' })
+    .json({ error: err.message || "Internal Server Error" })
 })

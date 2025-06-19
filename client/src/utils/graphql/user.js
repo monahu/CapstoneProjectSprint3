@@ -3,7 +3,43 @@ import { gql } from '@apollo/client'
 // ===========================
 // USER QUERIES
 // ===========================
-// get current user info & profile
+
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($firebaseUid: String!) {
+    userProfile(firebaseUid: $firebaseUid) {
+      id
+      firebaseUid
+      email
+      displayName
+      photoURL
+      firstName
+      lastName
+      phone
+      createdAt
+      updatedAt
+      posts {
+        id
+        title
+        placeName
+        imageUrl
+        createdAt
+      }
+      wantToGo {
+        id
+        post {
+          id
+          title
+          placeName
+          imageUrl
+          author {
+            displayName
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GET_ME = gql`
   query GetMe {
     me {
@@ -47,15 +83,6 @@ export const GET_ME = gql`
 
 // ===========================
 // USER MUTATIONS
-/*   input SyncUserInput {
-    firebaseUid: String!
-    email: String!
-    displayName: String
-    photoURL: String
-    firstName: String
-    lastName: String
-    phone: String
-  } */
 // ===========================
 
 export const SYNC_USER = gql`
@@ -91,3 +118,52 @@ export const UPDATE_USER_PROFILE = gql`
     }
   }
 `
+/* 
+export const SYNC_USER_MUTATION = gql`
+  mutation SyncUser($input: SyncUserInput!) {
+    syncUser(input: $input) {
+      id
+      firebaseUid
+      email
+      displayName
+      photoURL
+      firstName
+      lastName
+      phone
+      createdAt
+      updatedAt
+    }
+  }
+`
+export const GET_USER_PROFILE = gql`
+  query GetUserProfile($firebaseUid: String!) {
+    userProfile(firebaseUid: $firebaseUid) {
+      id
+      firebaseUid
+      email
+      displayName
+      photoURL
+      firstName
+      lastName
+      phone
+      goingList
+      postList
+      createdAt
+      updatedAt
+    }
+  }
+`
+
+export const UPDATE_USER_PROFILE = gql`
+  mutation UpdateUserProfile($input: UpdateUserProfileInput!) {
+    updateUserProfile(input: $input) {
+      id
+      displayName
+      photoURL
+      firstName
+      lastName
+      phone
+    }
+  }
+`
+ */

@@ -108,3 +108,62 @@ const postMutations = {
 
     return await Post.findById(postId)
   },
+  
+  /**
+   * Toggle user's like status for a post
+   * Any authenticated user can like any post
+   */
+  toggleLike: async (_, { postId }, { user, currentUser }) => {
+    requireAuthAndCurrentUser(user, currentUser)
+
+    const existing = await Like.findOne({
+      userId: currentUser._id,
+      postId: postId,
+    })
+
+    if (existing) {
+      // Remove existing like
+      await Like.findByIdAndDelete(existing._id)
+    } else {
+      // Add new like
+      await new Like({ userId: currentUser._id, postId: postId }).save()
+    }
+
+    return await Post.findById(postId)
+  },
+
+  toggleShare: async (_, { postId }, { user, currentUser }) => {
+    requireAuthAndCurrentUser(user, currentUser)
+
+    const post = await Post.findById(postId)
+    if (!post) {
+      throw new Error("Post not found")
+    }
+
+    post.shareCount += 1
+    await post.save()
+
+    return post
+  },
+  /**
+   * Add a tag to a post
+   * Only the post owner can add tags to their posts
+   */
+  addTagToPost: async (_, { postId, tagName }, { user, currentUser }) => {
+    requireAuthAndCurrentUser(user, currentUser)
+    await checkPostOwnership(postId, currentUser) // Throws error if not owner
+
+    // Find existing tag or create new one
+    let tag = await Tag.findOne({ name: tagName.trim() })
+    if (!tag) {
+      tag = await new Tag({ name: tagName.trim() }).save()
+    }
+
+    // Check if tag association already exists to avoid duplicates
+    const existing = await PostsTags.findOne({ postId: postId, tagId: tag._id })
+    if (!existing) {
+      await new PostsTags({ postId: postId, tagId: tag._id }).save()
+    }
+
+    return await Post.findById(postId)
+  },

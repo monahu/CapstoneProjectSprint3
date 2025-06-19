@@ -12,4 +12,18 @@ const checkPostOwnership = async (postId, currentUser) => {
     return { currentUser, post };
 };
 
+const requireAuthAndCurrentUser = (user, currentUser) => {
+    if (!user) {
+        throw new GraphQLError("Authentication required", {
+            extensions: { code: "UNAUTHENTICATED" },
+        });
+    }
+    if (!currentUser) {
+        throw new GraphQLError("Current user not found", {
+            extensions: { code: "UNAUTHENTICATED" },
+        });
+    }
+    return currentUser;
+};
+
 module.exports = { checkPostOwnership };

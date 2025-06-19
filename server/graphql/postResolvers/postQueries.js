@@ -39,3 +39,55 @@ const postQueries = {
       .sort({ createdAt: -1 })
       .populate("userId", "displayName photoURL")
   },
+  
+  /**
+   * Search posts by tag names
+   */
+  searchPostsByTags: async (_, { tags, limit = 10, offset = 0 }) => {
+    if (!tags || tags.length === 0) return []
+
+    // Find tags that match the search terms (case insensitive)
+    const matchingTags = await Tag.find({
+      name: { $in: tags.map((tag) => new RegExp(tag.trim(), "i")) },
+    })
+
+    if (matchingTags.length === 0) return []
+
+    // Find post-tag associations for matching tags
+    const postTagRecords = await PostsTags.find({
+      tagId: { $in: matchingTags.map((tag) => tag._id) },
+    })
+
+    // Get unique post IDs
+    const postIds = [...new Set(postTagRecords.map((record) => record.postId))]
+
+    // Find and return posts
+    return await Post.find({ _id: { $in: postIds } })
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip(offset)
+      .populate("userId", "displayName photoURL")
+  },
+
+  /**
+   * Simple search posts by search term
+   * Searches in place name, content, and tag names
+   */
+  searchPosts: async (_, { searchTerm, limit = 10, offset = 0 }) => {
+    if (!searchTerm || searchTerm.trim() === "") return []
+
+    const trimmedTerm = searchTerm.trim()
+
+    // Find tags that match search term
+    const matchingTags = await Tag.find({
+      name: { $regex: trimmedTerm, $options: "i" },
+    })
+
+    // Get post IDs that have matching tags
+    let tagPostIds = []
+    if (matchingTags.length > 0) {
+      const postTagRecords = await PostsTags.find({
+        tagId: { $in: matchingTags.map((tag) => tag._id) },
+      })
+      tagPostIds = postTagRecords.map((record) => record.postId)
+    }

@@ -1,14 +1,14 @@
-import Navbar from '../Navbar'
-import { useState } from 'react'
-import { Link } from 'react-router'
-import Footer from '../Footer'
-import ContinueWithButtons from './ContinueWithButtons'
-import LoginForm from './LoginForm'
-import { useAuth } from '../../hooks/useAuth'
-import { APP_CONFIG, ROUTES } from '../../utils/constants/app'
-import { UI_TEXT } from '../../utils/constants/ui'
-import Hero from '../Hero'
-import heroImage from '../../assets/img/login_hero1.webp'
+import Navbar from "../Navbar"
+import { useState } from "react"
+import { Link } from "react-router"
+import Footer from "../Footer"
+import ContinueWithButtons from "./ContinueWithButtons"
+import LoginForm from "./LoginForm"
+import { useAuth } from "../../hooks/useAuth"
+import { APP_CONFIG, ROUTES } from "../../utils/constants/app"
+import { UI_TEXT } from "../../utils/constants/ui"
+import Hero from "../Hero"
+import heroImage from "../../assets/img/login_hero1.webp"
 
 const Login = () => {
   const [isSignInForm, setIsSignInForm] = useState(true)
@@ -23,7 +23,7 @@ const Login = () => {
         await signUp(formData)
       }
     } catch (error) {
-      console.error('Auth error:', error)
+      console.error("Auth error:", error)
     }
   }
 
@@ -32,9 +32,9 @@ const Login = () => {
   }
 
   return (
-    <div className='min-h-screen  bg-white '>
+    <div className="min-h-screen bg-white">
       <Navbar />
-      <div className='flex min-h-full flex-1 flex-col justify-center p-6 sm:px-6 lg:px-8 gradient-bg'>
+      <main className="flex min-h-full flex-1 flex-col justify-center p-6 sm:px-6 lg:px-8 gradient-bg">
         <Hero
           heroImage={heroImage}
           title={
@@ -43,27 +43,27 @@ const Login = () => {
           description={UI_TEXT.loginHero.description}
           buttonText={UI_TEXT.loginHero.button}
           showButton={false}
-          className='min-h-[30vh]'
-          contentClassName='max-w-md'
+          className="min-h-[30vh]"
+          contentClassName="max-w-md"
         />
         {/* sub title */}
-        <div className='mt-8 sm:mx-auto sm:w-full sm:max-w-md'>
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <Link
             to={ROUTES.HOME}
-            className='w-full bg-transparent border-none'
+            className="w-full bg-transparent border-none"
           >
             <img
               alt={APP_CONFIG.name}
               src={APP_CONFIG.logo}
-              className='mx-auto w-auto'
+              className="mx-auto w-auto"
             />
           </Link>
-          <h2 className='mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900'>
-            {isSignInForm ? UI_TEXT.login.signIn : UI_TEXT.login.signUp}{' '}
+          <h2 className="mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900">
+            {isSignInForm ? UI_TEXT.login.signIn : UI_TEXT.login.signUp}{" "}
             {UI_TEXT.login.toAccount}
           </h2>
           <p
-            className='mt-1 text-center text-sm/6 text-gray-500 cursor-pointer'
+            className="mt-1 text-center text-sm/6 text-gray-500 cursor-pointer"
             onClick={toggleSignInForm}
           >
             {isSignInForm
@@ -75,9 +75,9 @@ const Login = () => {
         <div
           className={`mt-2 lg:max-w-[600px] sm:mx-auto sm:w-full sm:max-w-[480px]`}
         >
-          <div className='bg-white px-6 py-12 shadow-sm sm:rounded-lg sm:px-12'>
+          <div className="bg-white px-6 py-12 shadow-sm sm:rounded-lg sm:px-12">
             {errorMessage && (
-              <div className='mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded'>
+              <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
                 {errorMessage}
               </div>
             )}
@@ -89,7 +89,7 @@ const Login = () => {
             {/*    {isSignInForm && <ContinueWithButtons />} */}
           </div>
         </div>
-      </div>
+      </main>
       <Footer />
     </div>
   )

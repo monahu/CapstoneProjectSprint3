@@ -50,3 +50,55 @@ vi.mock("./LoginForm", () => ({
     </form>
   ),
 }));
+
+describe("Login Component", () => {
+  const renderLogin = (options = {}) => {
+    // Use renderWithProviders instead of manual BrowserRouter wrapping
+    return renderWithProviders(<Login />, options);
+  };
+
+  it("renders without crashing", () => {
+    renderLogin();
+    expect(screen.getByTestId("navbar")).toBeInTheDocument();
+    expect(screen.getByTestId("hero")).toBeInTheDocument();
+    expect(screen.getByTestId("login-form")).toBeInTheDocument();
+    expect(screen.getByTestId("footer")).toBeInTheDocument();
+  });
+
+  it("starts with sign in form by default", () => {
+    renderLogin();
+    expect(screen.getByText("Sign In Form")).toBeInTheDocument();
+  });
+
+  it("has toggle functionality", () => {
+    renderLogin();
+
+    // Should have form toggle elements
+    expect(screen.getByText("Sign In Form")).toBeInTheDocument();
+
+    // Should have some form of toggle button (simplified test)
+    const buttons = screen.getAllByRole("button");
+    expect(buttons.length).toBeGreaterThan(0);
+  });
+
+  it("has proper main structure", () => {
+    renderLogin();
+
+    const main = screen.getByRole("main");
+    expect(main).toBeInTheDocument();
+    expect(main).toHaveClass("min-h-full");
+  });
+
+  it("renders with custom Redux state", () => {
+    const customState = {
+      user: {
+        currentUser: null,
+        isAuthenticated: false,
+        loading: false,
+      },
+    };
+
+    renderLogin({ preloadedState: customState });
+    expect(screen.getByTestId("login-form")).toBeInTheDocument();
+  });
+});

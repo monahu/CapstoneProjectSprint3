@@ -25,11 +25,24 @@ const RestaurantCard = ({
     >
       {/* Restaurant Image */}
       <div className='relative'>
-        <img
-          src={image}
-          alt={restaurantName}
-          className='w-auto h-1/3 object-cover'
-        />
+        <picture className='w-full h-full'>
+          {/* Mobile */}
+          <source
+            media='(max-width: 768px)'
+            srcSet={`${image.replace('.webp', '_mobile.webp')} 1x, ${image.replace('.webp', '_mobile@2x.webp')} 2x`}
+          />
+          {/* Tablet */}
+          <source
+            media='(max-width: 1024px)'
+            srcSet={image.replace('.webp', '_tablet.webp')}
+          />
+          {/* Desktop - fallback */}
+          <img
+            src={image}
+            alt={restaurantName}
+            className='w-full h-64 object-cover'
+          />
+        </picture>
       </div>
 
       {/* Content */}

@@ -29,6 +29,24 @@ describe("Hero Component", () => {
     expect(screen.getByText("Custom Description")).toBeInTheDocument();
   });
 
+  it("calls onButtonClick when button is clicked", async () => {
+    const mockOnButtonClick = vi.fn();
+    const user = userEvent.setup();
+
+    render(
+      <Hero
+        {...defaultProps}
+        onButtonClick={mockOnButtonClick}
+        buttonText="Click Me"
+      />
+    );
+
+    const button = screen.getByText("Click Me");
+    await user.click(button);
+
+    expect(mockOnButtonClick).toHaveBeenCalledTimes(1);
+  });
+
   it("hides button when showButton is false", () => {
     render(
       <Hero {...defaultProps} showButton={false} buttonText="Hidden Button" />

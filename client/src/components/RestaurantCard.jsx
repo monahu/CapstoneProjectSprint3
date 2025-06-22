@@ -43,7 +43,7 @@ const RestaurantCard = ({
                 alt={user.name}
               />
             </div>
-            <p className='text-sm text-base-content'>{user.name}</p>
+            <p className='text-sm text-base-content text-black font-medium'>{user.name}</p>
           </div>
           <div className='order-1 md:order-2 w-full h-fit my-auto'>
             <p className='text-sm text-gray-600'>{user.location}</p>

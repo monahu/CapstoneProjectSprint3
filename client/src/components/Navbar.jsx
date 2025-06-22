@@ -33,6 +33,7 @@ const Navbar = ({ setSidebarOpen }) => {
           <button
             onClick={() => setSidebarOpen(true)}
             className='-m-2.5 p-2.5 text-gray-700 lg:hidden'
+            aria-label='Open sidebar menu'
           >
             <MenuIcon className='size-6' />
           </button>

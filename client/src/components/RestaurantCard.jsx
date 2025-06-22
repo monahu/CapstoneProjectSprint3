@@ -41,6 +41,8 @@ const RestaurantCard = ({
             src={image}
             alt={restaurantName}
             className='w-full h-64 object-cover'
+            loading='lazy'
+            decoding='async'
           />
         </picture>
       </div>

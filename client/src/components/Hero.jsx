@@ -14,21 +14,23 @@ const Hero = ({
     <div className={`hero rounded-2xl relative overflow-hidden ${className}`}>
       {/* Background Image */}
       <picture className='absolute inset-0 w-full h-full'>
-        {/* Mobile */}
         <source
           media='(max-width: 768px)'
-          srcSet={heroImage.replace('.webp', '_mobile.webp')}
+          srcSet={`${heroImage.replace('.webp', '_mobile.webp')} 720w`}
+          sizes='100vw'
         />
-        {/* Tablet */}
         <source
           media='(max-width: 1024px)'
-          srcSet={heroImage.replace('.webp', '_tablet.webp')}
+          srcSet={`${heroImage.replace('.webp', '_tablet.webp')} 1024w`}
+          sizes='100vw'
         />
-        {/* Desktop - fallback */}
         <img
           src={heroImage}
           alt='Hero background'
           className='w-full h-full object-cover rounded-2xl'
+          loading='eager'
+          fetchpriority='high'
+          decoding='sync'
         />
       </picture>
 

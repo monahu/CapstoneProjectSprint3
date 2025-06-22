@@ -1,66 +1,70 @@
-import { describe, it, expect, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import Hero from "./Hero";
+import { describe, it, expect, vi } from 'vitest'
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import Hero from './Hero'
 
-describe("Hero Component", () => {
+describe('Hero Component', () => {
   const defaultProps = {
-    heroImage: "test-image.jpg",
-  };
+    heroImage: 'test-image.jpg',
+  }
 
-  it("renders with default props", () => {
-    render(<Hero {...defaultProps} />);
+  it('renders with default props', () => {
+    render(<Hero {...defaultProps} />)
 
     // Should render the hero container
-    const heroDiv = document.querySelector(".hero");
-    expect(heroDiv).toBeInTheDocument();
-  });
+    const heroDiv = document.querySelector('.hero')
+    expect(heroDiv).toBeInTheDocument()
+  })
 
-  it("renders with custom title and description", () => {
+  it('renders with custom title and description', () => {
     render(
       <Hero
         {...defaultProps}
-        title="Custom Title"
-        description="Custom Description"
+        title='Custom Title'
+        description='Custom Description'
       />
-    );
+    )
 
-    expect(screen.getByText("Custom Title")).toBeInTheDocument();
-    expect(screen.getByText("Custom Description")).toBeInTheDocument();
-  });
+    expect(screen.getByText('Custom Title')).toBeInTheDocument()
+    expect(screen.getByText('Custom Description')).toBeInTheDocument()
+  })
 
-  it("calls onButtonClick when button is clicked", async () => {
-    const mockOnButtonClick = vi.fn();
-    const user = userEvent.setup();
+  it('calls onButtonClick when button is clicked', async () => {
+    const mockOnButtonClick = vi.fn()
+    const user = userEvent.setup()
 
     render(
       <Hero
         {...defaultProps}
         onButtonClick={mockOnButtonClick}
-        buttonText="Click Me"
+        buttonText='Click Me'
       />
-    );
+    )
 
-    const button = screen.getByText("Click Me");
-    await user.click(button);
+    const button = screen.getByText('Click Me')
+    await user.click(button)
 
-    expect(mockOnButtonClick).toHaveBeenCalledTimes(1);
-  });
+    expect(mockOnButtonClick).toHaveBeenCalledTimes(1)
+  })
 
-  it("hides button when showButton is false", () => {
+  it('hides button when showButton is false', () => {
     render(
-      <Hero {...defaultProps} showButton={false} buttonText="Hidden Button" />
-    );
+      <Hero
+        {...defaultProps}
+        showButton={false}
+        buttonText='Hidden Button'
+      />
+    )
 
-    expect(screen.queryByText("Hidden Button")).not.toBeInTheDocument();
-  });
+    expect(screen.queryByText('Hidden Button')).not.toBeInTheDocument()
+  })
 
-  it("applies background image style", () => {
-    render(<Hero {...defaultProps} />);
+  it('applies background image via picture element', () => {
+    render(<Hero {...defaultProps} />)
 
-    const heroDiv = document.querySelector(".hero");
-    expect(heroDiv).toHaveStyle({
-      backgroundImage: "url(test-image.jpg)",
-    });
-  });
-});
+    // Check that the picture element contains an img with the correct src
+    const img = screen.getByAltText('Hero background')
+    expect(img).toBeInTheDocument()
+    expect(img).toHaveAttribute('src', 'test-image.jpg')
+  })
+})

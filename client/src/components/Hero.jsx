@@ -11,21 +11,38 @@ const Hero = ({
   contentClassName = '',
 }) => {
   return (
-    <div
-      className={`hero rounded-2xl ${className}`}
-      style={{
-        backgroundImage: `url(${heroImage})`,
-      }}
-    >
-      <div className={`hero-overlay rounded-2xl`}></div>
-      <div className='hero-content text-neutral-content text-center py-6'>
-        <div className={`max-w-md ${contentClassName} `}>
-          <h1 className='mb-5 text-5xl font-bold'>{title}</h1>
-          <p className='mb-5'>{description}</p>
+    <div className={`hero rounded-2xl relative overflow-hidden ${className}`}>
+      {/* Background Image */}
+      <picture className='absolute inset-0 w-full h-full'>
+        {/* Mobile */}
+        <source
+          media='(max-width: 768px)'
+          srcSet={heroImage.replace('.webp', '_mobile.webp')}
+        />
+        {/* Tablet */}
+        <source
+          media='(max-width: 1024px)'
+          srcSet={heroImage.replace('.webp', '_tablet.webp')}
+        />
+        {/* Desktop - fallback */}
+        <img
+          src={heroImage}
+          alt='Hero background'
+          className='w-full h-full object-cover rounded-2xl'
+        />
+      </picture>
+
+      {/* Content - needs to be on top */}
+      <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>
+      <div className='relative z-20 hero-content text-neutral-content text-center py-6'>
+        <div className={`max-w-md ${contentClassName}`}>
+          <h1 className='mb-5 text-6xl font-bold'>{title}</h1>
+          <p className='mb-5 text-[1.2rem]'>{description}</p>
           {showButton && (
             <button
               className='btn btn-primary'
               onClick={onButtonClick}
+              aria-label={`${buttonText} - Get started with your account`}
             >
               {buttonText}
             </button>

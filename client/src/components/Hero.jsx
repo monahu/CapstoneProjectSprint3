@@ -29,7 +29,7 @@ const Hero = ({
           alt='Hero background'
           className='w-full h-full object-cover rounded-2xl'
           loading='eager'
-          fetchpriority='high'
+          fetchPriority='high'
           decoding='sync'
         />
       </picture>

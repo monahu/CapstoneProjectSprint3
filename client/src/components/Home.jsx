@@ -1,9 +1,9 @@
-import Hero from "./Hero"
-import heroImage from "../assets/img/restJam_hero1.webp"
-import RestaurantCard from "./RestaurantCard"
-import { useNavigate } from "react-router"
-import { UI_TEXT } from "../utils/constants/ui"
-import { POSTS_DATA } from "../utils/constants/posts"
+import Hero from './Hero'
+import heroImage from '../assets/img/restJam_hero1.webp'
+import RestaurantCard from './Post/RestaurantCard'
+import { useNavigate } from 'react-router'
+import { UI_TEXT } from '../utils/constants/ui'
+import { POSTS_DATA } from '../utils/constants/posts'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -13,7 +13,7 @@ const Home = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className='min-h-screen'>
       <Hero
         heroImage={heroImage}
         onButtonClick={handleNavigateToLogin}
@@ -22,7 +22,7 @@ const Home = () => {
         <RestaurantCard
           key={post.id}
           {...post}
-          className="mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4"
+          className='mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4'
         />
       ))}
     </div>

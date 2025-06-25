@@ -93,35 +93,18 @@ const postMutations = {
   toggleWantToGo: async (_, { postId }, { user, currentUser }) => {
     requireAuthAndCurrentUser(user, currentUser)
 
-    console.log('🎯 ToggleWantToGo - PostID:', postId)
-    console.log('👤 ToggleWantToGo - UserID:', currentUser._id)
-
     const existing = await WantToGo.findOne({
       userId: currentUser._id,
       postId: postId,
     })
 
-    console.log(
-      '🔍 Existing WantToGo record:',
-      existing ? 'Found' : 'Not found'
-    )
-
     if (existing) {
-      // Remove existing want to go
-      console.log('❌ Removing existing WantToGo')
       await WantToGo.findByIdAndDelete(existing._id)
     } else {
-      // Add new want to go
-      console.log('✅ Adding new WantToGo')
       await new WantToGo({ userId: currentUser._id, postId: postId }).save()
     }
 
-    const result = await Post.findById(postId)
-    console.log(
-      '📤 ToggleWantToGo returning post:',
-      result ? 'Found' : 'Not found'
-    )
-    return result
+    return await Post.findById(postId)
   },
 
   /**
@@ -131,17 +114,25 @@ const postMutations = {
   toggleLike: async (_, { postId }, { user, currentUser }) => {
     requireAuthAndCurrentUser(user, currentUser)
 
-    const existing = await Like.findOne({
+    const existingLike = await Like.findOne({
       userId: currentUser._id,
       postId: postId,
     })
 
-    if (existing) {
-      // Remove existing like
-      await Like.findByIdAndDelete(existing._id)
+    if (existingLike) {
+      await Like.findByIdAndDelete(existingLike._id)
     } else {
-      // Add new like
-      await new Like({ userId: currentUser._id, postId: postId }).save()
+      try {
+        await new Like({ userId: currentUser._id, postId: postId }).save()
+      } catch (error) {
+        if (error.code === 11000) {
+          // Handle duplicate key error - cleanup and retry
+          await Like.deleteMany({ userId: currentUser._id, postId: postId })
+          await new Like({ userId: currentUser._id, postId: postId }).save()
+        } else {
+          throw error
+        }
+      }
     }
 
     return await Post.findById(postId)

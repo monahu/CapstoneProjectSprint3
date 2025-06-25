@@ -21,10 +21,18 @@ const authLink = setContext(async (_, { headers }) => {
     const currentUser = auth.currentUser
     if (currentUser) {
       token = await currentUser.getIdToken()
+      console.log('🔐 Apollo Auth - Token generated, length:', token.length)
+    } else {
+      console.log('🔓 Apollo Auth - No current user')
     }
   } catch (error) {
-    console.error('Error getting auth token:', error)
+    console.error('❌ Apollo Auth - Error getting token:', error)
   }
+
+  console.log('📡 Apollo Auth - Request headers:', {
+    hasAuth: !!token,
+    tokenPreview: token ? `${token.substring(0, 20)}...` : 'none',
+  })
 
   return {
     headers: {

@@ -1,6 +1,7 @@
 import Hero from './Hero'
 import heroImage from '../assets/img/restJam_hero1.webp'
 import RestaurantCard from './Post/RestaurantCard'
+import { PostCardSkeleton, ImageSkeleton } from './Skeleton'
 import { useNavigate } from 'react-router'
 import { UI_TEXT } from '../utils/constants/ui'
 import { usePosts } from '../hooks/usePost'
@@ -63,17 +64,15 @@ const Home = () => {
   if (loading) {
     return (
       <div className='min-h-screen'>
-        <Hero
-          heroImage={heroImage}
-          onButtonClick={handleNavigateToLogin}
-        />
-        <div className='flex justify-center items-center py-20'>
-          <div className='loading loading-spinner loading-lg'></div>
+        <ImageSkeleton />
+        <div className='container mx-auto px-4 py-8 space-y-6'>
+          {Array.from({ length: 4 }).map((_, index) => (
+            <PostCardSkeleton key={index} />
+          ))}
         </div>
       </div>
     )
   }
-
   if (error) {
     return (
       <div className='min-h-screen'>

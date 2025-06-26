@@ -6,12 +6,14 @@ import { auth } from '../utils/firebase'
 import { addUser, removeUser } from '../utils/userSlice'
 import { ROUTES } from '../utils/constants/app'
 import { NAVIGATION } from '../utils/constants/navigation'
+import { useSyncUser } from './useUser'
 
 export const useNavbar = () => {
   const location = useLocation()
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const user = useSelector((store) => store.user)
+  const { syncUser } = useSyncUser()
 
   const handleSignOut = () => {
     signOut(auth)
@@ -34,7 +36,7 @@ export const useNavbar = () => {
 
   // Authentication state management
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
         const {
           uid,
@@ -45,6 +47,8 @@ export const useNavbar = () => {
           lastName,
           phone,
         } = user
+
+        // Update Redux store first
         dispatch(
           addUser({
             uid,
@@ -56,6 +60,28 @@ export const useNavbar = () => {
             phone,
           })
         )
+
+        // Silent sync to ensure database is up to date
+        // This ensures navbar and posts show same photo
+        try {
+          await syncUser({
+            variables: {
+              input: {
+                firebaseUid: uid,
+                email,
+                displayName,
+                photoURL,
+                firstName,
+                lastName,
+                phone,
+              },
+            },
+          })
+        } catch (error) {
+          // Silent fail - don't disrupt user experience
+          console.warn('User sync failed (non-critical):', error)
+        }
+
         // Only redirect to home if user is on login page
         if (location.pathname === ROUTES.LOGIN) {
           navigate(ROUTES.HOME)
@@ -71,7 +97,7 @@ export const useNavbar = () => {
     })
     // Unsubscribe onAuthStateChanged when component unmount
     return () => unsubscribe()
-  }, [location.pathname, navigate, dispatch, protectedRoutes])
+  }, [location.pathname, navigate, dispatch, protectedRoutes, syncUser])
 
   return {
     user,

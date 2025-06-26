@@ -10,6 +10,7 @@ const RestaurantCard = ({
   image = postImage.default,
   user,
   title,
+  location,
   placeName,
   description,
   date,
@@ -40,7 +41,8 @@ const RestaurantCard = ({
 
   return (
     <div
-      className={`bg-white rounded-2xl shadow-lg overflow-hidden mx-auto ${className}`}
+      className={`bg-white rounded-2xl shadow-lg overflow-hidden mx-auto cursor-pointer hover:shadow-xl transition-shadow ${className}`}
+      onClick={handleViewDetail}
     >
       {/* Restaurant Image */}
       <div className='relative'>
@@ -68,7 +70,7 @@ const RestaurantCard = ({
 
       {/* Content */}
       <div className='p-4 md:p-8'>
-        {/* User Info & Like Button */}
+        {/* Author Info & Rating */}
         <div className=' mb-3 flex justify-evenly align-center w-full gap-3 sm:gap-6 flex-wrap md:flex-nowrap'>
           <div className='order-2 md:order-1 avatar w-fit flex-col items-center my-auto'>
             <div className='w-12 md:w-16 rounded-full'>
@@ -82,7 +84,7 @@ const RestaurantCard = ({
             </p>
           </div>
           <div className='order-1 text-center md:text-left md:order-2 w-full h-fit my-auto'>
-            <p className='text-sm text-gray-600'>{user.location}</p>
+            <p className='text-sm text-gray-600'>{location}</p>
             <h2 className='font-semibold text-3xl sm:text-2xl text-gray-900'>
               {title}
             </h2>

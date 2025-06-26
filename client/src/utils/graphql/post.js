@@ -19,6 +19,7 @@ export const GET_ALL_POSTS = gql`
       author {
         id
         displayName
+        photoURL
       }
       rating {
         type

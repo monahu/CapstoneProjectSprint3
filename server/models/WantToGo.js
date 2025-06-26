@@ -13,4 +13,7 @@ const wantToGoSchema = new mongoose.Schema({
   },
 })
 
+// Add composite unique index to prevent duplicate want-to-go records
+wantToGoSchema.index({ userId: 1, postId: 1 }, { unique: true })
+
 module.exports = mongoose.model('WantToGo', wantToGoSchema)

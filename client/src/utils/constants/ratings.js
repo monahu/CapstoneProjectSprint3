@@ -1,4 +1,4 @@
-import { ThumbsUp, Frown, CircleHelp, Heart } from "lucide-react"
+import { ThumbsUp, Frown, CircleHelp, Heart } from 'lucide-react'
 
 export const ICON_MAP = {
   ThumbsUp,
@@ -8,19 +8,19 @@ export const ICON_MAP = {
 }
 
 export const RATING_MAP = {
-  recommended: {
-    color: "bg-secondary",
-    text: "Recommended",
-    icon: ["ThumbsUp", "😁"],
+  RECOMMENDED: {
+    color: 'bg-secondary',
+    text: 'Recommended',
+    icon: ['ThumbsUp', '😁'],
   },
-  soso: {
-    color: "bg-accent-content",
-    text: "Not Recommended",
-    icon: ["CircleHelp", "🙁"],
+  SOSO: {
+    color: 'bg-accent-content',
+    text: 'Not Recommended',
+    icon: ['CircleHelp', '🙁'],
   },
-  new: {
-    color: "bg-primary/50",
-    text: "New",
-    icon: ["🆕", "🤔"],
+  NEW: {
+    color: 'bg-primary/50',
+    text: 'New',
+    icon: ['🆕', '🤔'],
   },
 }

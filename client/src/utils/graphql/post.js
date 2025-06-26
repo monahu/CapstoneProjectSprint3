@@ -3,7 +3,8 @@ import { gql } from '@apollo/client'
 // ===========================
 // POST QUERIES
 // ===========================
-
+// * Get all posts (limit, offset, filter)
+// * manually tested
 export const GET_ALL_POSTS = gql`
   query GetAllPosts($limit: Int, $offset: Int, $filter: PostFilter) {
     posts(limit: $limit, offset: $offset, filter: $filter) {
@@ -14,32 +15,20 @@ export const GET_ALL_POSTS = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       author {
         id
         displayName
-        photoURL
-        firstName
-        lastName
       }
       rating {
-        id
-        score
         type
-        description
       }
       attendees {
         id
         displayName
-        photoURL
       }
       attendeeCount
       isWantToGo
-      likes {
-        id
-        displayName
-        photoURL
-      }
       likeCount
       isLiked
       tags {
@@ -61,7 +50,7 @@ export const GET_POST_BY_ID = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       author {
         id
         displayName
@@ -85,13 +74,6 @@ export const GET_POST_BY_ID = gql`
       }
       attendeeCount
       isWantToGo
-      likes {
-        id
-        displayName
-        photoURL
-        firstName
-        lastName
-      }
       likeCount
       isLiked
       tags {
@@ -113,7 +95,7 @@ export const GET_MY_POSTS = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       rating {
         id
         score
@@ -145,7 +127,7 @@ export const SEARCH_POSTS_BY_TAGS = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       tags {
         id
         name
@@ -183,7 +165,7 @@ export const SEARCH_POSTS = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       tags {
         id
         name
@@ -221,7 +203,7 @@ export const CREATE_POST = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       author {
         id
         displayName
@@ -251,7 +233,7 @@ export const UPDATE_POST = gql`
       location
       imageUrl
       createdAt
-      shares
+      shareCount
       author {
         id
         displayName
@@ -302,6 +284,15 @@ export const TOGGLE_WANT_TO_GO = gql`
         displayName
         photoURL
       }
+    }
+  }
+`
+
+export const TOGGLE_SHARE = gql`
+  mutation ToggleShare($postId: ID!) {
+    toggleShare(postId: $postId) {
+      id
+      shareCount
     }
   }
 `

@@ -1,22 +1,16 @@
-import {
-  Heart,
-  Share,
-  SendHorizontal,
-  Check,
-  CircleArrowRight,
-  Users,
-  MessageCircle,
-} from 'lucide-react'
-import { useState } from 'react'
+import { MessageCircle } from 'lucide-react'
 import { postImage } from '../../utils/constants/posts'
 import RatingBubble from './RatingBubble'
+import PostActions from './PostActions'
 import { useNavigate } from 'react-router'
+import { usePostActions } from '../../hooks/usePostActions'
 
 const RestaurantCard = ({
   id,
   image = postImage.default,
   user,
-  restaurantName,
+  title,
+  placeName,
   description,
   date,
   tags = [],
@@ -28,37 +22,20 @@ const RestaurantCard = ({
   isLiked = false,
   className = '',
 }) => {
-  // Local state for counts and status
-  const [currentLikeCount, setCurrentLikeCount] = useState(likeCount)
-  const [currentWantToGoCount, setCurrentWantToGoCount] =
-    useState(wantToGoCount)
-  const [liked, setLiked] = useState(isLiked)
-  const [wantToGo, setWantToGo] = useState(isWantToGo)
-
   const navigate = useNavigate()
+
+  // Use the custom hook for post interactions
+  const postActions = usePostActions({
+    postId: id,
+    initialLikeCount: likeCount,
+    initialShareCount: shareCount,
+    initialWantToGoCount: wantToGoCount,
+    initialIsLiked: isLiked,
+    initialIsWantToGo: isWantToGo,
+  })
 
   const handleViewDetail = () => {
     navigate(`/post/${id}`)
-  }
-
-  const handleLikeToggle = () => {
-    if (liked) {
-      setCurrentLikeCount((prev) => prev - 1)
-      setLiked(false)
-    } else {
-      setCurrentLikeCount((prev) => prev + 1)
-      setLiked(true)
-    }
-  }
-
-  const handleWantToGoToggle = () => {
-    if (wantToGo) {
-      setCurrentWantToGoCount((prev) => prev - 1)
-      setWantToGo(false)
-    } else {
-      setCurrentWantToGoCount((prev) => prev + 1)
-      setWantToGo(true)
-    }
   }
 
   return (
@@ -81,7 +58,7 @@ const RestaurantCard = ({
           {/* Desktop - fallback */}
           <img
             src={image}
-            alt={restaurantName}
+            alt={placeName}
             className='w-full h-64 object-cover'
             loading='lazy'
             decoding='async'
@@ -106,7 +83,9 @@ const RestaurantCard = ({
           </div>
           <div className='order-1 text-center md:text-left md:order-2 w-full h-fit my-auto'>
             <p className='text-sm text-gray-600'>{user.location}</p>
-            <h2 className='font-semibold text-gray-900'>{restaurantName}</h2>
+            <h2 className='font-semibold text-3xl sm:text-2xl text-gray-900'>
+              {title}
+            </h2>
           </div>
 
           <div className='order-3 w-fit my-auto'>
@@ -143,83 +122,9 @@ const RestaurantCard = ({
             </span>
           ))}
         </div>
-        {/* Social Actions */}
-        <div className='text-center'>
-          {/* Like it? text */}
-          <div className='text-gray-600 text-sm mb-4 divider'>Like it?</div>
 
-          <div className='flex flex-col sm:flex-row-reverse sm:justify-around gap-2 sm:gap-4'>
-            {/* Right side: Share and Like actions */}
-            <div className='flex flex-col sm:my-auto gap-2'>
-              {/* Top row badges */}
-              <div className='flex justify-center gap-4'>
-                <div className='flex flex-col items-center gap-2'>
-                  <div className='badge badge-outline badge-success rounded-full badge-lg gap-2 px-4 py-3 shadow-md'>
-                    <SendHorizontal className='w-4 h-4' />
-                    <span className='font-medium'>{shareCount}</span>
-                  </div>
-                  <button className='btn btn-circle btn-outline btn-success shadow-lg hover:shadow-xl transition-shadow md:my-auto'>
-                    <Share className='w-5 h-5' />
-                  </button>
-                </div>
-                <div className='flex flex-col items-center gap-2'>
-                  <div
-                    className={`badge badge-lg rounded-full gap-2 px-4 py-3 cursor-pointer shadow-md ${
-                      liked
-                        ? 'badge-secondary'
-                        : 'badge-outline badge-secondary'
-                    }`}
-                    onClick={handleLikeToggle}
-                  >
-                    <Heart
-                      className={`w-4 h-4 ${liked ? 'fill-current' : ''}`}
-                    />
-                    <span className='font-medium'>{currentLikeCount}</span>
-                  </div>
-                  <button
-                    onClick={handleLikeToggle}
-                    className={`btn btn-circle shadow-lg hover:shadow-xl transition-shadow ${
-                      liked ? 'btn-secondary' : 'btn-outline btn-secondary'
-                    }`}
-                  >
-                    <Heart
-                      className={`w-5 h-5 ${liked ? 'fill-current' : ''}`}
-                    />
-                  </button>
-                </div>
-              </div>
-
-              {/* Bottom row circular buttons */}
-              <div className='flex justify-center gap-4'></div>
-            </div>
-
-            {/* Left side: Want to GO button with count */}
-            <div className='flex flex-col items-center gap-2'>
-              <div className='badge badge-info badge-lg rounded-full gap-2 px-4 py-3 shadow-md'>
-                <Users className='w-4 h-4' />
-                <span className='font-medium'>{currentWantToGoCount}</span>
-              </div>
-              <button
-                onClick={handleWantToGoToggle}
-                className={`btn btn-md md:btn-lg rounded-full text-lg-bold gap-2 ${
-                  wantToGo
-                    ? 'btn-warning text-white hover:bg-warning-focus'
-                    : 'btn-primary text-white hover:bg-primary-focus'
-                }`}
-              >
-                {wantToGo ? (
-                  <>
-                    <Check className='w-6 h-6' /> You are Going
-                  </>
-                ) : (
-                  <>
-                    <CircleArrowRight className='w-6 h-6' /> Want to GO
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+        {/* Post Actions Component */}
+        <PostActions {...postActions} />
       </div>
     </div>
   )

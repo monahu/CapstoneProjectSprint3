@@ -45,6 +45,7 @@ const smartAuth = async (req, res, next) => {
   // Only allow specific public queries by operation name
   const isPublicQuery =
     operationName?.toLowerCase() === 'posts' ||
+    operationName === 'GetAllPosts' ||
     operationName === 'IntrospectionQuery'
 
   if (isPublicQuery) {

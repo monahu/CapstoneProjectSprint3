@@ -24,12 +24,12 @@ const typeDefs = `#graphql
     location: String
     imageUrl: String
     createdAt: Date
-    shares: Int
     author: AuthorInfo
     rating: Rating
     attendees: [AttendeeInfo]
     attendeeCount: Int
     isWantToGo: Boolean
+    likes: [AuthorInfo]
     likeCount: Int
     shareCount: Int
     isLiked: Boolean
@@ -41,16 +41,22 @@ const typeDefs = `#graphql
     id: ID!
     displayName: String
     photoURL: String
+    firstName: String
+    lastName: String
+    email: String
   }
 
   type AttendeeInfo {
     id: ID!
     displayName: String
     photoURL: String
+    firstName: String
+    lastName: String
   }
 
   type Rating {
     id: ID!
+    score: Float
     type: String
     description: String
   }

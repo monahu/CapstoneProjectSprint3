@@ -1,6 +1,6 @@
 export const APP_CONFIG = {
   name: 'RestJAM',
-  logo: 'restJAM-logo.svg',
+  logo: '/restJAM-logo.svg',
   supportEmail: 'support@restjam.com',
 }
 
@@ -12,4 +12,5 @@ export const ROUTES = {
   EDIT: '/edit',
   EXPLORE: '/explore',
   ERROR: '/error',
+  POST_DETAIL: '/post',
 }

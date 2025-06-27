@@ -73,6 +73,7 @@ const Home = () => {
       </div>
     )
   }
+
   if (error) {
     return (
       <div className='min-h-screen'>
@@ -103,8 +104,8 @@ const Home = () => {
             avatar:
               post.author.photoURL ||
               'https://img.daisyui.com/images/profile/demo/2@94.webp',
-            location: post.location,
           }}
+          location={post.location}
           title={post.title}
           placeName={post.placeName}
           description={post.content}

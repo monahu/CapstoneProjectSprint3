@@ -2,7 +2,7 @@ import { createBrowserRouter, RouterProvider } from 'react-router'
 import { Login } from './Login'
 import Browse from './Browse'
 import Home from './Home'
-import Detail from './Post/Detail'
+import Detail from './Detail'
 import ErrorPage from './ErrorPage'
 const Body = () => {
   const appRouter = createBrowserRouter([

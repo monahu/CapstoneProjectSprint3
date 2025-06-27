@@ -2,6 +2,70 @@ import { Field, ErrorMessage } from 'formik'
 import { UI_TEXT } from '../../utils/constants/ui'
 import { FORM_PLACEHOLDERS } from '../../utils/constants/form'
 
+// Common styles
+const FIELD_STYLES = {
+  label: 'block text-sm font-medium text-gray-900',
+  input:
+    'block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm',
+  error: 'mt-1 text-sm text-red-600',
+  required: 'text-pink-600',
+  optional: 'text-sm text-gray-500 ml-1',
+}
+
+const RequiredIndicator = () => (
+  <span
+    className={FIELD_STYLES.required}
+    aria-label='required'
+  >
+    {UI_TEXT.labels.required}
+  </span>
+)
+
+const FormField = ({
+  id,
+  name,
+  type = 'text',
+  label,
+  placeholder,
+  required = false,
+  autoComplete,
+  className = '',
+}) => (
+  <div className={className}>
+    <label
+      htmlFor={id}
+      className={FIELD_STYLES.label}
+    >
+      {label}
+      {required ? (
+        <RequiredIndicator />
+      ) : (
+        <span className={FIELD_STYLES.optional}>(optional)</span>
+      )}
+    </label>
+    <div className='mt-2'>
+      <Field
+        id={id}
+        name={name}
+        type={type}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className={FIELD_STYLES.input}
+        aria-required={required}
+        aria-describedby={`${name}-error`}
+      />
+      <ErrorMessage
+        name={name}
+        component='div'
+        className={FIELD_STYLES.error}
+        id={`${name}-error`}
+        role='alert'
+        aria-live='polite'
+      />
+    </div>
+  </div>
+)
+
 export const SignUpFields = () => (
   <div
     role='group'
@@ -14,42 +78,15 @@ export const SignUpFields = () => (
       Personal Information
     </h3>
 
-    {/* Username */}
-    <div className='mb-4'>
-      <label
-        htmlFor='userName'
-        className='block text-sm font-medium text-gray-900'
-      >
-        {UI_TEXT.labels.username}
-        <span
-          className='text-pink-600'
-          aria-label='required'
-        >
-          {UI_TEXT.labels.required}
-        </span>
-      </label>
-      <div className='mt-2'>
-        <Field
-          id='userName'
-          name='userName'
-          type='text'
-          placeholder={FORM_PLACEHOLDERS.username}
-          className='block w-full rounded-md px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm'
-          aria-required='true'
-          aria-describedby='userName-error'
-        />
-        <ErrorMessage
-          name='userName'
-          component='div'
-          className='mt-1 text-sm text-red-600'
-          id='userName-error'
-          role='alert'
-          aria-live='polite'
-        />
-      </div>
-    </div>
+    <FormField
+      id='userName'
+      name='userName'
+      label={UI_TEXT.labels.username}
+      placeholder={FORM_PLACEHOLDERS.username}
+      required
+      className='mb-4'
+    />
 
-    {/* First and Last Name */}
     <div
       className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4'
       role='group'
@@ -62,204 +99,63 @@ export const SignUpFields = () => (
         Name Information
       </h4>
 
-      <div>
-        <label
-          htmlFor='firstName'
-          className='block text-sm font-medium text-gray-900'
-        >
-          {UI_TEXT.labels.firstName}
-          <span
-            className='text-pink-600'
-            aria-label='required'
-          >
-            {UI_TEXT.labels.required}
-          </span>
-        </label>
-        <Field
-          id='firstName'
-          name='firstName'
-          type='text'
-          placeholder={FORM_PLACEHOLDERS.firstName}
-          className='block w-full rounded-md px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm'
-          aria-required='true'
-          aria-describedby='firstName-error'
-        />
-        <ErrorMessage
-          name='firstName'
-          component='div'
-          className='mt-1 text-sm text-red-600'
-          id='firstName-error'
-          role='alert'
-          aria-live='polite'
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor='lastName'
-          className='block text-sm font-medium text-gray-900'
-        >
-          {UI_TEXT.labels.lastName}
-          <span
-            className='text-pink-600'
-            aria-label='required'
-          >
-            {UI_TEXT.labels.required}
-          </span>
-        </label>
-        <Field
-          id='lastName'
-          name='lastName'
-          type='text'
-          placeholder={FORM_PLACEHOLDERS.lastName}
-          className='block w-full rounded-md px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm'
-          aria-required='true'
-          aria-describedby='lastName-error'
-        />
-        <ErrorMessage
-          name='lastName'
-          component='div'
-          className='mt-1 text-sm text-red-600'
-          id='lastName-error'
-          role='alert'
-          aria-live='polite'
-        />
-      </div>
-    </div>
-
-    {/* Phone */}
-    <div className='mb-4'>
-      <label
-        htmlFor='phone'
-        className='block text-sm font-medium text-gray-900'
-      >
-        {UI_TEXT.labels.phone}
-        <span className='text-sm text-gray-500 ml-1'>(optional)</span>
-      </label>
-      <Field
-        id='phone'
-        name='phone'
-        type='tel'
-        placeholder={FORM_PLACEHOLDERS.phone}
-        className='block w-full rounded-md px-3 py-1.5 text-base text-gray-900 placeholder:text-gray-400 outline-1 outline-gray-300 focus:outline-2 focus:outline-indigo-600 sm:text-sm'
-        aria-describedby='phone-error'
+      <FormField
+        id='firstName'
+        name='firstName'
+        label={UI_TEXT.labels.firstName}
+        placeholder={FORM_PLACEHOLDERS.firstName}
+        required
       />
-      <ErrorMessage
-        name='phone'
-        component='div'
-        className='mt-1 text-sm text-red-600'
-        id='phone-error'
-        role='alert'
-        aria-live='polite'
+
+      <FormField
+        id='lastName'
+        name='lastName'
+        label={UI_TEXT.labels.lastName}
+        placeholder={FORM_PLACEHOLDERS.lastName}
+        required
       />
     </div>
+
+    <FormField
+      id='phone'
+      name='phone'
+      type='tel'
+      label={UI_TEXT.labels.phone}
+      placeholder={FORM_PLACEHOLDERS.phone}
+      className='mb-4'
+    />
   </div>
 )
 
 export const EmailField = () => (
-  <div>
-    <label
-      htmlFor='email'
-      className='block text-sm/6 font-medium text-gray-900'
-    >
-      {UI_TEXT.labels.email}
-      <span
-        className='text-pink-600'
-        aria-label='required'
-      >
-        {UI_TEXT.labels.required}
-      </span>
-    </label>
-    <div className='mt-2'>
-      <Field
-        id='email'
-        name='email'
-        type='email'
-        autoComplete='email'
-        className='block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
-        aria-required='true'
-        aria-describedby='email-error'
-      />
-      <ErrorMessage
-        name='email'
-        component='div'
-        className='mt-1 text-sm text-red-600'
-        id='email-error'
-        role='alert'
-        aria-live='polite'
-      />
-    </div>
-  </div>
+  <FormField
+    id='email'
+    name='email'
+    type='email'
+    label={UI_TEXT.labels.email}
+    autoComplete='email'
+    required
+  />
 )
 
 export const PasswordField = () => (
-  <div>
-    <label
-      htmlFor='password'
-      className='block text-sm/6 font-medium text-gray-900'
-    >
-      {UI_TEXT.labels.password}
-      <span
-        className='text-pink-600'
-        aria-label='required'
-      >
-        {UI_TEXT.labels.required}
-      </span>
-    </label>
-    <div className='mt-2'>
-      <Field
-        id='password'
-        name='password'
-        type='password'
-        autoComplete='current-password'
-        className='block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6'
-        aria-required='true'
-        aria-describedby='password-error'
-      />
-      <ErrorMessage
-        name='password'
-        component='div'
-        className='mt-1 text-sm text-red-600'
-        id='password-error'
-        role='alert'
-        aria-live='polite'
-      />
-    </div>
-  </div>
+  <FormField
+    id='password'
+    name='password'
+    type='password'
+    label={UI_TEXT.labels.password}
+    autoComplete='current-password'
+    required
+  />
 )
 
 export const ConfirmPasswordField = () => (
-  <div>
-    <label
-      htmlFor='confirmPassword'
-      className='block text-sm font-medium text-gray-900'
-    >
-      {UI_TEXT.labels.confirmPassword}
-      <span
-        className='text-pink-600'
-        aria-label='required'
-      >
-        {UI_TEXT.labels.required}
-      </span>
-    </label>
-    <div className='mt-2'>
-      <Field
-        id='confirmPassword'
-        name='confirmPassword'
-        type='password'
-        placeholder={FORM_PLACEHOLDERS.confirmPassword}
-        className='block w-full rounded-md px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:outline-red-500 sm:text-sm'
-        aria-required='true'
-        aria-describedby='confirmPassword-error'
-      />
-      <ErrorMessage
-        name='confirmPassword'
-        component='div'
-        className='mt-1 text-sm text-red-600'
-        id='confirmPassword-error'
-        role='alert'
-        aria-live='polite'
-      />
-    </div>
-  </div>
+  <FormField
+    id='confirmPassword'
+    name='confirmPassword'
+    type='password'
+    label={UI_TEXT.labels.confirmPassword}
+    placeholder={FORM_PLACEHOLDERS.confirmPassword}
+    required
+  />
 )

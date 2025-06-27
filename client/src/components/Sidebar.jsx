@@ -91,8 +91,7 @@ const SidebarContent = ({ user }) => {
 
   return (
     <>
-      {/* Sidebar component, swap this element with another sidebar if you like */}
-      <div className='flex grow flex-col gap-y-5 overflow-y-auto  bg-white lg:px-0 px-6'>
+      <div className='flex grow flex-col gap-y-5 overflow-y-auto  bg-white px-6'>
         <div className='flex h-16 shrink-0 items-center'>
           <img
             alt={APP_CONFIG.name}

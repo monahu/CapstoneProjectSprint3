@@ -39,7 +39,7 @@ export const UI_TEXT = {
     title: '"Discover. Taste. Share."',
     description:
       'Find the best spots, rate your favorites, and find your next favorite place.',
-    button: 'Star with your account',
+    button: 'Start with your account',
     buttonLink: '/login',
   },
   loginHero: {

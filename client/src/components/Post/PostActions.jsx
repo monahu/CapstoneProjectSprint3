@@ -21,23 +21,15 @@ const PostActions = ({
 }) => {
   const navigate = useNavigate()
 
-  // Debug: Log what PostActions receives
-  console.log('🎬 PostActions render:', {
-    isLoggedIn,
-    isWantToGo,
-    currentWantToGoCount,
-    willShowYouAreGoing: isLoggedIn && isWantToGo,
-  })
-
   return (
-    <div
-      className='text-center'
-      onClick={(e) => e.stopPropagation()}
-    >
+    <div className='text-center'>
       {/* Like it? text */}
       <div className='text-gray-600 text-base mb-8 divider'>Like it?</div>
 
-      <div className='flex flex-col sm:flex-row-reverse sm:justify-around gap-4'>
+      <div
+        className='flex flex-col sm:flex-row-reverse justify-evenly md:justify-between gap-4 px-2 lg:px-20'
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Right side: Share and Like actions */}
         <div className='flex flex-col sm:my-auto gap-2'>
           {/* Top row badges */}
@@ -102,9 +94,6 @@ const PostActions = ({
           >
             {(() => {
               const showYouAreGoing = isLoggedIn && isWantToGo
-              console.log(
-                `🎭 Button text decision: isLoggedIn=${isLoggedIn}, isWantToGo=${isWantToGo}, showing="${showYouAreGoing ? 'You are Going' : 'Want to GO'}"`
-              )
 
               return showYouAreGoing ? (
                 <>

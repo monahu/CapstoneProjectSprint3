@@ -61,12 +61,34 @@ export const UI_TEXT = {
   },
   createHero: {
     title: 'Create Your Reviews/Recommendations',
-    description:
-      '',
+    description: '',
   },
   editHero: {
     title: 'Edit Your Reviews/Recommendations',
-    description:
-      '',
+    description: '',
+  },
+  exploreHero: {
+    title: 'Explore',
+    description: 'Choose your filters and start exploring',
+  },
+  explore: {
+    title: 'Explore',
+    tagsTitle: 'Explore',
+    tagsSubtitle: 'Tags',
+    backButton: 'Back',
+    searchPlaceholder: 'Explore restaurants, places, or tags...',
+    searchContext: 'All the reviews/recommendations under',
+    cleanFiltersButton: 'Clean Chosen Tags/Text',
+    startExploringTitle: 'Start Exploring',
+    startExploringDescription:
+      'Search for restaurants, places, or tags to discover new experiences',
+    searchingText: 'Searching for',
+    searchErrorTitle: 'Search Error',
+    noResultsTitle: 'No Results Found',
+    noResultsDescription: 'Try adjusting your search terms or filters',
+    placesDiscovered: 'places discovered',
+    searchFor: 'for',
+    moreButton: 'more',
+    lessButton: 'less',
   },
 }

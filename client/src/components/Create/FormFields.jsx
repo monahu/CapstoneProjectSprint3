@@ -1,6 +1,9 @@
-import { Field, ErrorMessage } from 'formik'
+import { Field, ErrorMessage, useField, useFormikContext  } from 'formik'
 import { UI_TEXT } from '../../utils/constants/ui'
 import { FORM_PLACEHOLDERS } from '../../utils/constants/form'
+import { useEffect } from 'react'
+import { EditorContent, useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
 
 // Common styles
 const FIELD_STYLES = {
@@ -66,96 +69,83 @@ const FormField = ({
   </div>
 )
 
-export const SignUpFields = () => (
-  <div
-    role='group'
-    aria-labelledby='personal-info-legend'
-  >
-    <h3
-      id='personal-info-legend'
-      className='sr-only'
-    >
-      Personal Information
-    </h3>
+export const TitleField = () => (
+  <FormField
+    id='title'
+    name='title'
+    type='text'
+    label={UI_TEXT.labels.title}
+    autoComplete='off'
+    required
+  />
+)
 
-    <FormField
-      id='userName'
-      name='userName'
-      label={UI_TEXT.labels.username}
-      placeholder={FORM_PLACEHOLDERS.username}
-      required
-      className='mb-4'
-    />
+export const ImageUploadField = () => {
+  const { setFieldValue } = useFormikContext()
+  const [field, meta] = useField('image')
 
-    <div
-      className='grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4'
-      role='group'
-      aria-labelledby='name-legend'
-    >
-      <h4
-        id='name-legend'
-        className='sr-only'
+  return (
+    <div className='mb-4'>
+      <label
+        htmlFor='image'
+        className={FIELD_STYLES.label}
       >
-        Name Information
-      </h4>
-
-      <FormField
-        id='firstName'
-        name='firstName'
-        label={UI_TEXT.labels.firstName}
-        placeholder={FORM_PLACEHOLDERS.firstName}
-        required
-      />
-
-      <FormField
-        id='lastName'
-        name='lastName'
-        label={UI_TEXT.labels.lastName}
-        placeholder={FORM_PLACEHOLDERS.lastName}
-        required
-      />
+        {UI_TEXT.labels.image}
+        <RequiredIndicator />
+      </label>
+      <div className='mt-2'>
+        <input
+          id='image'
+          name='image'
+          type='file'
+          accept='image/*'
+          onChange={(event) => {
+            setFieldValue('image', event.currentTarget.files[0])
+          }}
+          className='block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500'
+        />
+        {meta.touched && meta.error && (
+          <div className={FIELD_STYLES.error}>{meta.error}</div>
+        )}
+      </div>
     </div>
+  )
+}
 
-    <FormField
-      id='phone'
-      name='phone'
-      type='tel'
-      label={UI_TEXT.labels.phone}
-      placeholder={FORM_PLACEHOLDERS.phone}
-      className='mb-4'
-    />
-  </div>
-)
+export const RichTextField = () => {
+  const { setFieldValue } = useFormikContext()
+  const [field, meta] = useField('content')
 
-export const EmailField = () => (
-  <FormField
-    id='email'
-    name='email'
-    type='email'
-    label={UI_TEXT.labels.email}
-    autoComplete='email'
-    required
-  />
-)
+  const editor = useEditor({
+    extensions: [StarterKit],
+    content: field.value || '',
+    onUpdate: ({ editor }) => {
+      setFieldValue('content', editor.getHTML())
+    },
+  })
 
-export const PasswordField = () => (
-  <FormField
-    id='password'
-    name='password'
-    type='password'
-    label={UI_TEXT.labels.password}
-    autoComplete='current-password'
-    required
-  />
-)
+  useEffect(() => {
+    if (editor && field.value) {
+      editor.commands.setContent(field.value)
+    }
+  }, [editor, field.value])
 
-export const ConfirmPasswordField = () => (
-  <FormField
-    id='confirmPassword'
-    name='confirmPassword'
-    type='password'
-    label={UI_TEXT.labels.confirmPassword}
-    placeholder={FORM_PLACEHOLDERS.confirmPassword}
-    required
-  />
-)
+  return (
+    <div className='mb-4'>
+      <label htmlFor='content' className={FIELD_STYLES.label}>
+        {UI_TEXT.labels.content || 'Content'}
+        <RequiredIndicator />
+      </label>
+      <div
+        id='content'
+        className='mt-2 min-h-[150px] rounded-md border border-gray-300 p-2 focus-within:border-indigo-600 prose max-w-full'
+      >
+        <EditorContent editor={editor} />
+      </div>
+      {meta.touched && meta.error && (
+        <div className={FIELD_STYLES.error}>{meta.error}</div>
+      )}
+    </div>
+  )
+}
+

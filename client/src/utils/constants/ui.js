@@ -34,6 +34,8 @@ export const UI_TEXT = {
     confirmPassword: 'Confirm Password',
     phone: 'Phone',
     required: '*',
+    title: 'Title',
+    image: 'Pick an Image',
   },
   hero: {
     title: '"Discover. Taste. Share."',

@@ -1,4 +1,4 @@
-import { useQuery, useMutation } from '@apollo/client'
+import { useQuery, useMutation, useLazyQuery } from '@apollo/client'
 import {
   GET_ALL_POSTS,
   GET_POST_BY_ID,
@@ -7,6 +7,9 @@ import {
   DELETE_POST,
   TOGGLE_LIKE,
   TOGGLE_WANT_TO_GO,
+  SEARCH_POSTS,
+  SEARCH_POSTS_BY_TAGS,
+  GET_ALL_TAGS,
 } from '../utils/graphql/post'
 
 export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
@@ -101,4 +104,93 @@ export const useDeletePost = () => {
   })
 
   return { deletePost, loading, error }
+}
+
+// ===========================
+// SEARCH HOOKS
+// ===========================
+
+export const useSearchPosts = () => {
+  const [executeSearch, { data, loading, error, called }] = useLazyQuery(
+    SEARCH_POSTS,
+    {
+      notifyOnNetworkStatusChange: true,
+      fetchPolicy: 'cache-and-network',
+      onError: (error) => {
+        console.error('SEARCH_POSTS error:', error)
+      },
+    }
+  )
+
+  const searchPosts = (searchTerm, options = {}) => {
+    const { tags, location, limit = 20 } = options
+
+    return executeSearch({
+      variables: {
+        searchTerm: searchTerm?.trim() || null,
+        tags: tags?.length ? tags : null,
+        location: location?.trim() || null,
+        limit,
+      },
+    })
+  }
+
+  return {
+    searchPosts,
+    posts: data?.searchPosts || [],
+    loading,
+    error,
+    called,
+    hasSearched: called,
+  }
+}
+
+export const useSearchPostsByTags = () => {
+  const { data, loading, error, called, refetch } = useQuery(
+    SEARCH_POSTS_BY_TAGS,
+    {
+      skip: true,
+      notifyOnNetworkStatusChange: true,
+      fetchPolicy: 'cache-and-network',
+      onError: (error) => {
+        console.error('SEARCH_POSTS_BY_TAGS error:', error)
+      },
+    }
+  )
+
+  const searchByTags = (tags, limit = 20) => {
+    if (!tags || tags.length === 0) return
+
+    return refetch({
+      tags: tags.map((tag) => tag.trim()).filter(Boolean),
+      limit,
+    })
+  }
+
+  return {
+    searchByTags,
+    posts: data?.searchPostsByTags || [],
+    loading,
+    error,
+    called,
+    hasSearched: called && !loading,
+  }
+}
+
+// ===========================
+// TAG HOOKS
+// ===========================
+
+export const useTags = () => {
+  const { data, loading, error } = useQuery(GET_ALL_TAGS, {
+    onError: (error) => {
+      console.error('GET_ALL_TAGS error:', error)
+    },
+  })
+
+  return {
+    tags: data?.tags || [],
+    loading,
+    error,
+  }
 }

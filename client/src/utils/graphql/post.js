@@ -1,6 +1,18 @@
 import { gql } from '@apollo/client'
 
 // ===========================
+// TAG QUERIES
+// ===========================
+export const GET_ALL_TAGS = gql`
+  query GetAllTags {
+    tags {
+      id
+      name
+    }
+  }
+`
+
+// ===========================
 // POST QUERIES
 // ===========================
 // * Get all posts (limit, offset, filter)

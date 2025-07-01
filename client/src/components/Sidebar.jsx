@@ -5,7 +5,7 @@ import {
   DialogPanel,
   TransitionChild,
 } from '@headlessui/react'
-import { Link } from 'react-router'
+import { Link, useLocation } from 'react-router'
 import { NAVIGATION } from '../utils/constants/navigation'
 import { APP_CONFIG } from '../utils/constants/app'
 import SearchForm from './SearchForm'
@@ -69,21 +69,26 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   )
 }
 
+
 const SidebarContent = ({ user }) => {
+  const location = useLocation();
   const navigationList = user
     ? NAVIGATION.sidebar.map((item) => ({
         ...item,
         icon: iconMap[item.icon],
+        current: location.pathname === item.href,
       }))
     : NAVIGATION.sidebarVisitor.map((item) => ({
         ...item,
         icon: iconMap[item.icon],
-      }))
-  const tags = NAVIGATION.tags
+        current: location.pathname === item.href,
+      }));
+  const tags = NAVIGATION.tags;
   const explore = {
     ...NAVIGATION.explore,
     icon: iconMap[NAVIGATION.explore.icon],
-  }
+    current: location.pathname === NAVIGATION.explore.href,
+  };
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(' ')

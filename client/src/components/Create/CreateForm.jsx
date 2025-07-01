@@ -21,16 +21,19 @@ const CreateForm = ({ onSubmit, isLoading }) => {
 
   return (
     <Formik
+      initialValues={{
+        title: '',
+        image: null,
+        content: '',
+      }}
       // validationSchema={getValidationSchema(isSignInForm)}
       onSubmit={handleSubmit}
     >
       {() => (
         <Form className='space-y-6'>
-
           <TitleField />
           <ImageUploadField />
           <RichTextField />
-
         </Form>
       )}
     </Formik>

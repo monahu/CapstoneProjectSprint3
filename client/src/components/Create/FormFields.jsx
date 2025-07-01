@@ -113,39 +113,63 @@ export const ImageUploadField = () => {
 }
 
 export const RichTextField = () => {
-  const { setFieldValue } = useFormikContext()
-  const [field, meta] = useField('content')
+  const { setFieldValue } = useFormikContext();
+  const [field, meta] = useField('content');
 
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: field.value || '',
-    onUpdate: ({ editor }) => {
-      setFieldValue('content', editor.getHTML())
-    },
-  })
-
+ const editor = useEditor({
+  extensions: [
+    StarterKit.configure({
+      bulletList: { keepMarks: true, keepAttributes: false },
+      orderedList: { keepMarks: true, keepAttributes: false },
+      heading: { levels: [1, 2, 3] },
+    }),
+  ],
+  content: field.value || '',
+  onUpdate: ({ editor }) => {
+    setFieldValue('content', editor.getHTML());
+  },
+});
+  // Only set content on mount, not on every value change (prevents double-click issue)
   useEffect(() => {
-    if (editor && field.value) {
-      editor.commands.setContent(field.value)
+    if (editor && field.value && editor.getHTML() !== field.value) {
+      editor.commands.setContent(field.value);
     }
-  }, [editor, field.value])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editor]);
+
+  // toolbar component for rich text formatting
+  const Toolbar = () => (
+  <div className="flex gap-2 mb-2 flex-wrap">
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run(); }} className={editor.isActive('bold') ? 'font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Bold"><b>B</b></button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run(); }} className={editor.isActive('italic') ? 'italic bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Italic"><i>I</i></button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run(); }} className={editor.isActive('strike') ? 'line-through bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Strikethrough"><s>S</s></button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run(); }} className={editor.isActive('bulletList') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Bullet List">• List</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run(); }} className={editor.isActive('orderedList') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Ordered List">1. List</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().setParagraph().run(); }} className={editor.isActive('paragraph') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Paragraph">P</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 1 }).run(); }} className={editor.isActive('heading', { level: 1 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Heading 1">H1</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run(); }} className={editor.isActive('heading', { level: 2 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Heading 2">H2</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run(); }} className={editor.isActive('heading', { level: 3 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Heading 3">H3</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().undo().run(); }} className="px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50" title="Undo">↺ Undo</button>
+    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().redo().run(); }} className="px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50" title="Redo">↻ Redo</button>
+  </div>
+)
+
 
   return (
-    <div className='mb-4'>
-      <label htmlFor='content' className={FIELD_STYLES.label}>
+    <div className="mb-4">
+      <label htmlFor="content" className={FIELD_STYLES.label}>
         {UI_TEXT.labels.content || 'Content'}
         <RequiredIndicator />
       </label>
-      <div
-        id='content'
-        className='mt-2 min-h-[150px] rounded-md border border-gray-300 p-2 focus-within:border-indigo-600 prose max-w-full'
-      >
-        <EditorContent editor={editor} />
+      <div className="mt-2 min-h-[150px] rounded-md border border-gray-300 p-2 focus-within:border-indigo-600 prose max-w-full">
+        {editor && <Toolbar />}
+        {editor && <EditorContent editor={editor} className='tiptap-editor prose prose-sm max-w-none min-h-[150px] p-2' />}
       </div>
+      
       {meta.touched && meta.error && (
         <div className={FIELD_STYLES.error}>{meta.error}</div>
       )}
     </div>
-  )
-}
+  );
+};
 

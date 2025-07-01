@@ -19,11 +19,11 @@ const Body = () => {
           path: 'post/:id',
           element: <Detail />,
         },
-        /* {
+        {
           path: "create",
           element: <Create />,
         },
-        {
+        /*{
           path: "profile",
           element: <Profile />,
         },

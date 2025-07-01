@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from 'react-router'
-import { usePost } from '../hooks/usePost'
-import heroImage from '../assets/img/detail_hero1.webp'
-import Hero from './Hero'
-import { PostCardSkeleton, ImageSkeleton } from './Skeleton'
-import RestaurantDetail from './Post/RestaurantDetail'
-import { UI_TEXT } from '../utils/constants/ui'
+import { usePost } from '../../hooks/usePost'
+import heroImage from '../../assets/img/detail_hero1.webp'
+import Hero from '../Hero'
+import { PostCardSkeleton, ImageSkeleton } from '../Skeleton'
+import { UI_TEXT } from '../../utils/constants/ui'
+import CreateForm from './CreateForm'
 
 const Create = () => {
   const { id } = useParams()
@@ -35,36 +35,9 @@ const Create = () => {
         />
         <div className='text-center'>
           <h2 className='text-2xl font-bold text-gray-900 mb-4'>
-            Post Not Found
+            Something went wrong!
           </h2>
           <p className='text-gray-600 mb-6'>{error.message}</p>
-          <button
-            onClick={() => navigate(-1)}
-            className='btn btn-primary'
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
-    )
-  }
-
-  if (!post) {
-    return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-        <Hero
-          heroImage={heroImage}
-          showButton={false}
-          title={UI_TEXT.detailHero.title}
-          description={UI_TEXT.detailHero.description}
-        />
-        <div className='text-center'>
-          <h2 className='text-2xl font-bold text-gray-900 mb-4'>
-            Post Not Found
-          </h2>
-          <p className='text-gray-600 mb-6'>
-            The restaurant post you're looking for doesn't exist.
-          </p>
           <button
             onClick={() => navigate(-1)}
             className='btn btn-primary'
@@ -81,16 +54,22 @@ const Create = () => {
       <Hero
         heroImage={heroImage}
         showButton={false}
-        title={UI_TEXT.detailHero.title}
-        description={UI_TEXT.detailHero.description}
+        title={UI_TEXT.createHero.title}
+        description={UI_TEXT.createHero.description}
         className='min-h-[30vh]'
       />
-      <RestaurantDetail
-        post={post}
-        loading={loading}
-        error={error}
-        className='mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4'
+
+      <div className='container mx-auto px-4 py-12 max-w-2xl'>
+      <CreateForm
+        isSignInForm={false}
+        onSubmit={(values) => {
+          // form submission logic here
+          console.log('Form submitted with:', values)
+        }}
+        isLoading={false}
       />
+    </div>
+
     </div>
   )
 }

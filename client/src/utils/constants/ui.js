@@ -60,8 +60,9 @@ export const UI_TEXT = {
       'Explore the best spots, rate your favorites, and find your next favorite place.',
   },
   createHero: {
-    title: 'Create Your Reviews/Recommendations',
-    description: '',
+    title: 'Create Your Reviews/ Recommendations',
+    description:
+      '',
   },
   editHero: {
     title: 'Edit Your Reviews/Recommendations',

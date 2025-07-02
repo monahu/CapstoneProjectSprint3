@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin "daisyui";
+@import 'prosemirror-view/style/prosemirror.css';
 
 .gradient-bg {
     background: radial-gradient(circle,
@@ -7,4 +8,31 @@
             rgba(204, 198, 217, 0.1) 42%,
             rgba(148, 187, 233, 0.1) 87%);
     color: #000;
+}
+
+.tiptap-editor :is(ul, ol) {
+  list-style-type: revert !important;
+  margin-left: 1.5rem;
+  padding-left: 1rem;
+}
+
+.tiptap-editor h1 {
+  font-size: 2.25rem; /* Tailwind's text-4xl */
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.tiptap-editor h2 {
+  font-size: 1.875rem; /* text-3xl */
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+}
+
+.tiptap-editor h3 {
+  font-size: 1.5rem; /* text-2xl */
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
 }

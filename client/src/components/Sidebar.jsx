@@ -14,6 +14,7 @@ import {
   TransitionChild,
 } from '@headlessui/react'
 import { Link } from 'react-router'
+import { NAVIGATION } from '../utils/constants/navigation'
 import { APP_CONFIG } from '../utils/constants/app'
 import SearchForm from './SearchForm'
 import { useSelector } from 'react-redux'

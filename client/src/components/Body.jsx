@@ -3,7 +3,7 @@ import { Login } from './Login'
 import Browse from './Browse'
 import Home from './Home'
 import Detail from './Detail'
-import Create from './Create'
+import Create from './Create/Create'
 import Explore from './Explore'
 import ErrorPage from './ErrorPage'
 const Body = () => {

@@ -1,15 +1,24 @@
-import { House, SquarePen, Settings, Telescope, X, LogIn } from 'lucide-react'
+import {
+  House,
+  SquarePen,
+  Settings,
+  Telescope,
+  X,
+  LogIn,
+  Search,
+} from 'lucide-react'
 import {
   Dialog,
   DialogBackdrop,
   DialogPanel,
   TransitionChild,
 } from '@headlessui/react'
-import { Link, useLocation } from 'react-router'
+import { Link } from 'react-router'
 import { NAVIGATION } from '../utils/constants/navigation'
 import { APP_CONFIG } from '../utils/constants/app'
 import SearchForm from './SearchForm'
 import { useSelector } from 'react-redux'
+import { useSidebar } from '../hooks'
 
 const iconMap = {
   House,
@@ -69,40 +78,44 @@ const Sidebar = ({ sidebarOpen, setSidebarOpen }) => {
   )
 }
 
-
 const SidebarContent = ({ user }) => {
-  const location = useLocation();
-  const navigationList = user
-    ? NAVIGATION.sidebar.map((item) => ({
-        ...item,
-        icon: iconMap[item.icon],
-        current: location.pathname === item.href,
-      }))
-    : NAVIGATION.sidebarVisitor.map((item) => ({
-        ...item,
-        icon: iconMap[item.icon],
-        current: location.pathname === item.href,
-      }));
-  const tags = NAVIGATION.tags;
-  const explore = {
-    ...NAVIGATION.explore,
-    icon: iconMap[NAVIGATION.explore.icon],
-    current: location.pathname === NAVIGATION.explore.href,
-  };
+  const {
+    navigationList: navList,
+    explore: exploreData,
+    tags,
+    hasMoreTags,
+    showAllTags,
+    setShowAllTags,
+    handleTagClick,
+    classNames,
+  } = useSidebar(user)
 
-  function classNames(...classes) {
-    return classes.filter(Boolean).join(' ')
+  // Add icons to navigation items
+  const navigationList = navList.map((item) => ({
+    ...item,
+    icon: iconMap[item.icon],
+  }))
+
+  // Add icon to explore data
+  const explore = {
+    ...exploreData,
+    icon: iconMap[exploreData.icon],
   }
 
   return (
     <>
       <div className='flex grow flex-col gap-y-5 overflow-y-auto  bg-white px-6'>
         <div className='flex h-16 shrink-0 items-center'>
-          <img
-            alt={APP_CONFIG.name}
-            src={APP_CONFIG.logo}
-            className='h-12 w-auto mt-2'
-          />
+          <Link
+            to='/'
+            className='flex items-center hover:opacity-80 transition-opacity'
+          >
+            <img
+              alt={APP_CONFIG.name}
+              src={APP_CONFIG.logo}
+              className='h-12 w-auto mt-2'
+            />
+          </Link>
         </div>
         <nav className='mt-6 flex flex-1 flex-col'>
           <ul
@@ -142,8 +155,8 @@ const SidebarContent = ({ user }) => {
             </li>
             <li>
               <div className='text-xs/6 font-semibold text-gray-400 flex flex-row gap-x-3'>
-                <a
-                  href={explore.href}
+                <Link
+                  to={explore.href}
                   className={classNames(
                     explore.current
                       ? 'bg-primary text-white'
@@ -161,7 +174,7 @@ const SidebarContent = ({ user }) => {
                     )}
                   />
                   {explore.name}
-                </a>
+                </Link>
               </div>
               <ul
                 role='list'
@@ -169,7 +182,8 @@ const SidebarContent = ({ user }) => {
               >
                 {tags.map((tag) => (
                   <li key={tag.name}>
-                    <a
+                    <button
+                      onClick={() => handleTagClick(tag.name)}
                       className={classNames(
                         tag.current
                           ? ' text-white'
@@ -182,18 +196,33 @@ const SidebarContent = ({ user }) => {
                           tag.current
                             ? 'border-primary bg-primary'
                             : 'border-gray-600 bg-gray-50 hover:border-indigo-600 group-hover:text-indigo-600 ',
-                          'flex size-6 w-full px-3 py-1 items-center justify-center rounded-xl border-[1.4px] text-[0.9rem] font-medium'
+                          'flex size-6 w-full px-3 py-1 items-center justify-center rounded-xl border-[1.4px] text-[0.9rem] font-medium cursor-pointer transition-colors'
                         )}
                       >
                         {tag.name}
                       </span>
                       {/* <span className='truncate'>{tag.name}</span> */}
-                    </a>
+                    </button>
                   </li>
                 ))}
               </ul>
+
+              {/* More Button */}
+              {hasMoreTags && (
+                <div className='mt-3 text-center'>
+                  <button
+                    onClick={() => setShowAllTags(!showAllTags)}
+                    className='text-purple-600 text-sm font-medium underline hover:text-purple-800 transition-colors'
+                  >
+                    {showAllTags ? 'less' : 'more'}
+                  </button>
+                </div>
+              )}
             </li>
-            <SearchForm className=' md:hidden border-t border-gray-200 pt-4' />
+            <SearchForm
+              className=' md:hidden border-t border-gray-200 pt-4'
+              hideClearButton={true}
+            />
           </ul>
         </nav>
       </div>

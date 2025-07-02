@@ -4,6 +4,7 @@ import Browse from './Browse'
 import Home from './Home'
 import Detail from './Detail'
 import Create from './Create'
+import Explore from './Explore'
 import ErrorPage from './ErrorPage'
 const Body = () => {
   const appRouter = createBrowserRouter([
@@ -20,17 +21,17 @@ const Body = () => {
           element: <Detail />,
         },
         {
-          path: "create",
+          path: 'create',
           element: <Create />,
         },
         /*{
           path: "profile",
           element: <Profile />,
-        },
+        },*/
         {
-          path: "explore",
+          path: 'explore',
           element: <Explore />,
-        }, */
+        },
       ],
     },
     {

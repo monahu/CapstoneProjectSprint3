@@ -19,6 +19,23 @@ const postFieldResolvers = {
    * Resolve the author of a post
    */
   author: async (parent) => {
+    // Always fetch fresh user data from database instead of relying on populate
+    const freshUser = await User.findById(parent.userId._id || parent.userId)
+
+    if (freshUser) {
+      const result = {
+        id: freshUser._id.toString(),
+        displayName: freshUser.displayName || DEFAULT_USER_DISPLAY_NAME,
+        photoURL: freshUser.photoURL || DEFAULT_USER_PHOTO_URL,
+        firstName: freshUser.firstName || '',
+        lastName: freshUser.lastName || '',
+        email: freshUser.email || '',
+      }
+      console.log('✅ Returning fresh author data:', result)
+      return result
+    }
+
+    // Fallback to populated data if fresh lookup fails
     if (parent.userId._id) {
       const result = {
         id: parent.userId._id.toString(),
@@ -28,10 +45,11 @@ const postFieldResolvers = {
         lastName: parent.userId.lastName || '',
         email: parent.userId.email || '',
       }
-
+      console.log('⚠️ Using fallback populated data:', result)
       return result
     }
 
+    console.log('❌ No user data found, should not happen')
     const user = await User.findById(parent.userId)
     return user
   },

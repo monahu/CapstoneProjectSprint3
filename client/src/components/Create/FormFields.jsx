@@ -1,11 +1,10 @@
-import { Field, ErrorMessage, useField, useFormikContext  } from 'formik'
-import { UI_TEXT } from '../../utils/constants/ui'
-import { FORM_PLACEHOLDERS } from '../../utils/constants/form'
-import { useEffect } from 'react'
-import { EditorContent, useEditor } from '@tiptap/react'
-import StarterKit from '@tiptap/starter-kit'
+import { Field, ErrorMessage, useField, useFormikContext } from 'formik';
+import { UI_TEXT } from '../../utils/constants/ui';
+import { FORM_PLACEHOLDERS } from '../../utils/constants/form';
+import { useEffect } from 'react';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
 
-// Common styles
 const FIELD_STYLES = {
   label: 'block text-sm font-medium text-gray-900',
   input:
@@ -13,16 +12,13 @@ const FIELD_STYLES = {
   error: 'mt-1 text-sm text-red-600',
   required: 'text-pink-600',
   optional: 'text-sm text-gray-500 ml-1',
-}
+};
 
 const RequiredIndicator = () => (
-  <span
-    className={FIELD_STYLES.required}
-    aria-label='required'
-  >
+  <span className={FIELD_STYLES.required} aria-label="required">
     {UI_TEXT.labels.required}
   </span>
-)
+);
 
 const FormField = ({
   id,
@@ -35,10 +31,7 @@ const FormField = ({
   className = '',
 }) => (
   <div className={className}>
-    <label
-      htmlFor={id}
-      className={FIELD_STYLES.label}
-    >
+    <label htmlFor={id} className={FIELD_STYLES.label}>
       {label}
       {required ? (
         <RequiredIndicator />
@@ -46,7 +39,7 @@ const FormField = ({
         <span className={FIELD_STYLES.optional}>(optional)</span>
       )}
     </label>
-    <div className='mt-2'>
+    <div className="mt-2">
       <Field
         id={id}
         name={name}
@@ -59,101 +52,95 @@ const FormField = ({
       />
       <ErrorMessage
         name={name}
-        component='div'
+        component="div"
         className={FIELD_STYLES.error}
         id={`${name}-error`}
-        role='alert'
-        aria-live='polite'
+        role="alert"
+        aria-live="polite"
       />
     </div>
   </div>
-)
+);
 
 export const TitleField = () => (
   <FormField
-    id='title'
-    name='title'
-    type='text'
+    id="title"
+    name="title"
+    type="text"
     label={UI_TEXT.labels.title}
-    autoComplete='off'
+    autoComplete="off"
     required
   />
-)
+);
 
 export const ImageUploadField = () => {
-  const { setFieldValue } = useFormikContext()
-  const [field, meta] = useField('image')
+  const { setFieldValue } = useFormikContext();
+  const [field, meta] = useField('image');
 
   return (
-    <div className='mb-4'>
-      <label
-        htmlFor='image'
-        className={FIELD_STYLES.label}
-      >
+    <div className="mb-4">
+      <label htmlFor="image" className={FIELD_STYLES.label}>
         {UI_TEXT.labels.image}
         <RequiredIndicator />
       </label>
-      <div className='mt-2'>
+      <div className="mt-2">
         <input
-          id='image'
-          name='image'
-          type='file'
-          accept='image/*'
+          id="image"
+          name="image"
+          type="file"
+          accept="image/*"
           onChange={(event) => {
-            setFieldValue('image', event.currentTarget.files[0])
+            setFieldValue('image', event.currentTarget.files[0]);
           }}
-          className='block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500'
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-indigo-600 file:text-white hover:file:bg-indigo-500"
         />
         {meta.touched && meta.error && (
           <div className={FIELD_STYLES.error}>{meta.error}</div>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 export const RichTextField = () => {
   const { setFieldValue } = useFormikContext();
   const [field, meta] = useField('content');
 
- const editor = useEditor({
-  extensions: [
-    StarterKit.configure({
-      bulletList: { keepMarks: true, keepAttributes: false },
-      orderedList: { keepMarks: true, keepAttributes: false },
-      heading: { levels: [1, 2, 3] },
-    }),
-  ],
-  content: field.value || '',
-  onUpdate: ({ editor }) => {
-    setFieldValue('content', editor.getHTML());
-  },
-});
-  // Only set content on mount, not on every value change (prevents double-click issue)
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        bulletList: { keepMarks: true, keepAttributes: false },
+        orderedList: { keepMarks: true, keepAttributes: false },
+        heading: { levels: [1, 2, 3] },
+      }),
+    ],
+    content: field.value || '',
+    onUpdate: ({ editor }) => {
+      setFieldValue('content', editor.getHTML());
+    },
+  });
+
   useEffect(() => {
     if (editor && field.value && editor.getHTML() !== field.value) {
       editor.commands.setContent(field.value);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor]);
 
-  // toolbar component for rich text formatting
   const Toolbar = () => (
-  <div className="flex gap-2 mb-2 flex-wrap">
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run(); }} className={editor.isActive('bold') ? 'font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Bold"><b>B</b></button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run(); }} className={editor.isActive('italic') ? 'italic bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Italic"><i>I</i></button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run(); }} className={editor.isActive('strike') ? 'line-through bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Strikethrough"><s>S</s></button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run(); }} className={editor.isActive('bulletList') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Bullet List">• List</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run(); }} className={editor.isActive('orderedList') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Ordered List">1. List</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().setParagraph().run(); }} className={editor.isActive('paragraph') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Paragraph">P</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 1 }).run(); }} className={editor.isActive('heading', { level: 1 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Heading 1">H1</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run(); }} className={editor.isActive('heading', { level: 2 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Heading 2">H2</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run(); }} className={editor.isActive('heading', { level: 3 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'} title="Heading 3">H3</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().undo().run(); }} className="px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50" title="Undo">↺ Undo</button>
-    <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().redo().run(); }} className="px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50" title="Redo">↻ Redo</button>
-  </div>
-)
-
+    <div className="flex gap-2 mb-2 flex-wrap items-center">
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBold().run(); }} className={editor.isActive('bold') ? 'font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>B</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleItalic().run(); }} className={editor.isActive('italic') ? 'italic bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>I</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleStrike().run(); }} className={editor.isActive('strike') ? 'line-through bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>S</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleBulletList().run(); }} className={editor.isActive('bulletList') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>• List</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleOrderedList().run(); }} className={editor.isActive('orderedList') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>1. List</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().setParagraph().run(); }} className={editor.isActive('paragraph') ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>P</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 1 }).run(); }} className={editor.isActive('heading', { level: 1 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>H1</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 2 }).run(); }} className={editor.isActive('heading', { level: 2 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>H2</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().toggleHeading({ level: 3 }).run(); }} className={editor.isActive('heading', { level: 3 }) ? 'bg-indigo-100 text-indigo-700 px-2 py-1 rounded border border-gray-300' : 'px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50'}>H3</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().undo().run(); }} className="px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50">↺ Undo</button>
+      <button type="button" onMouseDown={(e) => { e.preventDefault(); editor.chain().focus().redo().run(); }} className="px-2 py-1 rounded border border-gray-300 hover:bg-indigo-50">↻ Redo</button>
+    </div>
+  );
 
   return (
     <div className="mb-4">
@@ -163,13 +150,16 @@ export const RichTextField = () => {
       </label>
       <div className="mt-2 min-h-[150px] rounded-md border border-gray-300 p-2 focus-within:border-indigo-600 prose max-w-full">
         {editor && <Toolbar />}
-        {editor && <EditorContent editor={editor} className='tiptap-editor prose prose-sm max-w-none min-h-[150px] p-2' />}
+        {editor && (
+          <EditorContent
+            editor={editor}
+            className="tiptap-editor prose prose-sm max-w-none min-h-[150px] p-2"
+          />
+        )}
       </div>
-      
       {meta.touched && meta.error && (
         <div className={FIELD_STYLES.error}>{meta.error}</div>
       )}
     </div>
   );
 };
-

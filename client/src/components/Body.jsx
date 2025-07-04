@@ -4,7 +4,7 @@ import Browse from './Browse'
 import Home from './Home'
 import Detail from './Detail'
 import Create from './Create/Create'
-import Explore from './Explore'
+import Explore from './Explore/Explore'
 import ErrorPage from './ErrorPage'
 const Body = () => {
   const appRouter = createBrowserRouter([

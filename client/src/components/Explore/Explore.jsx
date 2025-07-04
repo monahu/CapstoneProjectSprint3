@@ -1,10 +1,10 @@
-import Hero from "./Hero"
-import ExploreHeader from "./Explore/ExploreHeader"
-import ActiveFilters from "./Explore/ActiveFilters"
-import ExploreResults from "./Explore/ExploreResults"
-import { useExplore } from "../hooks"
-import heroImage from "../assets/img/explore_hero1.webp"
-import { UI_TEXT } from "../utils/constants/ui"
+import Hero from '../Hero'
+import ExploreHeader from './ExploreHeader'
+import ActiveFilters from './ActiveFilters'
+import ExploreResults from './ExploreResults'
+import { useExplore } from '../../hooks'
+import heroImage from '../../assets/img/explore_hero1.webp'
+import { UI_TEXT } from '../../utils/constants/ui'
 
 const Explore = () => {
   const {
@@ -32,13 +32,13 @@ const Explore = () => {
   } = useExplore()
 
   return (
-    <div className="min-h-screen">
+    <div className='min-h-screen'>
       <Hero
         heroImage={heroImage}
         showButton={false}
         title={UI_TEXT.exploreHero.title}
         description={UI_TEXT.exploreHero.description}
-        className="h-[30vh]"
+        className='h-[30vh]'
       />
 
       <ExploreHeader

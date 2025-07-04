@@ -1,4 +1,4 @@
-import RatingBubble from "./RatingBubble"
+import { RatingBubble } from "../Post"
 
 const PostMeta = ({ author, rating, layout = "detail" }) => {
   if (layout === "card") {

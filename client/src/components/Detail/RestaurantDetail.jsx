@@ -1,38 +1,36 @@
-import { useNavigate } from 'react-router'
-import { usePostActions } from '../../hooks/usePostActions'
-import { PostCardSkeleton } from '../Skeleton'
-import PostActions from './PostActions'
-import PostImage from './PostImage'
-import PostMeta from './PostMeta'
-import PostTags from './PostTags'
-import PostHeader from './PostHeader'
-import PostDate from './PostDate'
-import AttendeesList from './AttendeesList'
-import MapView from './MapView'
+import { useNavigate } from "react-router"
+import { usePostActions } from "../../hooks/usePostActions"
+import { PostCardSkeleton } from "../Skeleton"
+import { PostImage, PostTags, PostActions } from "../Post"
+import PostMeta from "./PostMeta"
+import PostHeader from "./PostHeader"
+import PostDate from "./PostDate"
+import AttendeesList from "./AttendeesList"
+import MapView from "./MapView"
 
 const apiKey =
   import.meta.env.VITE_GOOGLE_MAPS_API_KEY ||
-  'AIzaSyBVlQTh9Q_24hXDsANsF4cBLTQF5edIMTg'
+  "AIzaSyBVlQTh9Q_24hXDsANsF4cBLTQF5edIMTg"
 
 const LoadingState = () => (
-  <div className='min-h-screen bg-gray-50 px-4 py-8'>
-    <div className='max-w-2xl mx-auto'>
+  <div className="min-h-screen bg-gray-50 px-4 py-8">
+    <div className="max-w-2xl mx-auto">
       <PostCardSkeleton />
     </div>
   </div>
 )
 
 const ErrorState = ({ error, navigate }) => (
-  <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-    <div className='text-center'>
-      <h2 className='text-2xl font-bold text-gray-900 mb-4'>Post Not Found</h2>
-      <p className='text-gray-600 mb-6'>
+  <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="text-center">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4">Post Not Found</h2>
+      <p className="text-gray-600 mb-6">
         {error?.message ||
           "The restaurant post you're looking for doesn't exist."}
       </p>
       <button
         onClick={() => navigate(-1)}
-        className='btn btn-primary'
+        className="btn btn-primary"
       >
         Go Back
       </button>
@@ -72,7 +70,7 @@ const RestaurantDetail = ({ post, loading, error, className }) => {
       />
 
       {/* Content */}
-      <div className='p-4 sm:p-6'>
+      <div className="p-4 sm:p-6">
         <PostHeader
           title={post.title}
           location={post.location}
@@ -82,8 +80,8 @@ const RestaurantDetail = ({ post, loading, error, className }) => {
         <PostTags tags={post.tags} />
 
         {/* Description */}
-        <div className='mb-6 px-2 lg:px-20'>
-          <p className='text-gray-700 leading-relaxed text-sm sm:text-base'>
+        <div className="mb-6 px-2 lg:px-20">
+          <p className="text-gray-700 leading-relaxed text-sm sm:text-base">
             {post.content}
           </p>
         </div>
@@ -93,9 +91,9 @@ const RestaurantDetail = ({ post, loading, error, className }) => {
         <PostActions {...postActions} />
 
         {/* More Info Section */}
-        <div className='mt-12'>
-          <div className='text-gray-600 text-base mb-4 divider'>More Info</div>
-          <h3 className='text-lg font-semibold text-gray-900 mb-3 px-2 lg:px-20'>
+        <div className="mt-12">
+          <div className="text-gray-600 text-base mb-4 divider">More Info</div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-3 px-2 lg:px-20">
             Poster
           </h3>
           <PostMeta

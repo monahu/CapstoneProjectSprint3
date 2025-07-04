@@ -1,15 +1,15 @@
-import { createBrowserRouter, RouterProvider } from 'react-router'
-import { Login } from './Login'
-import Browse from './Browse'
-import Home from './Home'
-import Detail from './Detail'
-import Create from './Create/Create'
-import Explore from './Explore/Explore'
-import ErrorPage from './ErrorPage'
+import { createBrowserRouter, RouterProvider } from "react-router"
+import { Login } from "./Login"
+import Browse from "./Browse"
+import Home from "./Home"
+import { Detail } from "./Detail"
+import Create from "./Create/Create"
+import { Explore } from "./Explore"
+import ErrorPage from "./ErrorPage"
 const Body = () => {
   const appRouter = createBrowserRouter([
     {
-      path: '/',
+      path: "/",
       element: <Browse />,
       children: [
         {
@@ -17,11 +17,11 @@ const Body = () => {
           element: <Home />,
         },
         {
-          path: 'post/:id',
+          path: "post/:id",
           element: <Detail />,
         },
         {
-          path: 'create',
+          path: "create",
           element: <Create />,
         },
         /*{
@@ -29,17 +29,17 @@ const Body = () => {
           element: <Profile />,
         },*/
         {
-          path: 'explore',
+          path: "explore",
           element: <Explore />,
         },
       ],
     },
     {
-      path: '/login',
+      path: "/login",
       element: <Login />,
     },
     {
-      path: '*', // Catch-all route for 404
+      path: "*", // Catch-all route for 404
       element: <ErrorPage />,
     },
   ])

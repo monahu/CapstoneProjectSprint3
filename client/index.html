@@ -5,10 +5,21 @@
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/restjam.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description"
+    content="RestJAM is a platform for creating and sharing your own recommendations for restaurants, food spots, and more.">
   <title>RestJAM</title>
+  <!-- Essential preconnects only -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="dns-prefetch" href="//fonts.gstatic.com">
-  <link rel="preload" href="src/assets/images/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px)">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+  <!-- Module preloading -->
+  <link rel="modulepreload" href="/src/main.jsx">
+  <link rel="modulepreload" href="/src/App.jsx">
+
+  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px)">
+  <link rel="preload" href="/src/assets/img/restJam_hero1_tablet.webp" as="image"
+    media="(min-width: 769px) and (max-width: 1024px)">
+  <link rel="preload" href="/src/assets/img/restJam_hero1.webp" as="image" media="(min-width: 1025px)">
 </head>
 
 <body>

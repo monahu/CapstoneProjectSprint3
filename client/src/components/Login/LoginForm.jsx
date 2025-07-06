@@ -6,8 +6,8 @@ import {
 } from "./FormFields";
 import { UI_TEXT } from "../../utils/constants/ui";
 import { FORM_CONFIG } from "../../utils/constants/form";
-import FieldWithMic from "../Speech/FieldWithMic";
-import SpeechButton from "../Speech/SpeechButton";
+import { FieldWithMic, SpeechButton } from "../Speech";
+
 
 const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
   const handleSubmit = async (values, { setSubmitting }) => {

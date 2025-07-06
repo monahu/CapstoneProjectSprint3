@@ -1,6 +1,10 @@
 server/node_modules/*
 server/.env
 .env
+# Allow example env files
+!.env.example
+!client/.env.example
+!server/.env.example
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

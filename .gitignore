@@ -11,3 +11,4 @@ server/.env
 *.njsproj
 *.sln
 *.sw?
+client/.env

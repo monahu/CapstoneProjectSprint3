@@ -8,7 +8,6 @@ import { UI_TEXT } from "../../utils/constants/ui";
 import { FORM_CONFIG } from "../../utils/constants/form";
 import { FieldWithMic, SpeechButton } from "../Speech";
 
-
 const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
@@ -33,7 +32,7 @@ const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
     >
       {({ setFieldValue }) => (
         <Form className="space-y-6">
-          {!isSignInForm && <SignUpFields />}
+          {!isSignInForm && <SignUpFields setFieldValue={setFieldValue} />}
 
           <FieldWithMic name="email" type="email">
             <SpeechButton
@@ -49,7 +48,7 @@ const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
             />
           </FieldWithMic>
 
-          {!isSignInForm && <ConfirmPasswordField />}
+          {!isSignInForm && <ConfirmPasswordField setFieldValue={setFieldValue} />}
 
           <div className="flex items-center justify-between">
             <div className="text-sm/6">

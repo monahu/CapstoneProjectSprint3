@@ -61,7 +61,7 @@ const Create = () => {
 
       <div className="w-full px-0 sm:px-0 py-8 flex justify-center">
         <div
-          className="bg-white rounded-xl shadow-lg p-4 sm:p-8 md:p-10 mt-6 md:mt-10 w-full max-w-screen-xl"
+          className="bg-white rounded-xl shadow-lg p-2 xs:p-4 sm:p-6 md:p-10 mt-6 md:mt-10 w-full max-w-screen-xl mx-0 sm:mx-4"
         >
           <CreateForm
             isSignInForm={false}

@@ -4,7 +4,7 @@ import { FieldWithMic, SpeechButton } from "../components/Speech";
 import * as Yup from "yup";
 import Hero from "./Hero";
 import heroImage from "./../assets/img/login_hero1.webp";
-import { UI_TEXT } from "./../utils/constants/ui"; 
+import { UI_TEXT } from "./../utils/constants/ui";
 
 const validationSchema = Yup.object({
     isAnonymous: Yup.string().required(),
@@ -27,7 +27,7 @@ const validationSchema = Yup.object({
     message: Yup.string(),
 });
 
-const predefinedAmounts = [1, 5, 10, 15];
+const predefinedAmounts = [1, 3, 5, 10, 15, 20, 25];
 
 const Donate = () => {
     const [customAmountSelected, setCustomAmountSelected] = useState(false);
@@ -172,16 +172,29 @@ const Donate = () => {
                                 </div>
 
                                 {customAmountSelected && (
-                                    <FieldWithMic
-                                        name="amount"
-                                        label="Enter custom amount"
-                                        type="number"
-                                    >
-                                        <SpeechButton
-                                            fieldName="amount"
-                                            setFieldValue={setFieldValue}
+                                    <div>
+                                        <label
+                                            htmlFor="amount"
+                                            className="block font-medium mb-1"
+                                        >
+                                            Enter custom amount
+                                        </label>
+                                        <input
+                                            id="amount"
+                                            name="amount"
+                                            type="number"
+                                            min="1"
+                                            step="any"
+                                            onChange={(e) =>
+                                                setFieldValue(
+                                                    "amount",
+                                                    parseFloat(e.target.value)
+                                                )
+                                            }
+                                            className="w-full border rounded px-3 py-2"
+                                            placeholder="e.g. 3.50"
                                         />
-                                    </FieldWithMic>
+                                    </div>
                                 )}
                             </div>
 

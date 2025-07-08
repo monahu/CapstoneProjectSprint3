@@ -6,6 +6,8 @@ import { Detail } from "./Detail"
 import Create from "./Create/Create"
 import { Explore } from "./Explore"
 import ErrorPage from "./ErrorPage"
+import Donate from "./Donate"
+
 const Body = () => {
   const appRouter = createBrowserRouter([
     {
@@ -28,6 +30,10 @@ const Body = () => {
           path: "profile",
           element: <Profile />,
         },*/
+        {
+          path: "donate",
+          element: <Donate />,
+        },
         {
           path: "explore",
           element: <Explore />,

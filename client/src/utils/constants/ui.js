@@ -97,4 +97,10 @@ export const UI_TEXT = {
     searchPlaceholder: 'Search restaurants, places, or tags...',
     mobileSearchPlaceholder: 'Search...',
   },
+  donateHero: {
+    title: 'Support Our Mission',
+    description:
+      'Your contributions help us maintain and improve our platform. Every donation counts!',
+    button: 'Donate Now',
+  },
 }

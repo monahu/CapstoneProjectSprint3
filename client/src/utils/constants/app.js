@@ -12,5 +12,6 @@ export const ROUTES = {
   EDIT: '/edit',
   EXPLORE: '/explore',
   ERROR: '/error',
+  DONATE: '/donate',
   POST_DETAIL: '/post',
 }

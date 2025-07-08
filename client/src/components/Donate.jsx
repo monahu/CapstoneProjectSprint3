@@ -1,0 +1,216 @@
+import { useState } from "react";
+import { Formik, Form } from "formik";
+import { FieldWithMic, SpeechButton } from "../components/Speech";
+import * as Yup from "yup";
+import Hero from "./Hero";
+import heroImage from "./../assets/img/login_hero1.webp";
+import { UI_TEXT } from "./../utils/constants/ui"; 
+
+const validationSchema = Yup.object({
+    isAnonymous: Yup.string().required(),
+    name: Yup.string().when("isAnonymous", {
+        is: "no",
+        then: (schema) => schema.required("Required"),
+        otherwise: (schema) => schema.notRequired(),
+    }),
+    email: Yup.string()
+        .email("Invalid email")
+        .when("isAnonymous", {
+            is: "no",
+            then: (schema) => schema.required("Required"),
+            otherwise: (schema) => schema.notRequired(),
+        }),
+    amount: Yup.number()
+        .typeError("Please enter a valid number")
+        .min(1, "Minimum is 1")
+        .required("Required"),
+    message: Yup.string(),
+});
+
+const predefinedAmounts = [1, 5, 10, 15];
+
+const Donate = () => {
+    const [customAmountSelected, setCustomAmountSelected] = useState(false);
+
+    return (
+        <main>
+            <Hero
+                heroImage={heroImage}
+                title={UI_TEXT.donateHero.title}
+                description={UI_TEXT.donateHero.description}
+                showButton={false}
+                className="min-h-[30vh]"
+                contentClassName="max-w-md"
+            />
+
+            <div className="mx-auto max-w-xl px-6 py-12">
+                <h1 className="text-2xl font-bold mb-6 text-center">
+                    🧋 Buy me a coffee
+                </h1>
+
+                <Formik
+                    initialValues={{
+                        isAnonymous: "no",
+                        name: "",
+                        email: "",
+                        amount: "",
+                        message: "",
+                    }}
+                    validationSchema={validationSchema}
+                    onSubmit={(values) => {
+                        console.log("Donation submitted:", values);
+                        alert("Thanks for your support! 🙏");
+                    }}
+                >
+                    {({ setFieldValue, values }) => (
+                        <Form className="space-y-6">
+                            {/* Anonymous Toggle */}
+                            <div>
+                                <label className="block font-medium mb-1">
+                                    Donate as:
+                                </label>
+                                <div className="flex space-x-4">
+                                    <label className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            name="isAnonymous"
+                                            value="no"
+                                            checked={
+                                                values.isAnonymous === "no"
+                                            }
+                                            onChange={() =>
+                                                setFieldValue(
+                                                    "isAnonymous",
+                                                    "no"
+                                                )
+                                            }
+                                            className="mr-2"
+                                        />
+                                        Use my name/email
+                                    </label>
+                                    <label className="flex items-center">
+                                        <input
+                                            type="radio"
+                                            name="isAnonymous"
+                                            value="yes"
+                                            checked={
+                                                values.isAnonymous === "yes"
+                                            }
+                                            onChange={() =>
+                                                setFieldValue(
+                                                    "isAnonymous",
+                                                    "yes"
+                                                )
+                                            }
+                                            className="mr-2"
+                                        />
+                                        Anonymous
+                                    </label>
+                                </div>
+                            </div>
+
+                            {/* Conditionally show name/email */}
+                            {values.isAnonymous === "no" && (
+                                <>
+                                    <FieldWithMic name="name" label="Your Name">
+                                        <SpeechButton
+                                            fieldName="name"
+                                            setFieldValue={setFieldValue}
+                                        />
+                                    </FieldWithMic>
+
+                                    <FieldWithMic
+                                        name="email"
+                                        label="Email"
+                                        type="email"
+                                    >
+                                        <SpeechButton
+                                            fieldName="email"
+                                            setFieldValue={setFieldValue}
+                                        />
+                                    </FieldWithMic>
+                                </>
+                            )}
+
+                            {/* Amount */}
+                            <div>
+                                <label className="block font-medium mb-2">
+                                    Donation Amount (CAD)
+                                </label>
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {predefinedAmounts.map((amount) => (
+                                        <button
+                                            key={amount}
+                                            type="button"
+                                            className={`px-4 py-2 border rounded ${
+                                                values.amount === amount
+                                                    ? "bg-green-600 text-white"
+                                                    : "bg-white"
+                                            }`}
+                                            onClick={() => {
+                                                setCustomAmountSelected(false);
+                                                setFieldValue("amount", amount);
+                                            }}
+                                        >
+                                            ${amount}
+                                        </button>
+                                    ))}
+                                    <button
+                                        type="button"
+                                        className={`px-4 py-2 border rounded ${
+                                            customAmountSelected
+                                                ? "bg-green-600 text-white"
+                                                : "bg-white"
+                                        }`}
+                                        onClick={() => {
+                                            setCustomAmountSelected(true);
+                                            setFieldValue("amount", "");
+                                        }}
+                                    >
+                                        Other
+                                    </button>
+                                </div>
+
+                                {customAmountSelected && (
+                                    <FieldWithMic
+                                        name="amount"
+                                        label="Enter custom amount"
+                                        type="number"
+                                    >
+                                        <SpeechButton
+                                            fieldName="amount"
+                                            setFieldValue={setFieldValue}
+                                        />
+                                    </FieldWithMic>
+                                )}
+                            </div>
+
+                            {/* Message */}
+                            <FieldWithMic
+                                name="message"
+                                label="Message (optional)"
+                            >
+                                <SpeechButton
+                                    fieldName="message"
+                                    setFieldValue={setFieldValue}
+                                />
+                            </FieldWithMic>
+
+                            {/* Submit */}
+                            <div className="text-center">
+                                <button
+                                    type="submit"
+                                    className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700"
+                                >
+                                    🧋 Donate
+                                </button>
+                            </div>
+                        </Form>
+                    )}
+                </Formik>
+            </div>
+        </main>
+    );
+};
+
+export default Donate;

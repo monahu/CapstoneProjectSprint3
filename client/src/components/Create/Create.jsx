@@ -59,16 +59,20 @@ const Create = () => {
         className='min-h-[30vh]'
       />
 
-      <div className='container mx-auto px-4 py-12 max-w-2xl'>
-      <CreateForm
-        isSignInForm={false}
-        onSubmit={(values) => {
-          // form submission logic here
-          console.log('Form submitted with:', values)
-        }}
-        isLoading={false}
-      />
-    </div>
+      <div className="w-full px-0 sm:px-0 py-8 flex justify-center">
+        <div
+          className="bg-white rounded-xl shadow-lg p-4 sm:p-8 md:p-10 mt-6 md:mt-10 w-full max-w-screen-xl"
+        >
+          <CreateForm
+            isSignInForm={false}
+            onSubmit={(values) => {
+              // form submission logic here
+              console.log('Form submitted with:', values)
+            }}
+            isLoading={false}
+          />
+        </div>
+      </div>
 
     </div>
   )

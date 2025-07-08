@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router'
-import { usePost } from '../../hooks/usePost'
+import { usePost, useCreatePost } from '../../hooks/usePost'
 import heroImage from '../../assets/img/detail_hero1.webp'
 import Hero from '../Hero'
 import { PostCardSkeleton, ImageSkeleton } from '../Skeleton'
@@ -9,7 +9,9 @@ import CreateForm from './CreateForm'
 const Create = () => {
   const { id } = useParams()
   const navigate = useNavigate()
+
   const { post, loading, error } = usePost(id)
+  const { createPost, loading: creating, error: createError } = useCreatePost()
 
   if (loading) {
     return (
@@ -65,12 +67,50 @@ const Create = () => {
         >
           <CreateForm
             isSignInForm={false}
-            onSubmit={(values) => {
-              // form submission logic here
-              console.log('Form submitted with:', values)
+            onSubmit={async (values, { resetForm }) => {
+              let imageUrls = null;
+              if (values.image) {
+                // Upload image to backend to get all URLs
+                const formData = new FormData();
+                formData.append('image', values.image);
+                const res = await fetch('/api/upload-image', {
+                  method: 'POST',
+                  body: formData,
+                });
+                const data = await res.json();
+                if (data.success) {
+                  imageUrls = data.urls;
+                } else {
+                  throw new Error('Image upload failed');
+                }
+              }
+              const postPayload = {
+                title: values.title,
+                content: values.content,
+                imageUrls,
+              };
+              try {
+                const res = await fetch('/api/posts', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(postPayload),
+                });
+                const data = await res.json();
+                if (data.success) {
+                  resetForm && resetForm();
+                  navigate('/');
+                } else {
+                  throw new Error(data.error || 'Failed to create post');
+                }
+              } catch (err) {
+                console.error('Create post error:', err);
+              }
             }}
-            isLoading={false}
+            isLoading={creating}
           />
+          {createError && (
+            <div className="text-red-600 mt-4">{createError.message}</div>
+          )}
         </div>
       </div>
 

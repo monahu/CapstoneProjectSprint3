@@ -63,8 +63,7 @@ export const UI_TEXT = {
   },
   createHero: {
     title: 'Create Your Reviews/ Recommendations',
-    description:
-      '',
+    description: '',
   },
   editHero: {
     title: 'Edit Your Reviews/Recommendations',
@@ -93,5 +92,9 @@ export const UI_TEXT = {
     searchFor: 'for',
     moreButton: 'more',
     lessButton: 'less',
+  },
+  searchForm: {
+    searchPlaceholder: 'Search restaurants, places, or tags...',
+    mobileSearchPlaceholder: 'Search...',
   },
 }

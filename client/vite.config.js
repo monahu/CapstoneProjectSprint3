@@ -6,6 +6,11 @@ import viteCompression from "vite-plugin-compression"
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), viteCompression()],
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3500',
+    },
+  },
   test: {
     environment: "jsdom",
     setupFiles: ["./src/setupTests.js"],

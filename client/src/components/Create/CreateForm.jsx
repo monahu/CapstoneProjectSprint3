@@ -48,6 +48,18 @@ const CreateForm = ({ onSubmit, isLoading }) => {
       {({ isSubmitting, values, setFieldValue }) => (
         <Form className='space-y-6'>
           <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-900">Review Title</label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Enter review title"
+              value={values.title}
+              onChange={e => setFieldValue('title', e.target.value)}
+            />
+          </div>
+          <div>
             <label htmlFor="placeName" className="block text-sm font-medium text-gray-900">Place Name</label>
             <input
               id="placeName"
@@ -57,18 +69,6 @@ const CreateForm = ({ onSubmit, isLoading }) => {
               placeholder="Enter place name"
               value={values.placeName}
               onChange={e => setFieldValue('placeName', e.target.value)}
-            />
-          </div>
-          <div>
-            <label htmlFor="title" className="block text-sm font-medium text-gray-900">Title</label>
-            <input
-              id="title"
-              name="title"
-              type="text"
-              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
-              placeholder="Enter title"
-              value={values.title}
-              onChange={e => setFieldValue('title', e.target.value)}
             />
           </div>
           <div>
@@ -83,7 +83,7 @@ const CreateForm = ({ onSubmit, isLoading }) => {
               disabled={ratingsLoading}
             >
               <option value="">{ratingsLoading ? 'Loading...' : 'Select rating'}</option>
-              {ratings.map(rating => (
+              {Array.isArray(ratings) && ratings.length > 0 && ratings.map(rating => (
                 <option key={rating._id || rating.id} value={rating._id || rating.id}>{rating.type}{rating.description ? ` - ${rating.description}` : ''}</option>
               ))}
             </select>

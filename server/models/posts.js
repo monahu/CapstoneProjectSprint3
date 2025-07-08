@@ -18,7 +18,12 @@ const postSchema = new mongoose.Schema({
   placeName: { type: String, maxlength: 50 },
   content: { type: String },
   location: { type: String, maxlength: 200 },
-  imageUrl: { type: String, maxlength: 200 },
+  imageUrls: {
+    desktop: { type: String, maxlength: 300 },
+    mobile: { type: String, maxlength: 300 },
+    mobile2x: { type: String, maxlength: 300 },
+    tablet: { type: String, maxlength: 300 },
+  },
   createdAt: { type: Date, default: Date.now },
   shareCount: { type: Number, default: 0 },
 })

@@ -36,6 +36,14 @@ app.use(express.json())
 app.use(cookieParser())
 app.use(cors())
 
+// Image upload route (Cloudinary)
+const imageUploadRoute = require('./routes/imageUpload');
+app.use('/api/upload-image', imageUploadRoute);
+
+// Post REST route
+const postRoute = require('./routes/post');
+app.use('/api/posts', postRoute);
+
 // Create Apollo Server
 const server = new ApolloServer({
   typeDefs,

@@ -1,10 +1,10 @@
 import { Formik, Form } from 'formik'
 import { getValidationSchema } from '../../utils/validationSchema'
 import {
-  TitleField,
   ImageUploadField,
   RichTextField,
 } from './FormFields'
+import { useEffect, useState } from 'react';
 import { UI_TEXT } from '../../utils/constants/ui'
 import { FORM_CONFIG } from '../../utils/constants/form'
 
@@ -19,42 +19,34 @@ const CreateForm = ({ onSubmit, isLoading }) => {
     }
   }
 
+  // Fetch ratings from backend REST API
+  const [ratings, setRatings] = useState([]);
+  const [ratingsLoading, setRatingsLoading] = useState(true);
+  useEffect(() => {
+    fetch('/api/ratings')
+      .then(res => res.json())
+      .then(data => {
+        setRatings(data);
+        setRatingsLoading(false);
+      })
+      .catch(() => setRatingsLoading(false));
+  }, []);
   return (
     <Formik
       initialValues={{
         title: '',
         image: null,
         content: '',
-        userId: '',
         ratingId: '',
         placeName: '',
         location: '',
+        tags: '',
       }}
       // validationSchema={getValidationSchema(isSignInForm)}
       onSubmit={handleSubmit}
     >
-      {({ isSubmitting }) => (
+      {({ isSubmitting, values, setFieldValue }) => (
         <Form className='space-y-6'>
-          <div>
-            <label htmlFor="userId" className="block text-sm font-medium text-gray-900">User ID</label>
-            <input
-              id="userId"
-              name="userId"
-              type="text"
-              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
-              placeholder="Enter user ID"
-            />
-          </div>
-          <div>
-            <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">Rating ID</label>
-            <input
-              id="ratingId"
-              name="ratingId"
-              type="text"
-              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
-              placeholder="Enter rating ID"
-            />
-          </div>
           <div>
             <label htmlFor="placeName" className="block text-sm font-medium text-gray-900">Place Name</label>
             <input
@@ -63,9 +55,39 @@ const CreateForm = ({ onSubmit, isLoading }) => {
               type="text"
               className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
               placeholder="Enter place name"
+              value={values.placeName}
+              onChange={e => setFieldValue('placeName', e.target.value)}
             />
           </div>
-          <TitleField />
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-900">Title</label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Enter title"
+              value={values.title}
+              onChange={e => setFieldValue('title', e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">Rating</label>
+            <select
+              id="ratingId"
+              name="ratingId"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              value={values.ratingId}
+              onChange={e => setFieldValue('ratingId', e.target.value)}
+              required
+              disabled={ratingsLoading}
+            >
+              <option value="">{ratingsLoading ? 'Loading...' : 'Select rating'}</option>
+              {ratings.map(rating => (
+                <option key={rating._id || rating.id} value={rating._id || rating.id}>{rating.type}{rating.description ? ` - ${rating.description}` : ''}</option>
+              ))}
+            </select>
+          </div>
           <div>
             <label htmlFor="location" className="block text-sm font-medium text-gray-900">Location</label>
             <input
@@ -74,6 +96,20 @@ const CreateForm = ({ onSubmit, isLoading }) => {
               type="text"
               className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
               placeholder="Enter location"
+              value={values.location}
+              onChange={e => setFieldValue('location', e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="tags" className="block text-sm font-medium text-gray-900">Tags</label>
+            <input
+              id="tags"
+              name="tags"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Comma separated tags (e.g. Food,Review,Low Calorie)"
+              value={values.tags}
+              onChange={e => setFieldValue('tags', e.target.value)}
             />
           </div>
           <ImageUploadField />

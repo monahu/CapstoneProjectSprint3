@@ -40,6 +40,10 @@ app.use(cors())
 const imageUploadRoute = require('./routes/imageUpload');
 app.use('/api/upload-image', imageUploadRoute);
 
+// Ratings REST route
+const ratingsRouter = require('./routes/ratings');
+app.use('/api/ratings', ratingsRouter);
+
 // Post REST route
 const postRoute = require('./routes/post');
 app.use('/api/posts', postRoute);

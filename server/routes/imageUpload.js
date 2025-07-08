@@ -59,7 +59,9 @@ router.post('/', upload.single('image'), async (req, res) => {
         .webp({ quality: 90 })
         .toBuffer();
       const url = await uploadToCloudinary(resized, filename, folder);
-      urls[size.name || 'desktop'] = url;
+      // Use explicit keys: desktop, mobile, mobile@2x, tablet
+      const key = size.name === '' ? 'desktop' : size.name.replace(/^_/, '');
+      urls[key] = url;
     }
     res.json({ success: true, urls });
   } catch (err) {

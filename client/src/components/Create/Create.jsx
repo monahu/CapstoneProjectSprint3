@@ -67,7 +67,7 @@ const Create = () => {
         >
           <CreateForm
             isSignInForm={false}
-            onSubmit={async (values, { resetForm }) => {
+            onSubmit={async (values, formikHelpers) => {
               let imageUrls = null;
               if (values.image) {
                 // Upload image to backend to get all URLs
@@ -84,20 +84,44 @@ const Create = () => {
                   throw new Error('Image upload failed');
                 }
               }
+              // Convert tags string to array (comma separated, trimmed, non-empty)
+              const tagsArray = (values.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+
+              // Get Firebase ID token
+              let idToken = null;
+              try {
+                const { auth } = await import('../../utils/firebase');
+                if (auth.currentUser) {
+                  idToken = await auth.currentUser.getIdToken();
+                } else {
+                  throw new Error('User not authenticated');
+                }
+              } catch (err) {
+                console.error('Failed to get Firebase ID token:', err);
+                throw err;
+              }
+
               const postPayload = {
                 title: values.title,
                 content: values.content,
                 imageUrls,
+                ratingId: values.ratingId,
+                placeName: values.placeName,
+                location: values.location,
+                tags: tagsArray,
               };
               try {
                 const res = await fetch('/api/posts', {
                   method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${idToken}`,
+                  },
                   body: JSON.stringify(postPayload),
                 });
                 const data = await res.json();
                 if (data.success) {
-                  resetForm && resetForm();
+                  if (formikHelpers && formikHelpers.resetForm) formikHelpers.resetForm();
                   navigate('/');
                 } else {
                   throw new Error(data.error || 'Failed to create post');

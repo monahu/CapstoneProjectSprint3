@@ -8,7 +8,7 @@ import { usePostActions } from "../../hooks/usePostActions"
 
 const RestaurantCard = ({
   id,
-  image = postImage.default,
+  image,
   user,
   title,
   location,
@@ -40,6 +40,9 @@ const RestaurantCard = ({
     navigate(`/post/${id}`)
   }
 
+  // Prefer imageUrls.desktop if available, fallback to image, then default
+  const mainImage = image?.desktop || image || postImage.default;
+
   return (
     <div
       className={`bg-white rounded-2xl shadow-lg overflow-hidden mx-auto cursor-pointer hover:shadow-xl transition-shadow ${className}`}
@@ -47,7 +50,7 @@ const RestaurantCard = ({
     >
       {/* Restaurant Image */}
       <PostImage
-        imageUrl={image}
+        imageUrl={mainImage}
         alt={placeName}
       />
 

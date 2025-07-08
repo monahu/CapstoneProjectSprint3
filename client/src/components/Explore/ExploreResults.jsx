@@ -99,7 +99,7 @@ const ExploreResults = ({
                 <RestaurantCard
                   key={post.id}
                   id={post.id}
-                  image={post.imageUrl}
+                  image={post.imageUrls?.desktop || post.imageUrl}
                   user={{
                     name: post.author?.displayName,
                     avatar:

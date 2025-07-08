@@ -13,7 +13,7 @@ export const RATING_MAP = {
     text: 'Recommended',
     icon: ['ThumbsUp', '😁'],
   },
-  SOSO: {
+  'SO-SO': {
     color: 'bg-accent-content',
     text: 'Not Recommended',
     icon: ['CircleHelp', '🙁'],

@@ -23,7 +23,12 @@ const CreateForm = ({ onSubmit, isLoading }) => {
   const [ratings, setRatings] = useState([]);
   const [ratingsLoading, setRatingsLoading] = useState(true);
   useEffect(() => {
-    fetch('/api/ratings')
+    // Use absolute URL in development if window.location.hostname is not localhost
+    let url = '/api/ratings';
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      url = 'http://localhost:3500/api/ratings';
+    }
+    fetch(url)
       .then(res => res.json())
       .then(data => {
         setRatings(data);

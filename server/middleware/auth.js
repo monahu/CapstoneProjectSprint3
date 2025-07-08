@@ -83,4 +83,4 @@ const smartAuth = async (req, res, next) => {
   return authenticateFirebaseIdToken(req, res, next)
 }
 
-module.exports = { smartAuth, admin }
+module.exports = { smartAuth, admin, authenticateFirebaseIdToken }

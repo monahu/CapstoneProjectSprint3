@@ -13,6 +13,9 @@ export const NAVIGATION = {
     { name: 'Create', href: ROUTES.CREATE, icon: 'SquarePen', current: false },
     { name: 'Profile', href: ROUTES.PROFILE, icon: 'Settings', current: false },
   ],
+  footer: [
+        { name: 'Buy me a coffee', href: ROUTES.DONATE, icon: 'coffee', current: false },
+  ],
   sidebarVisitor: [
     { name: 'Home', href: ROUTES.HOME, icon: 'House', current: true },
     { name: 'Login', href: ROUTES.LOGIN, icon: 'LogIn', current: false },

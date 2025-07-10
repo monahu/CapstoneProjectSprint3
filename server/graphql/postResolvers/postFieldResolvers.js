@@ -31,7 +31,7 @@ const postFieldResolvers = {
         lastName: freshUser.lastName || '',
         email: freshUser.email || '',
       }
-      console.log('✅ Returning fresh author data:', result)
+
       return result
     }
 

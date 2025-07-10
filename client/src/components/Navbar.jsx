@@ -78,7 +78,7 @@ const Navbar = ({ setSidebarOpen }) => {
                 className='size-8 rounded-full'
               />
               <span className='ml-2 text-sm font-semibold text-gray-900 hidden lg:inline'>
-                {user.displayName}
+                {user?.displayName}
               </span>
               <ChevronDown className='ml-1 size-4 text-gray-400 hidden lg:inline' />
             </MenuButton>

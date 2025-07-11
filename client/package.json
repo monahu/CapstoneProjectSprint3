@@ -17,6 +17,7 @@
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@headlessui/react": "^2.2.4",
+    "@stripe/stripe-js": "^7.4.0",
     "@tailwindcss/vite": "^4.1.7",
     "@tiptap/react": "^2.23.1",
     "@tiptap/starter-kit": "^2.23.1",

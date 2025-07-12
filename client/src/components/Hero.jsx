@@ -42,7 +42,7 @@ const Hero = ({
           <p className='mb-5 text-[1.2rem]'>{description}</p>
           {showButton && (
             <button
-              className='btn btn-primary'
+              className='btn btn-primary text-lg md:btn-lg md:text-[1.2rem]'
               onClick={onButtonClick}
               aria-label={`${buttonText} - Get started with your account`}
             >

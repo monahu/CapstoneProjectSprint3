@@ -42,7 +42,9 @@ export const UI_TEXT = {
     description:
       'Find the best spots, rate your favorites, and find your next favorite place.',
     button: 'Start with your account',
+    buttonLoggedIn: 'Go to create a review',
     buttonLink: '/login',
+    buttonLinkLoggedIn: '/create',
   },
   loginHero: {
     title: 'Welcome Back',

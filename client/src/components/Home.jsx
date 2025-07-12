@@ -8,19 +8,20 @@ import { usePosts } from '../hooks/usePost'
 import { useEffect, useState } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../utils/firebase'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { addUser, removeUser } from '../utils/userSlice'
 
 const Home = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
+  const user = useSelector((state) => state.user)
   const [authInitialized, setAuthInitialized] = useState(false)
 
   // Always fetch posts, but refetch when auth changes
   const { posts, loading, error, refetch } = usePosts(10, 0)
 
   const handleNavigateToLogin = () => {
-    navigate(UI_TEXT.hero.buttonLink)
+    navigate(user ? UI_TEXT.hero.buttonLinkLoggedIn : UI_TEXT.hero.buttonLink)
   }
 
   // Listen for auth state changes
@@ -92,6 +93,7 @@ const Home = () => {
     <div className='min-h-screen'>
       <Hero
         heroImage={heroImage}
+        buttonText={user ? UI_TEXT.hero.buttonLoggedIn : UI_TEXT.hero.button}
         onButtonClick={handleNavigateToLogin}
       />
       {posts.map((post) => (

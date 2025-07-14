@@ -9,6 +9,7 @@ const { smartAuth } = require('./middleware/auth')
 const { merge } = require('lodash')
 const cors = require('cors')
 const rateLimit = require('express-rate-limit')
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 // Utilities
 const { createGraphQLContext } = require('./utils/graphqlContext')
@@ -53,6 +54,9 @@ const server = new ApolloServer({
   typeDefs,
   resolvers,
 })
+
+const stripeRoute = require('./routes/stripe');
+app.use('/api/payment', stripeRoute);
 
 // Rate limiting for GraphQL endpoint
 const limiter = rateLimit({

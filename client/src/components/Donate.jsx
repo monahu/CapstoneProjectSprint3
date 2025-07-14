@@ -5,6 +5,9 @@ import * as Yup from "yup";
 import Hero from "./Hero";
 import heroImage from "./../assets/img/login_hero1.webp";
 import { UI_TEXT } from "./../utils/constants/ui";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 const validationSchema = Yup.object({
     isAnonymous: Yup.string().required(),
@@ -57,9 +60,43 @@ const Donate = () => {
                         message: "",
                     }}
                     validationSchema={validationSchema}
-                    onSubmit={(values) => {
-                        console.log("Donation submitted:", values);
-                        alert("Thanks for your support! 🙏");
+                    onSubmit={async (values) => {
+                        try {
+                            const response = await fetch(
+                                "http://localhost:3500/api/payment/create-checkout-session",
+                                {
+                                    method: "POST",
+                                    headers: {
+                                        "Content-Type": "application/json",
+                                    },
+                                    body: JSON.stringify({
+                                        amount: values.amount,
+                                        name:
+                                            values.isAnonymous === "no"
+                                                ? values.name
+                                                : "Anonymous",
+                                        email:
+                                            values.isAnonymous === "no"
+                                                ? values.email
+                                                : undefined,
+                                    }),
+                                }
+                            );
+
+                            const data = await response.json();
+
+                            if (!data.id) {
+                                throw new Error("Session creation failed");
+                            }
+
+                            const stripe = await stripePromise;
+                            await stripe.redirectToCheckout({
+                                sessionId: data.id,
+                            });
+                        } catch (error) {
+                            console.error("Stripe checkout error:", error);
+                            alert("Something went wrong. Please try again.");
+                        }
                     }}
                 >
                     {({ setFieldValue, values }) => (

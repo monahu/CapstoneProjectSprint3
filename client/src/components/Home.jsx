@@ -1,15 +1,19 @@
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router'
+import { useDispatch, useSelector } from 'react-redux'
+import { onAuthStateChanged } from 'firebase/auth'
+
 import Hero from './Hero'
-import heroImage from '../assets/img/restJam_hero1.webp'
+import LoadingState from './LoadingState'
+import ErrorMessage from './ErrorMessage'
+import EmptyState from './EmptyState'
 import RestaurantCard from './Post/RestaurantCard'
 import { PostCardSkeleton, ImageSkeleton } from './Skeleton'
-import { useNavigate } from 'react-router'
 import { UI_TEXT } from '../utils/constants/ui'
 import { usePosts } from '../hooks/usePost'
-import { useEffect, useState } from 'react'
-import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../utils/firebase'
-import { useDispatch, useSelector } from 'react-redux'
 import { addUser, removeUser } from '../utils/userSlice'
+import heroImage from '../assets/img/restJam_hero1.webp'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -20,11 +24,14 @@ const Home = () => {
   // Always fetch posts, but refetch when auth changes
   const { posts, loading, error, refetch } = usePosts(10, 0)
 
+  // hero button link to login or share post
   const handleNavigateToLogin = () => {
     navigate(user ? UI_TEXT.hero.buttonLinkLoggedIn : UI_TEXT.hero.buttonLink)
   }
 
-  // Listen for auth state changes
+  // ===========================
+  // AUTH STATE MANAGEMENT
+  // ===========================
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       console.log('🔥 Auth state changed:', user ? 'Logged in' : 'Logged out')
@@ -62,33 +69,16 @@ const Home = () => {
     return () => unsubscribe()
   }, [dispatch, authInitialized, refetch])
 
+  // ===========================
+  // RENDER LOGIC
+  // ===========================
+
+  // Loading state
   if (loading) {
-    return (
-      <div className='min-h-screen'>
-        <ImageSkeleton />
-        <div className='container mx-auto px-4 py-8 space-y-6'>
-          {Array.from({ length: 4 }).map((_, index) => (
-            <PostCardSkeleton key={index} />
-          ))}
-        </div>
-      </div>
-    )
+    return <LoadingState />
   }
 
-  if (error) {
-    return (
-      <div className='min-h-screen'>
-        <Hero
-          heroImage={heroImage}
-          onButtonClick={handleNavigateToLogin}
-        />
-        <div className='text-center py-20'>
-          <p className='text-red-500'>Error loading posts: {error.message}</p>
-        </div>
-      </div>
-    )
-  }
-
+  // Main layout with Hero
   return (
     <div className='min-h-screen'>
       <Hero
@@ -96,6 +86,20 @@ const Home = () => {
         buttonText={user ? UI_TEXT.hero.buttonLoggedIn : UI_TEXT.hero.button}
         onButtonClick={handleNavigateToLogin}
       />
+      {/* Content based on state */}
+      {error && (
+        <ErrorMessage
+          error={error}
+          onRetry={() => refetch()}
+        />
+      )}
+      {!error && (!posts || posts.length === 0) && (
+        <EmptyState
+          onAction={handleNavigateToLogin}
+          actionText='Share Your Experience'
+        />
+      )}
+      {/* Posts List */}
       {posts.map((post) => (
         <RestaurantCard
           key={post.id}

@@ -28,8 +28,16 @@ const Explore = () => {
     navigate,
     clearAllFilters,
     handleTagClick,
+    searchPosts,
     classNames,
   } = useExplore()
+
+  // Retry function for failed searches
+  const handleRetry = () => {
+    if (hasActiveSearch) {
+      searchPosts(searchTerm, { tags, location })
+    }
+  }
 
   return (
     <div className='min-h-screen'>
@@ -38,7 +46,7 @@ const Explore = () => {
         showButton={false}
         title={UI_TEXT.exploreHero.title}
         description={UI_TEXT.exploreHero.description}
-        className='h-[30vh]'
+        className='min-h-[30vh]'
       />
 
       <ExploreHeader
@@ -69,6 +77,7 @@ const Explore = () => {
         searchTerm={searchTerm}
         tags={tags}
         location={location}
+        onRetry={handleRetry}
       />
     </div>
   )

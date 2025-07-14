@@ -1,95 +1,60 @@
-import { useParams, useNavigate } from "react-router"
-import { usePost } from "../../hooks/usePost"
-import heroImage from "../../assets/img/detail_hero1.webp"
-import Hero from "../Hero"
-import { PostCardSkeleton, ImageSkeleton } from "../Skeleton"
-import RestaurantDetail from "./RestaurantDetail"
-import { UI_TEXT } from "../../utils/constants/ui"
+import { useParams, useNavigate } from 'react-router'
+import { usePost } from '../../hooks/usePost'
+import heroImage from '../../assets/img/detail_hero1.webp'
+import Hero from '../Hero'
+import LoadingState from '../LoadingState'
+import ErrorMessage from '../ErrorMessage'
+import RestaurantDetail from './RestaurantDetail'
+import { UI_TEXT } from '../../utils/constants/ui'
 
 const Detail = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { post, loading, error } = usePost(id)
+  const { post, loading, error, refetch } = usePost(id)
 
+  // Loading state
   if (loading) {
-    return (
-      <div className="min-h-screen">
-        <ImageSkeleton />
-        <div className="container mx-auto px-4 py-8 space-y-6">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <PostCardSkeleton key={index} />
-          ))}
-        </div>
-      </div>
-    )
+    return <LoadingState skeletonCount={1} />
   }
 
+  // Error state
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Hero
-          heroImage={heroImage}
-          showButton={false}
-          title={UI_TEXT.detailHero.title}
-          description={UI_TEXT.detailHero.description}
-        />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Post Not Found
-          </h2>
-          <p className="text-gray-600 mb-6">{error.message}</p>
-          <button
-            onClick={() => navigate(-1)}
-            className="btn btn-primary"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
+      <ErrorMessage
+        error={error}
+        onRetry={() => refetch()}
+      />
     )
   }
 
+  // No post found
   if (!post) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Hero
-          heroImage={heroImage}
-          showButton={false}
-          title={UI_TEXT.detailHero.title}
-          description={UI_TEXT.detailHero.description}
-        />
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            Post Not Found
-          </h2>
-          <p className="text-gray-600 mb-6">
-            The restaurant post you're looking for doesn't exist.
-          </p>
-          <button
-            onClick={() => navigate(-1)}
-            className="btn btn-primary"
-          >
-            Go Back
-          </button>
-        </div>
-      </div>
+      <ErrorMessage
+        error={{
+          message: "The restaurant post you're looking for doesn't exist.",
+        }}
+        onRetry={() => navigate(-1)}
+      />
     )
   }
 
+  // Success state
   return (
-    <div className="min-h-screen">
+    <div className='min-h-screen'>
       <Hero
         heroImage={heroImage}
         showButton={false}
         title={UI_TEXT.detailHero.title}
         description={UI_TEXT.detailHero.description}
-        className="min-h-[30vh]"
+        className='min-h-[30vh]'
       />
       <RestaurantDetail
         post={post}
         loading={loading}
         error={error}
-        className="mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4"
+        refetch={refetch}
+        className='mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4'
       />
     </div>
   )

@@ -81,12 +81,12 @@ const PostActions = ({
           {/* Want to go badge - always show */}
           <div className='badge badge-info badge-lg rounded-full gap-2 px-4 py-3 shadow-md'>
             <Users className='w-4 h-4' />
-            <span className='font-medium'>{currentWantToGoCount}</span>
+            <span className='font-medium '>{currentWantToGoCount}</span>
           </div>
           {/* Want to go button */}
           <button
             onClick={handleWantToGoToggle}
-            className={`btn btn-md md:btn-lg rounded-full text-lg-bold gap-2 ${
+            className={`btn btn-md md:btn-lg rounded-full text-lg-bold text-sm md:text-base lg:text-lg whitespace-nowrap gap-2 ${
               isLoggedIn && isWantToGo
                 ? 'btn-warning text-white hover:bg-warning-focus'
                 : 'btn-primary text-white hover:bg-primary-focus'

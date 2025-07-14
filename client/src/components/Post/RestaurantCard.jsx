@@ -1,10 +1,11 @@
-import { postImage } from "../../utils/constants/posts"
-import RatingBubble from "./RatingBubble"
-import PostActions from "./PostActions"
-import PostImage from "./PostImage"
-import PostTags from "./PostTags"
-import { useNavigate } from "react-router"
-import { usePostActions } from "../../hooks/usePostActions"
+import { postImage } from '../../utils/constants/posts'
+import RatingBubble from './RatingBubble'
+import PostActions from './PostActions'
+import PostImage from './PostImage'
+import PostTags from './PostTags'
+import RichTextDisplay from './RichTextDisplay'
+import { useNavigate } from 'react-router'
+import { usePostActions } from '../../hooks/usePostActions'
 
 const RestaurantCard = ({
   id,
@@ -22,7 +23,7 @@ const RestaurantCard = ({
   wantToGoCount = 0,
   isWantToGo = false,
   isLiked = false,
-  className = "",
+  className = '',
 }) => {
   const navigate = useNavigate()
 
@@ -41,7 +42,7 @@ const RestaurantCard = ({
   }
 
   // Prefer imageUrls.desktop if available, fallback to image, then default
-  const mainImage = image?.desktop || image || postImage.default;
+  const mainImage = image?.desktop || image || postImage.default
 
   return (
     <div
@@ -55,52 +56,49 @@ const RestaurantCard = ({
       />
 
       {/* Content */}
-      <div className="p-4 md:p-8">
+      <div className='p-4 md:p-8'>
         {/* Author Info & Rating */}
-        <div className=" mb-3 flex justify-evenly align-center w-full gap-3 sm:gap-6 flex-wrap md:flex-nowrap">
-          <div className="order-2 md:order-1 avatar w-fit flex-col items-center my-auto">
-            <div className="w-12 md:w-16 rounded-full">
+        <div className=' mb-3 flex justify-evenly align-center w-full gap-3 sm:gap-6 flex-wrap md:flex-nowrap'>
+          <div className='order-2 md:order-1 avatar w-fit flex-col items-center my-auto'>
+            <div className='w-12 md:w-16 rounded-full'>
               <img
                 src={user.avatar}
                 alt={user.name}
               />
             </div>
-            <p className="text-sm text-base-content text-black font-medium">
+            <p className='text-sm text-base-content text-black font-medium'>
               {user.name}
             </p>
           </div>
-          <div className="order-1 text-center md:text-left md:order-2 w-full h-fit my-auto">
-            <p className="text-sm text-gray-600">{location}</p>
-            <h2 className="font-semibold text-3xl sm:text-2xl text-gray-900">
+          <div className='order-1 text-center md:text-left md:order-2 w-full h-fit my-auto'>
+            <p className='text-sm text-gray-600'>{location}</p>
+            <h2 className='font-semibold text-3xl sm:text-2xl text-gray-900'>
               {title}
             </h2>
           </div>
-          <div className="order-3 w-fit my-auto">
+          <div className='order-3 w-fit my-auto'>
             <RatingBubble rating={rating} />
           </div>
         </div>
 
-        {/* Description */}
-        <div className="mb-3 flex flex-col items-center">
-          <p className="text-gray-800 text-sm leading-relaxed line-clamp-3 md:line-clamp-2">
-            {description}
-          </p>
-          {description && description.length > 150 && (
-            <button
-              onClick={handleViewDetail}
-              className="text-blue-600 text-sm font-medium mt-2 hover:text-indigo-700 hover:cursor-pointer transition-colors mx-auto"
-            >
-              💙 <span className="underline">View Detail</span> 💙
-            </button>
-          )}
+        {/* Rich Text Description */}
+        <div className='mb-3 flex flex-col items-center'>
+          <div className='w-full'>
+            <RichTextDisplay
+              content={description}
+              className='text-sm '
+              maxLines={4}
+              onViewMore={handleViewDetail}
+            />
+          </div>
         </div>
 
         {/* Date */}
-        <p className="text-xs text-gray-600 mb-3">{date}</p>
+        <p className='text-xs text-gray-600 mb-3'>{date}</p>
 
         <PostTags
           tags={tags}
-          variant="card"
+          variant='card'
         />
 
         <PostActions {...postActions} />

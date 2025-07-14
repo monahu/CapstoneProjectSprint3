@@ -125,11 +125,20 @@ export const useSearchPosts = () => {
   const searchPosts = (searchTerm, options = {}) => {
     const { tags, location, limit = 20 } = options
 
+    // Check if we have any search criteria
+    const hasSearchTerm = searchTerm?.trim()
+    const hasTags = tags?.length > 0
+    const hasLocation = location?.trim()
+
+    if (!hasSearchTerm && !hasTags && !hasLocation) {
+      return
+    }
+
     return executeSearch({
       variables: {
-        searchTerm: searchTerm?.trim() || null,
-        tags: tags?.length ? tags : null,
-        location: location?.trim() || null,
+        searchTerm: hasSearchTerm || null,
+        tags: hasTags ? tags : null,
+        location: hasLocation || null,
         limit,
       },
     })

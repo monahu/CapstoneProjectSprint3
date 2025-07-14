@@ -1,7 +1,9 @@
-import { Search } from "lucide-react"
-import RestaurantCard from "../Post/RestaurantCard"
-import { PostCardSkeleton } from "../Skeleton"
-import { UI_TEXT } from "../../utils/constants/ui"
+import { Search } from 'lucide-react'
+import RestaurantCard from '../Post/RestaurantCard'
+import LoadingState from '../LoadingState'
+import ErrorMessage from '../ErrorMessage'
+import EmptyState from '../EmptyState'
+import { UI_TEXT } from '../../utils/constants/ui'
 
 const ExploreResults = ({
   hasActiveSearch,
@@ -12,69 +14,68 @@ const ExploreResults = ({
   searchTerm,
   tags,
   location,
+  onRetry,
 }) => {
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className='container mx-auto px-4 py-8'>
+      {/* Initial state - no search yet */}
       {!hasActiveSearch && !hasSearched && (
-        <div className="text-center py-20">
-          <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-600 mb-2">
+        <div className='text-center py-20'>
+          <Search className='w-16 h-16 text-gray-300 mx-auto mb-4' />
+          <h2 className='text-xl font-semibold text-gray-600 mb-2'>
             {UI_TEXT.explore.startExploringTitle}
           </h2>
-          <p className="text-gray-500">
+          <p className='text-gray-500'>
             {UI_TEXT.explore.startExploringDescription}
           </p>
         </div>
       )}
 
+      {/* Loading state with search context */}
       {loading && (
-        <div className="space-y-6">
-          <div className="text-center text-gray-600">
+        <>
+          <div className='text-center text-gray-600 mb-6'>
             {UI_TEXT.explore.searchingText} "
-            {searchTerm || tags.join(", ") || location}"...
+            {searchTerm || tags.join(', ') || location}"...
           </div>
-          {Array.from({ length: 4 }).map((_, index) => (
-            <PostCardSkeleton key={index} />
-          ))}
-        </div>
+          <LoadingState skeletonCount={4} />
+        </>
       )}
 
+      {/* Error state */}
       {error && (
-        <div className="text-center py-20">
-          <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md mx-auto">
-            <h2 className="text-lg font-semibold text-red-800 mb-2">
-              {UI_TEXT.explore.searchErrorTitle}
-            </h2>
-            <p className="text-red-600">{error.message}</p>
-          </div>
-        </div>
+        <ErrorMessage
+          error={error}
+          onRetry={onRetry}
+        />
       )}
 
+      {/* Search results */}
       {hasSearched && !loading && !error && (
         <>
           {/* Search Summary */}
-          <div className="mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">
+          <div className='mb-6'>
+            <h2 className='text-lg font-semibold text-gray-900'>
               {posts.length} {UI_TEXT.explore.placesDiscovered}
               {searchTerm && (
-                <span className="text-gray-600 font-normal">
-                  {" "}
+                <span className='text-gray-600 font-normal'>
+                  {' '}
                   {UI_TEXT.explore.searchFor} "{searchTerm}"
                 </span>
               )}
             </h2>
             {(tags.length > 0 || location) && (
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className='mt-2 flex flex-wrap gap-2'>
                 {tags.map((tag) => (
                   <span
                     key={tag}
-                    className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full"
+                    className='px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full'
                   >
                     #{tag}
                   </span>
                 ))}
                 {location && (
-                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">
+                  <span className='px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full'>
                     📍 {location}
                   </span>
                 )}
@@ -82,19 +83,20 @@ const ExploreResults = ({
             )}
           </div>
 
-          {/* Results */}
+          {/* No results found */}
           {posts.length === 0 ? (
-            <div className="text-center py-20">
-              <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <h2 className="text-xl font-semibold text-gray-600 mb-2">
+            <div className='text-center py-20'>
+              <Search className='w-16 h-16 text-gray-300 mx-auto mb-4' />
+              <h2 className='text-xl font-semibold text-gray-600 mb-2'>
                 {UI_TEXT.explore.noResultsTitle}
               </h2>
-              <p className="text-gray-500">
+              <p className='text-gray-500'>
                 {UI_TEXT.explore.noResultsDescription}
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            /* Results list */
+            <div className='space-y-6'>
               {posts.map((post) => (
                 <RestaurantCard
                   key={post.id}
@@ -104,7 +106,7 @@ const ExploreResults = ({
                     name: post.author?.displayName,
                     avatar:
                       post.author?.photoURL ||
-                      "https://img.daisyui.com/images/profile/demo/2@94.webp",
+                      'https://img.daisyui.com/images/profile/demo/2@94.webp',
                   }}
                   location={post.location}
                   title={post.title}
@@ -118,7 +120,7 @@ const ExploreResults = ({
                   wantToGoCount={post.attendeeCount}
                   isWantToGo={post.isWantToGo}
                   isLiked={post.isLiked}
-                  className="max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto"
+                  className='max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto'
                 />
               ))}
             </div>

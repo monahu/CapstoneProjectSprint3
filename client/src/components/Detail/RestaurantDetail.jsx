@@ -1,42 +1,18 @@
 import { useNavigate } from 'react-router'
 import { usePostActions } from '../../hooks/usePostActions'
-import { PostCardSkeleton } from '../Skeleton'
+import LoadingState from '../LoadingState'
+import ErrorMessage from '../ErrorMessage'
 import { PostImage, PostTags, PostActions } from '../Post'
 import PostMeta from './PostMeta'
 import PostHeader from './PostHeader'
 import PostDate from './PostDate'
 import AttendeesList from './AttendeesList'
 import MapView from './MapView'
+import RichTextDisplay from '../Post/RichTextDisplay'
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
-const LoadingState = () => (
-  <div className='min-h-screen bg-gray-50 px-4 py-8'>
-    <div className='max-w-2xl mx-auto'>
-      <PostCardSkeleton />
-    </div>
-  </div>
-)
-
-const ErrorState = ({ error, navigate }) => (
-  <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-    <div className='text-center'>
-      <h2 className='text-2xl font-bold text-gray-900 mb-4'>Post Not Found</h2>
-      <p className='text-gray-600 mb-6'>
-        {error?.message ||
-          "The restaurant post you're looking for doesn't exist."}
-      </p>
-      <button
-        onClick={() => navigate(-1)}
-        className='btn btn-primary'
-      >
-        Go Back
-      </button>
-    </div>
-  </div>
-)
-
-const RestaurantDetail = ({ post, loading, error, className }) => {
+const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
   const navigate = useNavigate()
 
   const postActions = usePostActions({
@@ -48,14 +24,32 @@ const RestaurantDetail = ({ post, loading, error, className }) => {
     initialIsWantToGo: post?.isWantToGo || false,
   })
 
-  if (loading) return <LoadingState />
-  if (error || !post)
+  // Loading state - use shared component
+  if (loading) {
+    return <LoadingState skeletonCount={1} />
+  }
+
+  // Error state - use shared component
+  if (error) {
     return (
-      <ErrorState
+      <ErrorMessage
         error={error}
-        navigate={navigate}
+        onRetry={refetch}
       />
     )
+  }
+
+  // No post found
+  if (!post) {
+    return (
+      <ErrorMessage
+        error={{
+          message: "The restaurant post you're looking for doesn't exist.",
+        }}
+        onRetry={() => navigate(-1)}
+      />
+    )
+  }
 
   return (
     <div
@@ -77,11 +71,12 @@ const RestaurantDetail = ({ post, loading, error, className }) => {
 
         <PostTags tags={post.tags} />
 
-        {/* Description */}
+        {/* Rich Text Content */}
         <div className='mb-6 px-2 lg:px-20'>
-          <p className='text-gray-700 leading-relaxed text-sm sm:text-base'>
-            {post.content}
-          </p>
+          <RichTextDisplay
+            content={post.content}
+            className='text-sm sm:text-base'
+          />
         </div>
 
         <PostDate createdAt={post.createdAt} />

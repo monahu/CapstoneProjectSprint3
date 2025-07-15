@@ -63,12 +63,17 @@ export const useExplore = () => {
       newTags = [...currentTagsArray, tagName]
     }
 
-    // Build new URL
-    const newSearchParams = new URLSearchParams(searchParams)
+    // Build new URL - clear search term and keep only tags + location
+    const newSearchParams = new URLSearchParams()
+
+    // Keep location if it exists
+    if (location) {
+      newSearchParams.set('location', location)
+    }
+
+    // Set tags if any are selected
     if (newTags.length > 0) {
       newSearchParams.set('tags', newTags.join(','))
-    } else {
-      newSearchParams.delete('tags')
     }
 
     const newUrl = `/explore${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`

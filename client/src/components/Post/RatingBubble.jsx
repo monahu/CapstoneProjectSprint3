@@ -1,13 +1,18 @@
 import { RATING_MAP, ICON_MAP } from '../../utils/constants/ratings'
 
 const RatingBubble = ({ rating }) => {
+  // Defensive: fallback to NEW if rating is missing or invalid
+  const ratingObj = RATING_MAP[rating] || RATING_MAP.NEW;
+  if (!RATING_MAP[rating]) {
+    console.warn("Unknown rating:", rating);
+  }
   return (
     <div className='chat chat-start inline-block'>
       <div
-        className={`chat-bubble p-2 md:p-4 rounded-2xl ms-auto ${RATING_MAP[rating].color}`}
+        className={`chat-bubble p-2 md:p-4 rounded-2xl ms-auto ${ratingObj.color}`}
       >
         <div className='grid grid-cols-[1fr_1fr_2px] items-center align-center gap-x-1 md:gap-x-2'>
-          {RATING_MAP[rating].icon.map((icon) => {
+          {ratingObj.icon.map((icon) => {
             // Check if it's an emoji (string) or icon component
             if (typeof icon === 'string' && /\p{Emoji}/u.test(icon)) {
               return (
@@ -34,7 +39,7 @@ const RatingBubble = ({ rating }) => {
             )
           })}
         </div>
-        <span className='hidden'>{RATING_MAP[rating].text}</span>
+        <span className='hidden'>{ratingObj.text}</span>
       </div>
     </div>
   )

@@ -1,6 +1,21 @@
+
 const express = require('express');
 const Post = require('../models/posts');
 const router = express.Router();
+
+// Get a single post by ID
+router.get('/:id', async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' });
+    }
+    res.json(post);
+  } catch (err) {
+    console.error('Get post error:', err);
+    res.status(500).json({ error: 'Failed to get post' });
+  }
+});
 
 // Use Firebase authentication middleware
 const { authenticateFirebaseIdToken } = require('../middleware/auth');

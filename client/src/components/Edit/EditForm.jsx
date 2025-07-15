@@ -6,7 +6,7 @@ const EditForm = ({ postId, onSuccess }) => {
   const { user } = useAuth();
   const [form, setForm] = useState({
     title: '',
-    description: '',
+    content: '',
     tags: [],
     rating: '',
     imageUrls: {},
@@ -20,7 +20,15 @@ const EditForm = ({ postId, onSuccess }) => {
       try {
         setLoading(true);
         const res = await axios.get(`/api/posts/${postId}`);
-        setForm(res.data);
+        // Map API response to form fields
+        const post = res.data;
+        setForm({
+          title: post.title || '',
+          content: post.content || '',
+          tags: post.tags || [],
+          rating: post.rating?.type || '',
+          imageUrls: post.imageUrls || {},
+        });
       } catch (err) {
         setError('Failed to load post');
       } finally {
@@ -69,18 +77,34 @@ const EditForm = ({ postId, onSuccess }) => {
         value={form.title}
         onChange={handleChange}
         placeholder="Title"
-        className="input input-bordered w-full"
+        className="input input-bordered w-full bg-white text-black placeholder-gray-500"
         required
       />
       <textarea
-        name="description"
-        value={form.description}
+        name="content"
+        value={form.content}
         onChange={handleChange}
-        placeholder="Description"
-        className="textarea textarea-bordered w-full"
+        placeholder="Content"
+        className="textarea textarea-bordered w-full bg-white text-black placeholder-gray-500"
         required
       />
-      {/* Add tag and rating fields as needed */}
+      <input
+        type="text"
+        name="rating"
+        value={form.rating}
+        onChange={handleChange}
+        placeholder="Rating (e.g. SO-SO, GOOD, BAD)"
+        className="input input-bordered w-full bg-white text-black placeholder-gray-500"
+      />
+      <input
+        type="text"
+        name="tags"
+        value={form.tags.map(tag => tag.name || tag).join(', ')}
+        onChange={e => setForm(f => ({ ...f, tags: e.target.value.split(',').map(t => t.trim()) }))}
+        placeholder="Tags (comma separated)"
+        className="input input-bordered w-full bg-white text-black placeholder-gray-500"
+      />
+      {/* You can add image upload/edit fields here if needed */}
       <button type="submit" className="btn btn-primary">Update Post</button>
     </form>
   );

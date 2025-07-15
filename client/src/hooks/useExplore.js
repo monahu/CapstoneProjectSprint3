@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo, useRef } from 'react'
 import { useSearchParams, useNavigate } from 'react-router'
 import { useSearchPosts, useTags } from './usePost'
 import { useClassNames } from './useClassNames'
+import { useTagSelection } from './useTagSelection'
 
 export const useExplore = () => {
   const [searchParams] = useSearchParams()
@@ -11,6 +12,7 @@ export const useExplore = () => {
   const { classNames } = useClassNames()
   const [showAllTags, setShowAllTags] = useState(false)
   const lastSearchRef = useRef(null)
+  const { handleTagClick } = useTagSelection()
 
   // Extract search parameters from URL
   const searchTerm = searchParams.get('q') || ''
@@ -49,35 +51,6 @@ export const useExplore = () => {
   const clearAllFilters = () => {
     lastSearchRef.current = null
     navigate('/explore', { replace: true })
-  }
-
-  // Handle tag click to add/remove from selection
-  const handleTagClick = (tagName) => {
-    const currentTagsArray = tags || []
-    let newTags
-    if (currentTagsArray.includes(tagName)) {
-      // Remove tag if already selected
-      newTags = currentTagsArray.filter((tag) => tag !== tagName)
-    } else {
-      // Add tag if not selected
-      newTags = [...currentTagsArray, tagName]
-    }
-
-    // Build new URL - clear search term and keep only tags + location
-    const newSearchParams = new URLSearchParams()
-
-    // Keep location if it exists
-    if (location) {
-      newSearchParams.set('location', location)
-    }
-
-    // Set tags if any are selected
-    if (newTags.length > 0) {
-      newSearchParams.set('tags', newTags.join(','))
-    }
-
-    const newUrl = `/explore${newSearchParams.toString() ? `?${newSearchParams.toString()}` : ''}`
-    navigate(newUrl, { replace: true })
   }
 
   // Get tags for display (limit to 10 unless showing all)

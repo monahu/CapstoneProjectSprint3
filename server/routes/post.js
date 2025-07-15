@@ -10,7 +10,22 @@ router.get('/:id', async (req, res) => {
     if (!post) {
       return res.status(404).json({ error: 'Post not found' });
     }
-    res.json(post);
+
+    // Populate tags for this post
+    const PostsTags = require('../models/PostsTags');
+    const Tag = require('../models/Tags');
+    const postTags = await PostsTags.find({ postId: post._id }).populate('tagId');
+    // tags array: [{ _id, name }]
+    const tags = postTags.map(pt => pt.tagId ? { _id: pt.tagId._id, name: pt.tagId.name } : null).filter(Boolean);
+
+    // Attach tags to post object (always an array)
+    const postObj = post.toObject();
+    postObj.tags = Array.isArray(tags) ? tags : [];
+
+    // Ensure tags field is always present, even if empty
+    if (!postObj.tags) postObj.tags = [];
+
+    res.json(postObj);
   } catch (err) {
     console.error('Get post error:', err);
     res.status(500).json({ error: 'Failed to get post' });
@@ -140,7 +155,14 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
       }
     }
 
-    res.json({ success: true, post });
+    // Populate tags for this post (same as GET)
+    const PostsTags = require('../models/PostsTags');
+    const postTags = await PostsTags.find({ postId: post._id }).populate('tagId');
+    const tagsArr = postTags.map(pt => pt.tagId ? { _id: pt.tagId._id, name: pt.tagId.name } : null).filter(Boolean);
+    const postObj = post.toObject();
+    postObj.tags = tagsArr;
+
+    res.json({ success: true, post: postObj });
   } catch (err) {
     console.error('Edit post error:', err);
     res.status(500).json({ error: 'Failed to edit post' });

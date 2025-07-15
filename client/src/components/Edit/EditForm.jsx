@@ -1,33 +1,36 @@
-import React, { useState, useEffect } from 'react';
+
+import React, { useEffect, useState } from 'react';
+import { Formik, Form } from 'formik';
 import { useAuth } from '../../hooks/useAuth';
 import axios from 'axios';
+import { ImageUploadField, RichTextField } from '../Create/FormFields';
+
+const RATINGS = [
+  { type: 'SO-SO', description: 'Average experience', id: 'SO-SO' },
+  { type: 'RECOMMENDED', description: 'Highly recommended place', id: 'RECOMMENDED' },
+  { type: 'NEW', description: 'New Place to try', id: 'NEW' },
+];
 
 const EditForm = ({ postId, onSuccess }) => {
   const { user } = useAuth();
-  const [form, setForm] = useState({
-    title: '',
-    content: '',
-    tags: [],
-    rating: '',
-    imageUrls: {},
-  });
-  const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Fetch post data for editing
     const fetchPost = async () => {
       try {
         setLoading(true);
         const res = await axios.get(`/api/posts/${postId}`);
-        // Map API response to form fields
         const post = res.data;
-        setForm({
+        setInitialValues({
           title: post.title || '',
+          placeName: post.placeName || '',
+          ratingId: post.rating?.id || post.ratingId || '',
+          location: post.location || '',
+          tags: post.tags ? post.tags.map(tag => tag.name || tag).join(', ') : '',
+          image: null, // Image upload field
           content: post.content || '',
-          tags: post.tags || [],
-          rating: post.rating?.type || '',
-          imageUrls: post.imageUrls || {},
         });
       } catch (err) {
         setError('Failed to load post');
@@ -38,75 +41,140 @@ const EditForm = ({ postId, onSuccess }) => {
     fetchPost();
   }, [postId]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  const handleSubmit = async (values, { setSubmitting }) => {
     setError(null);
     try {
-      const idToken = user ? await user.getIdToken() : null;
-      await axios.put(
-        `/api/posts/${postId}`,
-        form,
-        {
-          headers: {
-            Authorization: idToken ? `Bearer ${idToken}` : '',
-          },
+      let imageUrls = null;
+      if (values.image) {
+        // Upload image to backend to get all URLs
+        const formData = new FormData();
+        formData.append('image', values.image);
+        const res = await fetch('/api/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await res.json();
+        if (data.success) {
+          imageUrls = data.urls;
+        } else {
+          throw new Error('Image upload failed');
         }
-      );
+      }
+      // Convert tags string to array
+      const tagsArray = (values.tags || '').split(',').map(t => t.trim()).filter(Boolean);
+      // Get Firebase ID token
+      let idToken = null;
+      if (user && user.getIdToken) {
+        idToken = await user.getIdToken();
+      }
+      const postPayload = {
+        title: values.title,
+        placeName: values.placeName,
+        ratingId: values.ratingId,
+        location: values.location,
+        tags: tagsArray,
+        imageUrls,
+        content: values.content,
+      };
+      await axios.put(`/api/posts/${postId}`, postPayload, {
+        headers: {
+          Authorization: idToken ? `Bearer ${idToken}` : '',
+        },
+      });
       if (onSuccess) onSuccess();
     } catch (err) {
       setError('Failed to update post');
     } finally {
-      setLoading(false);
+      setSubmitting(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading || !initialValues) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <input
-        type="text"
-        name="title"
-        value={form.title}
-        onChange={handleChange}
-        placeholder="Title"
-        className="input input-bordered w-full bg-white text-black placeholder-gray-500"
-        required
-      />
-      <textarea
-        name="content"
-        value={form.content}
-        onChange={handleChange}
-        placeholder="Content"
-        className="textarea textarea-bordered w-full bg-white text-black placeholder-gray-500"
-        required
-      />
-      <input
-        type="text"
-        name="rating"
-        value={form.rating}
-        onChange={handleChange}
-        placeholder="Rating (e.g. SO-SO, GOOD, BAD)"
-        className="input input-bordered w-full bg-white text-black placeholder-gray-500"
-      />
-      <input
-        type="text"
-        name="tags"
-        value={form.tags.map(tag => tag.name || tag).join(', ')}
-        onChange={e => setForm(f => ({ ...f, tags: e.target.value.split(',').map(t => t.trim()) }))}
-        placeholder="Tags (comma separated)"
-        className="input input-bordered w-full bg-white text-black placeholder-gray-500"
-      />
-      {/* You can add image upload/edit fields here if needed */}
-      <button type="submit" className="btn btn-primary">Update Post</button>
-    </form>
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} enableReinitialize>
+      {({ isSubmitting, values, setFieldValue }) => (
+        <Form className="space-y-6">
+          <div>
+            <label htmlFor="title" className="block text-sm font-medium text-gray-900">Review Title</label>
+            <input
+              id="title"
+              name="title"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Enter review title"
+              value={values.title}
+              onChange={e => setFieldValue('title', e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="placeName" className="block text-sm font-medium text-gray-900">Place Name</label>
+            <input
+              id="placeName"
+              name="placeName"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Enter place name"
+              value={values.placeName}
+              onChange={e => setFieldValue('placeName', e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">Rating</label>
+            <select
+              id="ratingId"
+              name="ratingId"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              value={values.ratingId}
+              onChange={e => setFieldValue('ratingId', e.target.value)}
+              required
+            >
+              <option value="">Select rating</option>
+              {RATINGS.map(rating => (
+                <option key={rating.id} value={rating.id}>{rating.type} - {rating.description}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="location" className="block text-sm font-medium text-gray-900">Location</label>
+            <input
+              id="location"
+              name="location"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Enter location"
+              value={values.location}
+              onChange={e => setFieldValue('location', e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="tags" className="block text-sm font-medium text-gray-900">Tags</label>
+            <input
+              id="tags"
+              name="tags"
+              type="text"
+              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              placeholder="Comma separated tags (e.g. Food,Review,Low Calorie)"
+              value={values.tags}
+              onChange={e => setFieldValue('tags', e.target.value)}
+            />
+          </div>
+          <ImageUploadField />
+          <RichTextField />
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              className="btn btn-primary px-6 py-2 rounded-md text-white font-semibold disabled:opacity-60"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'Updating...' : 'Update Post'}
+            </button>
+          </div>
+        </Form>
+      )}
+    </Formik>
   );
 };
 

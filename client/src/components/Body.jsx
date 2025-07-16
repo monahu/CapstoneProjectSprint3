@@ -1,5 +1,6 @@
 import { createBrowserRouter, RouterProvider } from "react-router"
 import { Login } from "./Login"
+import Edit from "./Edit/Edit";
 import Browse from "./Browse"
 import Home from "./Home"
 import { Detail } from "./Detail"
@@ -25,6 +26,10 @@ const Body = () => {
         {
           path: "create",
           element: <Create />,
+        },
+        {
+          path: "edit/:id",
+          element: <Edit />,
         },
         /*{
           path: "profile",

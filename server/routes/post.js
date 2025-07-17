@@ -1,6 +1,6 @@
-
 const express = require('express');
 const Post = require('../models/posts');
+const PostsTags = require('../models/PostsTags');
 const User = require('../models/User');
 const router = express.Router();
 
@@ -13,7 +13,7 @@ router.get('/:id', async (req, res) => {
     }
 
     // Populate tags for this post
-    const PostsTags = require('../models/PostsTags');
+    
     const Tag = require('../models/Tags');
     const postTags = await PostsTags.find({ postId: post._id }).populate('tagId');
     // tags array: [{ _id, name }]
@@ -83,7 +83,7 @@ router.post('/', authenticateFirebaseIdToken, async (req, res) => {
     // Handle tags (array of strings)
     if (Array.isArray(tags) && tags.length > 0) {
       const Tag = require('../models/Tags');
-      const PostsTags = require('../models/PostsTags');
+      // const PostsTags = require('../models/PostsTags');
       for (let tagName of tags) {
         tagName = tagName.trim();
         if (!tagName) continue;
@@ -144,12 +144,22 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
     if (placeName) post.placeName = placeName;
     if (location) post.location = location;
 
-    await post.save();
+    // await post.save();
+    // console.log('✅ Post updated successfully:', post);
+
+    try {
+      await post.save();
+      console.log('✅ Post updated successfully:', post);
+    } catch (err) {
+      console.error('❌ Error saving updated post:', err);
+      return res.status(500).json({ error: 'Failed to update post', details: err.message });
+    }
+
 
     // Handle tags (replace all tags for this post)
     if (Array.isArray(tags)) {
       const Tag = require('../models/Tags');
-      const PostsTags = require('../models/PostsTags');
+      // const PostsTags = require('../models/PostsTags');
       // Remove existing tags
       await PostsTags.deleteMany({ postId: post._id });
       for (let tagName of tags) {
@@ -164,7 +174,7 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
     }
 
     // Populate tags for this post (same as GET)
-    const PostsTags = require('../models/PostsTags');
+    // const PostsTags = require('../models/PostsTags');
     const postTags = await PostsTags.find({ postId: post._id }).populate('tagId');
     const tagsArr = postTags.map(pt => pt.tagId ? { _id: pt.tagId._id, name: pt.tagId.name } : null).filter(Boolean);
     const postObj = post.toObject();

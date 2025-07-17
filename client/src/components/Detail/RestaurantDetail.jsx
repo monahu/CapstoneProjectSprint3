@@ -57,7 +57,7 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
     >
       {/* Restaurant Image */}
       <PostImage
-        imageUrl={post.imageUrls?.desktop || post.imageUrl}
+        imageUrl={post.imageUrls?.desktop || post.imageUrls}
         alt={post.placeName}
       />
 

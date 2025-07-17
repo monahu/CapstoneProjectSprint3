@@ -21,7 +21,12 @@ export const GET_USER_PROFILE = gql`
         id
         title
         placeName
-        imageUrl
+        imageUrls {
+          desktop
+          mobile
+          mobile2x
+          tablet
+        }
         createdAt
       }
       wantToGo {
@@ -30,7 +35,12 @@ export const GET_USER_PROFILE = gql`
           id
           title
           placeName
-          imageUrl
+          imageUrls {
+            desktop
+            mobile
+            mobile2x
+            tablet
+          }
           author {
             displayName
           }
@@ -57,7 +67,12 @@ export const GET_ME = gql`
         id
         title
         placeName
-        imageUrl
+        imageUrls {
+          desktop
+          mobile
+          mobile2x
+          tablet
+        }
         createdAt
         likeCount
         attendeeCount
@@ -68,7 +83,12 @@ export const GET_ME = gql`
           id
           title
           placeName
-          imageUrl
+          imageUrls {
+            desktop
+            mobile
+            mobile2x
+            tablet
+          }
           author {
             displayName
             photoURL

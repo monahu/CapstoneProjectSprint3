@@ -17,7 +17,10 @@ export const useNavbar = () => {
 
   const handleSignOut = () => {
     signOut(auth)
-      .then(() => {})
+      .then(() => {
+        // Redirect to login page after successful logout
+        navigate(ROUTES.LOGIN)
+      })
       .catch((error) => {
         console.error('sign out error', error)
         navigate(ROUTES.ERROR)
@@ -64,6 +67,12 @@ export const useNavbar = () => {
         // Silent sync to ensure database is up to date
         // This ensures navbar and posts show same photo
         try {
+          /* debug   console.log('🔄 Syncing user with:', {
+            firebaseUid: uid,
+            email,
+            displayName,
+            photoURL,
+          }) */
           await syncUser({
             variables: {
               input: {
@@ -71,9 +80,6 @@ export const useNavbar = () => {
                 email,
                 displayName,
                 photoURL,
-                firstName,
-                lastName,
-                phone,
               },
             },
           })

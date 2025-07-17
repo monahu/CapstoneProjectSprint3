@@ -25,7 +25,12 @@ export const GET_ALL_POSTS = gql`
       placeName
       content
       location
-      imageUrl
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
       createdAt
       shareCount
       author {
@@ -61,7 +66,12 @@ export const GET_POST_BY_ID = gql`
       placeName
       content
       location
-      imageUrl
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
       createdAt
       shareCount
       author {
@@ -106,7 +116,12 @@ export const GET_MY_POSTS = gql`
       placeName
       content
       location
-      imageUrl
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
       createdAt
       shareCount
       rating {
@@ -131,46 +146,8 @@ export const GET_MY_POSTS = gql`
 // ===========================
 
 export const SEARCH_POSTS_BY_TAGS = gql`
-  query SearchPostsByTags($tags: [String!]!, $limit: Int) {
-    searchPostsByTags(tags: $tags, limit: $limit) {
-      id
-      title
-      placeName
-      content
-      location
-      imageUrl
-      createdAt
-      shareCount
-      tags {
-        id
-        name
-      }
-      author {
-        id
-        displayName
-        photoURL
-      }
-      likeCount
-      attendeeCount
-      isWantToGo
-      isLiked
-    }
-  }
-`
-
-export const SEARCH_POSTS = gql`
-  query SearchPosts(
-    $searchTerm: String
-    $tags: [String]
-    $location: String
-    $limit: Int
-  ) {
-    searchPosts(
-      searchTerm: $searchTerm
-      tags: $tags
-      location: $location
-      limit: $limit
-    ) {
+  query SearchPostsByTags($tags: [String!]!, $limit: Int, $offset: Int) {
+    searchPostsByTags(tags: $tags, limit: $limit, offset: $offset) {
       id
       title
       placeName
@@ -189,14 +166,79 @@ export const SEARCH_POSTS = gql`
         photoURL
       }
       rating {
+        type
+      }
+      attendees {
+        id
+        displayName
+      }
+      attendeeCount
+      isWantToGo
+      likeCount
+      isLiked
+      tags {
+        id
+        name
+      }
+      isOwner
+    }
+  }
+`
+
+export const SEARCH_POSTS = gql`
+  query SearchPosts(
+    $searchTerm: String
+    $tags: [String]
+    $location: String
+    $limit: Int
+    $offset: Int
+  ) {
+    searchPosts(
+      searchTerm: $searchTerm
+      tags: $tags
+      location: $location
+      limit: $limit
+      offset: $offset
+    ) {
+      id
+      title
+      placeName
+      content
+      location
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
+      createdAt
+      shareCount
+      tags {
+        id
+        name
+      }
+      author {
+        id
+        displayName
+        photoURL
+      }
+      rating {
         id
         score
         type
       }
-      likeCount
+      attendees {
+        id
+        displayName
+      }
       attendeeCount
       isWantToGo
+      likeCount
       isLiked
+      tags {
+        id
+        name
+      }
       isOwner
     }
   }
@@ -214,7 +256,12 @@ export const CREATE_POST = gql`
       placeName
       content
       location
-      imageUrl
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
       createdAt
       shareCount
       author {
@@ -244,7 +291,12 @@ export const UPDATE_POST = gql`
       placeName
       content
       location
-      imageUrl
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
       createdAt
       shareCount
       author {

@@ -4,11 +4,12 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-} from 'firebase/auth'
-import { useDispatch } from 'react-redux'
-import { addUser } from '../utils/userSlice'
-import { useSyncUser } from './useUser'
-import { AUTH_CONFIG } from '../utils/constants/auth'
+} from "firebase/auth"
+import { useDispatch } from "react-redux"
+import { addUser } from "../utils/userSlice"
+import { useSyncUser } from "./useUser"
+import { AUTH_CONFIG } from "../utils/constants/auth"
+import { useAuthContext } from "./AuthContext";
 
 /**
  * Custom hook for handling Firebase authentication
@@ -17,6 +18,8 @@ import { AUTH_CONFIG } from '../utils/constants/auth'
  * @returns {signIn, signUp, errorMessage,} Auth methods and state
  */
 export const useAuth = () => {
+  const { user, loading, signOut } = useAuthContext();
+
   // Track authentication error messages
   const [errorMessage, setErrorMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -122,5 +125,9 @@ export const useAuth = () => {
     signIn,
     signUp,
     errorMessage,
+    user,
+    loading,
+    signOut,
+
   }
 }

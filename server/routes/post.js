@@ -3,6 +3,7 @@ const Post = require('../models/posts');
 const PostsTags = require('../models/PostsTags');
 const User = require('../models/User');
 const router = express.Router();
+const { authenticateFirebaseIdToken } = require('../middleware/auth');
 
 // Get a single post by ID
 router.get('/:id', async (req, res) => {
@@ -12,19 +13,12 @@ router.get('/:id', async (req, res) => {
       return res.status(404).json({ error: 'Post not found' });
     }
 
-    // Populate tags for this post
-    
     const Tag = require('../models/Tags');
     const postTags = await PostsTags.find({ postId: post._id }).populate('tagId');
-    // tags array: [{ _id, name }]
     const tags = postTags.map(pt => pt.tagId ? { _id: pt.tagId._id, name: pt.tagId.name } : null).filter(Boolean);
 
-    // Attach tags to post object (always an array)
     const postObj = post.toObject();
     postObj.tags = Array.isArray(tags) ? tags : [];
-
-    // Ensure tags field is always present, even if empty
-    if (!postObj.tags) postObj.tags = [];
 
     res.json(postObj);
   } catch (err) {
@@ -33,39 +27,22 @@ router.get('/:id', async (req, res) => {
   }
 });
 
-// Use Firebase authentication middleware
-const { authenticateFirebaseIdToken } = require('../middleware/auth');
-
-// Create a new post (with tags, ratingId, etc)
+// Create a new post
 router.post('/', authenticateFirebaseIdToken, async (req, res) => {
   try {
     const { title, content, imageUrls, ratingId, placeName, location, tags } = req.body;
-    // Get firebaseUid from Firebase decoded token
     const firebaseUid = req.user && (req.user.uid || req.user.id);
-    if (!firebaseUid) {
-      return res.status(401).json({ error: 'User not authenticated' });
-    }
-
-    // Find the user by firebaseUid
-    // const User = require('../models/User');
-    // const userDoc = await User.findOne({ firebaseUid });
+    if (!firebaseUid) return res.status(401).json({ error: 'User not authenticated' });
 
     const userDoc = await User.findByFirebaseUid(firebaseUid);
-    console.log('###route/post.js userDoc:', userDoc);
+    if (!userDoc) return res.status(404).json({ error: 'User not found' });
 
-    if (!userDoc) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    const userId = userDoc._id;
-
-    // Validate required fields
     if (!title || !content || !imageUrls || !imageUrls.desktop || !ratingId) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Create post
     const post = new Post({
-      userId,
+      userId: userDoc._id,
       title,
       content,
       imageUrls: {
@@ -78,19 +55,16 @@ router.post('/', authenticateFirebaseIdToken, async (req, res) => {
       placeName,
       location,
     });
+
     await post.save();
 
-    // Handle tags (array of strings)
     if (Array.isArray(tags) && tags.length > 0) {
       const Tag = require('../models/Tags');
-      // const PostsTags = require('../models/PostsTags');
       for (let tagName of tags) {
         tagName = tagName.trim();
         if (!tagName) continue;
         let tag = await Tag.findOne({ name: tagName });
-        if (!tag) {
-          tag = await Tag.create({ name: tagName });
-        }
+        if (!tag) tag = await Tag.create({ name: tagName });
         await PostsTags.findOneAndUpdate(
           { tagId: tag._id, postId: post._id },
           { tagId: tag._id, postId: post._id },
@@ -117,11 +91,7 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
     }
 
     // Find the user by firebaseUid
-    // const User = require('../models/User');
-    // const userDoc = await User.findOne({ firebaseUid });
     const userDoc = await User.findByFirebaseUid(firebaseUid);
-    console.log('###route/post.js userDoc:', userDoc);
-
     if (!userDoc) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -136,30 +106,30 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
       return res.status(403).json({ error: 'Not authorized to edit this post' });
     }
 
-    // Update fields
+    // Update fields if provided
     if (title) post.title = title;
     if (content) post.content = content;
-    if (imageUrls) post.imageUrls = imageUrls;
+
+    // Updated imageUrls mapping to handle multiple sizes
+    if (imageUrls && typeof imageUrls === 'object') {
+      post.imageUrls = {
+        desktop: imageUrls.desktop || '',
+        mobile: imageUrls.mobile || '',
+        mobile2x: imageUrls.mobile2x || imageUrls['mobile@2x'] || '',
+        tablet: imageUrls.tablet || '',
+      };
+    }
+
     if (ratingId) post.ratingId = ratingId;
     if (placeName) post.placeName = placeName;
     if (location) post.location = location;
 
-    // await post.save();
-    // console.log('✅ Post updated successfully:', post);
-
-    try {
-      await post.save();
-      console.log('✅ Post updated successfully:', post);
-    } catch (err) {
-      console.error('❌ Error saving updated post:', err);
-      return res.status(500).json({ error: 'Failed to update post', details: err.message });
-    }
-
+    // Save updated post
+    await post.save();
 
     // Handle tags (replace all tags for this post)
     if (Array.isArray(tags)) {
       const Tag = require('../models/Tags');
-      // const PostsTags = require('../models/PostsTags');
       // Remove existing tags
       await PostsTags.deleteMany({ postId: post._id });
       for (let tagName of tags) {
@@ -173,8 +143,7 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
       }
     }
 
-    // Populate tags for this post (same as GET)
-    // const PostsTags = require('../models/PostsTags');
+    // Populate tags for this post
     const postTags = await PostsTags.find({ postId: post._id }).populate('tagId');
     const tagsArr = postTags.map(pt => pt.tagId ? { _id: pt.tagId._id, name: pt.tagId.name } : null).filter(Boolean);
     const postObj = post.toObject();

@@ -79,7 +79,8 @@ const Create = () => {
                 });
                 const data = await res.json();
                 if (data.success) {
-                  imageUrls = data.urls;
+                  const { desktop, mobile, 'mobile@2x': mobile2x, tablet } = data.urls;
+                  imageUrls = { desktop, mobile, mobile2x, tablet };
                 } else {
                   throw new Error('Image upload failed');
                 }
@@ -110,6 +111,10 @@ const Create = () => {
                 location: values.location,
                 tags: tagsArray,
               };
+
+              // <-- Add console.log here to debug payload before sending -->
+              console.log('🟡 Submitting post:', postPayload);
+
               try {
                 const res = await fetch('/api/posts', {
                   method: 'POST',

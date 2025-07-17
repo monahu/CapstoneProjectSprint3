@@ -13,6 +13,7 @@ const EditForm = ({ postId, onSuccess }) => {
   const [ratingsLoading, setRatingsLoading] = useState(true);
   const [postData, setPostData] = useState(null);
 
+  // Fetch post data
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -28,6 +29,7 @@ const EditForm = ({ postId, onSuccess }) => {
     fetchPost();
   }, [postId]);
 
+  // Fetch ratings list
   useEffect(() => {
     let url = '/api/ratings';
     if (
@@ -46,12 +48,12 @@ const EditForm = ({ postId, onSuccess }) => {
       .catch(() => setRatingsLoading(false));
   }, []);
 
+  // Prepare initial form values after loading post and ratings
   useEffect(() => {
     if (ratingsLoading || !postData || ratings.length === 0) return;
 
     let ratingId = '';
 
-    // Use ratingId directly if available
     if (postData.ratingId) {
       ratingId = String(postData.ratingId);
     } else if (postData.rating && postData.rating._id) {
@@ -64,12 +66,6 @@ const EditForm = ({ postId, onSuccess }) => {
       if (found) ratingId = String(found._id);
     }
 
-    // Debug logs
-    console.log('[DEBUG] Rating Preselection Info:');
-    console.log('postData.ratingId:', postData.ratingId);
-    console.log('Resolved ratingId:', ratingId);
-    console.log('Available ratings:', ratings.map(r => ({ _id: r._id, type: r.type })));
-
     setInitialValues({
       title: postData.title || '',
       placeName: postData.placeName || '',
@@ -80,14 +76,13 @@ const EditForm = ({ postId, onSuccess }) => {
         : '',
       image: postData.imageUrls?.desktop || '',
       content: postData.content || '',
+      // Store entire imageUrls in state (for image upload)
+      imageUrls: postData.imageUrls || {},
     });
   }, [ratingsLoading, ratings, postData]);
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setError(null);
-
-    console.log('handleSubmit user:', user);
-    console.log('handleSubmit user.getIdToken:', user?.getIdToken);
 
     if (!user || typeof user.getIdToken !== 'function') {
       setError('You must be logged in to update a post.');
@@ -104,34 +99,57 @@ const EditForm = ({ postId, onSuccess }) => {
         return;
       }
 
+      // Handle image upload if user changed the image file (ImageUploadField passes File object)
+      let imageUrls = values.imageUrls || {};
+      if (values.image && values.image instanceof File) {
+        const formData = new FormData();
+        formData.append('image', values.image);
+
+        const res = await fetch('/api/upload-image', {
+          method: 'POST',
+          body: formData,
+        });
+
+        const data = await res.json();
+
+        if (data.success && data.urls) {
+          imageUrls = {
+            desktop: data.urls.desktop || '',
+            mobile: data.urls.mobile || '',
+            mobile2x: data.urls['mobile@2x'] || data.urls.mobile2x || '',
+            tablet: data.urls.tablet || '',
+          };
+        } else {
+          throw new Error('Image upload failed');
+        }
+      }
+
       const payload = {
         title: values.title,
         placeName: values.placeName,
         ratingId: values.ratingId,
         location: values.location,
-        tags: values.tags.split(',').map((t) => t.trim()),
-        imageUrls: { desktop: values.image },
+        tags: values.tags.split(',').map((t) => t.trim()).filter(Boolean),
+        imageUrls,
         content: values.content,
       };
-
-      console.log('EditForm PUT: idToken', idToken);
-      console.log('EditForm PUT: payload', payload);
 
       await axios.put(`/api/posts/${postId}`, payload, {
         headers: {
           Authorization: `Bearer ${idToken}`,
+          'Content-Type': 'application/json',
         },
       });
 
       if (onSuccess) onSuccess();
     } catch (err) {
-      setError('Failed to update post');
+      console.error('Failed to update post:', err);
+      setError('Failed to update post. ' + (err.message || ''));
     } finally {
       setSubmitting(false);
     }
   };
 
-  // Show message if not logged in
   if (!user) {
     return <div className="text-red-600">Please log in to edit this post.</div>;
   }
@@ -159,6 +177,7 @@ const EditForm = ({ postId, onSuccess }) => {
               onChange={e => setFieldValue('title', e.target.value)}
             />
           </div>
+
           <div>
             <label htmlFor="placeName" className="block text-sm font-medium text-gray-900">Place Name</label>
             <input
@@ -171,6 +190,7 @@ const EditForm = ({ postId, onSuccess }) => {
               onChange={e => setFieldValue('placeName', e.target.value)}
             />
           </div>
+
           <div>
             <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">Rating</label>
             <select
@@ -190,6 +210,7 @@ const EditForm = ({ postId, onSuccess }) => {
               ))}
             </select>
           </div>
+
           <div>
             <label htmlFor="location" className="block text-sm font-medium text-gray-900">Location</label>
             <input
@@ -202,6 +223,7 @@ const EditForm = ({ postId, onSuccess }) => {
               onChange={e => setFieldValue('location', e.target.value)}
             />
           </div>
+
           <div>
             <label htmlFor="tags" className="block text-sm font-medium text-gray-900">Tags</label>
             <input
@@ -214,6 +236,7 @@ const EditForm = ({ postId, onSuccess }) => {
               onChange={e => setFieldValue('tags', e.target.value)}
             />
           </div>
+
           {values.image && typeof values.image === 'string' && (
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-900">Current Image</label>
@@ -224,16 +247,19 @@ const EditForm = ({ postId, onSuccess }) => {
               />
             </div>
           )}
+
           <ImageUploadField
             value={values.image}
             setFieldValue={setFieldValue}
             initialImage={values.image}
           />
+
           <RichTextField
             value={values.content}
             setFieldValue={setFieldValue}
             initialContent={values.content}
           />
+
           <div className="flex justify-end">
             <button
               type="submit"

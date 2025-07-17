@@ -37,7 +37,7 @@ export const useNavbar = () => {
   const hideLogoRoutes = NAVIGATION.hideLogoRoutes
   const protectedRoutes = NAVIGATION.protectedRoutes
 
-  // Authentication state management
+  // Authentication state management - runs once only
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
@@ -64,15 +64,16 @@ export const useNavbar = () => {
           })
         )
 
-        // Silent sync to ensure database is up to date
-        // This ensures navbar and posts show same photo
+        // Sync user to database immediately (no delay needed)
         try {
-          /* debug   console.log('🔄 Syncing user with:', {
-            firebaseUid: uid,
-            email,
-            displayName,
-            photoURL,
-          }) */
+          // Ensure we have a fresh token before making the request
+          const token = await user.getIdToken(true)
+          if (!token) {
+            console.warn('⚠️ No Firebase token available, skipping user sync')
+            return
+          }
+
+          console.log('🔄 Syncing user with backend')
           await syncUser({
             variables: {
               input: {
@@ -83,32 +84,53 @@ export const useNavbar = () => {
               },
             },
           })
+          console.log('✅ User sync completed successfully')
         } catch (error) {
-          // Silent fail - don't disrupt user experience
-          console.warn('User sync failed (non-critical):', error)
-        }
-
-        // Only redirect to home if user is on login page
-        if (location.pathname === ROUTES.LOGIN) {
-          navigate(ROUTES.HOME)
+          // Enhanced error handling for different types of auth errors
+          if (
+            error.message?.includes('Authentication required') ||
+            error.message?.includes('firebaseUid') ||
+            error.networkError?.statusCode === 401
+          ) {
+            console.warn(
+              '⚠️ Authentication not ready yet, will retry on next request'
+            )
+          } else {
+            console.warn(
+              'User sync failed (non-critical):',
+              error.message || error
+            )
+          }
         }
       } else {
-        // no user logged in
+        // User is signed out
         dispatch(removeUser())
-        // Only redirect if they're trying to access protected routes
-        if (protectedRoutes.includes(location.pathname)) {
-          navigate(ROUTES.LOGIN)
-        }
       }
     })
-    // Unsubscribe onAuthStateChanged when component unmount
+
     return () => unsubscribe()
-  }, [location.pathname, navigate, dispatch, protectedRoutes, syncUser])
+  }, [dispatch, syncUser]) // Only depends on dispatch and syncUser, not location
+
+  // Navigation logic - runs when location or user changes
+  useEffect(() => {
+    if (user) {
+      // Only redirect to home if user is on login page
+      if (location.pathname === ROUTES.LOGIN) {
+        navigate(ROUTES.HOME)
+      }
+    } else {
+      // Only redirect if they're trying to access protected routes
+      if (protectedRoutes.includes(location.pathname)) {
+        navigate(ROUTES.LOGIN)
+      }
+    }
+  }, [location.pathname, navigate, user, protectedRoutes]) // Separate effect for navigation
 
   return {
     user,
     userNavigation,
     hideLogoRoutes,
+    protectedRoutes,
     handleSignOut,
     location,
   }

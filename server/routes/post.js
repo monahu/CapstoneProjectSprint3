@@ -1,6 +1,7 @@
 
 const express = require('express');
 const Post = require('../models/posts');
+const User = require('../models/User');
 const router = express.Router();
 
 // Get a single post by ID
@@ -46,8 +47,12 @@ router.post('/', authenticateFirebaseIdToken, async (req, res) => {
     }
 
     // Find the user by firebaseUid
-    const User = require('../models/User');
-    const userDoc = await User.findOne({ firebaseUid });
+    // const User = require('../models/User');
+    // const userDoc = await User.findOne({ firebaseUid });
+
+    const userDoc = await User.findByFirebaseUid(firebaseUid);
+    console.log('###route/post.js userDoc:', userDoc);
+
     if (!userDoc) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -112,8 +117,11 @@ router.put('/:id', authenticateFirebaseIdToken, async (req, res) => {
     }
 
     // Find the user by firebaseUid
-    const User = require('../models/User');
-    const userDoc = await User.findOne({ firebaseUid });
+    // const User = require('../models/User');
+    // const userDoc = await User.findOne({ firebaseUid });
+    const userDoc = await User.findByFirebaseUid(firebaseUid);
+    console.log('###route/post.js userDoc:', userDoc);
+
     if (!userDoc) {
       return res.status(404).json({ error: 'User not found' });
     }

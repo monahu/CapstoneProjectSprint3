@@ -51,7 +51,7 @@ const EditForm = ({ postId, onSuccess }) => {
 
     let ratingId = '';
 
-    // ✅ Use ratingId directly if available
+    // Use ratingId directly if available
     if (postData.ratingId) {
       ratingId = String(postData.ratingId);
     } else if (postData.rating && postData.rating._id) {
@@ -64,7 +64,7 @@ const EditForm = ({ postId, onSuccess }) => {
       if (found) ratingId = String(found._id);
     }
 
-    // 🔍 Debug logs
+    // Debug logs
     console.log('[DEBUG] Rating Preselection Info:');
     console.log('postData.ratingId:', postData.ratingId);
     console.log('Resolved ratingId:', ratingId);
@@ -85,8 +85,25 @@ const EditForm = ({ postId, onSuccess }) => {
 
   const handleSubmit = async (values, { setSubmitting }) => {
     setError(null);
+
+    console.log('handleSubmit user:', user);
+    console.log('handleSubmit user.getIdToken:', user?.getIdToken);
+
+    if (!user || typeof user.getIdToken !== 'function') {
+      setError('You must be logged in to update a post.');
+      setSubmitting(false);
+      return;
+    }
+
     try {
-      const idToken = user ? await user.getIdToken() : null;
+      const idToken = await user.getIdToken();
+
+      if (!idToken || typeof idToken !== 'string' || idToken.length < 10) {
+        setError('No valid authentication token found. Please log in again.');
+        setSubmitting(false);
+        return;
+      }
+
       const payload = {
         title: values.title,
         placeName: values.placeName,
@@ -97,9 +114,12 @@ const EditForm = ({ postId, onSuccess }) => {
         content: values.content,
       };
 
+      console.log('EditForm PUT: idToken', idToken);
+      console.log('EditForm PUT: payload', payload);
+
       await axios.put(`/api/posts/${postId}`, payload, {
         headers: {
-          Authorization: idToken ? `Bearer ${idToken}` : '',
+          Authorization: `Bearer ${idToken}`,
         },
       });
 
@@ -110,6 +130,11 @@ const EditForm = ({ postId, onSuccess }) => {
       setSubmitting(false);
     }
   };
+
+  // Show message if not logged in
+  if (!user) {
+    return <div className="text-red-600">Please log in to edit this post.</div>;
+  }
 
   if (loading || !initialValues) return <div>Loading...</div>;
   if (error) return <div className="text-red-500">{error}</div>;

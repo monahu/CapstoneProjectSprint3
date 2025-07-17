@@ -1,4 +1,5 @@
 // Script to seed the Rating collection with default types
+require('dotenv').config({ path: './server/.env' });
 const mongoose = require('mongoose');
 const Rating = require('../models/Rating');
 require('dotenv').config();

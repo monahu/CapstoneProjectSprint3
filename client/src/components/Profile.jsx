@@ -1,14 +1,18 @@
 import { useSelector } from "react-redux";
-import { useMyPosts } from "../hooks/usePost"; // ✅ Use the correct hook
+import { usePosts } from "../hooks/usePost"; // 🔄 Importa hook genérico
 import Hero from "./Hero";
 import RestaurantCard from "./Post/RestaurantCard";
 import heroImage from "../assets/img/resJam_post_1.webp";
-import { useNavbar } from "../hooks/useNavbar"; // ✅ Logout handler
+import { useNavbar } from "../hooks/useNavbar";
 
 const Profile = () => {
     const { handleSignOut } = useNavbar();
     const user = useSelector((state) => state.user);
-    const { posts: userPosts, loading } = useMyPosts(); // ✅ Use user-specific posts
+    const { posts, loading } = usePosts(); // 🔄 Usa todos os posts
+
+    // Filtra somente os posts do usuário logado (via userId)
+    const userPosts =
+        posts?.filter((post) => post?.author?.id === user?._id) || [];
 
     return (
         <div className="min-h-screen bg-gray-50">

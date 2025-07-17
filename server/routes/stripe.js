@@ -23,6 +23,7 @@ router.post("/create-checkout-session", async (req, res) => {
                 },
             ],
             mode: "payment",
+            // using dynamic URLs from environment variables
             success_url: `${process.env.FRONTEND_URL}/`,
             cancel_url: `${process.env.FRONTEND_URL}/`,
             customer_email: email || undefined,

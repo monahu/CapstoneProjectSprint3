@@ -106,9 +106,9 @@ const Home = () => {
           id={post.id}
           image={post.imageUrls?.desktop || post.imageUrl}
           user={{
-            name: post.author.displayName,
+            name: post.author?.displayName || 'Anonymous User',
             avatar:
-              post.author.photoURL ||
+              post.author?.photoURL ||
               'https://img.daisyui.com/images/profile/demo/2@94.webp',
           }}
           location={post.location}

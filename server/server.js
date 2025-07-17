@@ -9,11 +9,11 @@ const { smartAuth } = require('./middleware/auth')
 const { merge } = require('lodash')
 const cors = require('cors')
 const rateLimit = require('express-rate-limit')
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
 // Utilities
 const { createGraphQLContext } = require('./utils/graphqlContext')
-const { ensureDefaultRatings } = require('./utils/dbSeed')
+const { ensureDefaultRatings, cleanupOrphanedPosts } = require('./utils/dbSeed')
 
 // GraphQL imports
 const typeDefs = require('./graphql/typeDefs')
@@ -38,16 +38,16 @@ app.use(cookieParser())
 app.use(cors())
 
 // Image upload route (Cloudinary)
-const imageUploadRoute = require('./routes/imageUpload');
-app.use('/api/upload-image', imageUploadRoute);
+const imageUploadRoute = require('./routes/imageUpload')
+app.use('/api/upload-image', imageUploadRoute)
 
 // Ratings REST route
-const ratingsRouter = require('./routes/ratings');
-app.use('/api/ratings', ratingsRouter);
+const ratingsRouter = require('./routes/ratings')
+app.use('/api/ratings', ratingsRouter)
 
 // Post REST route
-const postRoute = require('./routes/post');
-app.use('/api/posts', postRoute);
+const postRoute = require('./routes/post')
+app.use('/api/posts', postRoute)
 
 // Create Apollo Server
 const server = new ApolloServer({
@@ -55,8 +55,8 @@ const server = new ApolloServer({
   resolvers,
 })
 
-const stripeRoute = require('./routes/stripe');
-app.use('/api/payment', stripeRoute);
+const stripeRoute = require('./routes/stripe')
+app.use('/api/payment', stripeRoute)
 
 // Rate limiting for GraphQL endpoint
 const limiter = rateLimit({
@@ -77,6 +77,8 @@ async function startServer() {
 
     // Ensure default data exists
     await ensureDefaultRatings()
+    // Clean up any orphaned posts
+    await cleanupOrphanedPosts()
 
     // Mount Apollo middleware with authentication
     app.use(

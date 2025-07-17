@@ -19,39 +19,75 @@ const postFieldResolvers = {
    * Resolve the author of a post
    */
   author: async (parent) => {
-    // Always fetch fresh user data from database instead of relying on populate
-    const freshUser = await User.findById(parent.userId._id || parent.userId)
+    try {
+      console.log('🔍 Author resolver - Post userId:', parent.userId)
 
-    if (freshUser) {
-      const result = {
-        id: freshUser._id.toString(),
-        displayName: freshUser.displayName || DEFAULT_USER_DISPLAY_NAME,
-        photoURL: freshUser.photoURL || DEFAULT_USER_PHOTO_URL,
-        firstName: freshUser.firstName || '',
-        lastName: freshUser.lastName || '',
-        email: freshUser.email || '',
+      // Get the user ID (handle both ObjectId and populated object)
+      let userId
+      if (parent.userId._id) {
+        userId = parent.userId._id
+      } else if (parent.userId) {
+        userId = parent.userId
+      } else {
+        console.log('❌ No userId found in post')
+        return null
       }
 
-      return result
-    }
+      console.log('🔍 Looking up user with ID:', userId)
 
-    // Fallback to populated data if fresh lookup fails
-    if (parent.userId._id) {
-      const result = {
-        id: parent.userId._id.toString(),
-        displayName: parent.userId.displayName || DEFAULT_USER_DISPLAY_NAME,
-        photoURL: parent.userId.photoURL || DEFAULT_USER_PHOTO_URL,
-        firstName: parent.userId.firstName || '',
-        lastName: parent.userId.lastName || '',
-        email: parent.userId.email || '',
+      // Always fetch fresh user data from database
+      const freshUser = await User.findById(userId)
+      //debug  console.log('👤 Fresh user found:', freshUser ? 'Yes' : 'No')
+
+      if (freshUser) {
+        const result = {
+          id: freshUser._id.toString(),
+          displayName: freshUser.displayName || DEFAULT_USER_DISPLAY_NAME,
+          photoURL: freshUser.photoURL || DEFAULT_USER_PHOTO_URL,
+          firstName: freshUser.firstName || '',
+          lastName: freshUser.lastName || '',
+          email: freshUser.email || '',
+        }
+
+        return result
       }
-      console.log('⚠️ Using fallback populated data:', result)
-      return result
-    }
 
-    console.log('❌ No user data found, should not happen')
-    const user = await User.findById(parent.userId)
-    return user
+      // Fallback to populated data if fresh lookup fails
+      if (parent.userId._id && parent.userId.displayName) {
+        const result = {
+          id: parent.userId._id.toString(),
+          displayName: parent.userId.displayName || DEFAULT_USER_DISPLAY_NAME,
+          photoURL: parent.userId.photoURL || DEFAULT_USER_PHOTO_URL,
+          firstName: parent.userId.firstName || '',
+          lastName: parent.userId.lastName || '',
+          email: parent.userId.email || '',
+        }
+        console.log('⚠️ Using fallback populated data:', result)
+        return result
+      }
+
+      // If all fails, return a default author
+      console.log('❌ User not found, returning default author')
+      return {
+        id: userId.toString(),
+        displayName: DEFAULT_USER_DISPLAY_NAME,
+        photoURL: DEFAULT_USER_PHOTO_URL,
+        firstName: '',
+        lastName: '',
+        email: '',
+      }
+    } catch (error) {
+      console.error('❌ Author resolver error:', error)
+      // Return a safe default to prevent null errors
+      return {
+        id: 'unknown',
+        displayName: DEFAULT_USER_DISPLAY_NAME,
+        photoURL: DEFAULT_USER_PHOTO_URL,
+        firstName: '',
+        lastName: '',
+        email: '',
+      }
+    }
   },
 
   /**

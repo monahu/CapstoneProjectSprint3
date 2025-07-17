@@ -4,11 +4,8 @@ const WantToGo = require('../../models/WantToGo')
 const Like = require('../../models/Likes')
 const Tag = require('../../models/Tags')
 const User = require('../../models/User')
-const {
-  getUserData,
-  checkPostOwnership,
-  requireAuthAndCurrentUser,
-} = require('../userHelpers')
+const { requireAuthAndCurrentUser } = require('../userHelpers')
+const { checkPostOwnership } = require('../postHelpers')
 
 /**
  * Post Mutation Resolvers

@@ -22,7 +22,7 @@ const typeDefs = `#graphql
     placeName: String
     content: String
     location: String
-    imageUrl: String
+    imageUrls: ImageUrls
     createdAt: Date
     author: AuthorInfo
     rating: Rating
@@ -35,6 +35,13 @@ const typeDefs = `#graphql
     isLiked: Boolean
     tags: [Tag]
     isOwner: Boolean
+  }
+
+    type ImageUrls {
+    desktop: String
+    mobile: String
+    mobile2x: String
+    tablet: String
   }
 
   type AuthorInfo {
@@ -73,6 +80,13 @@ const typeDefs = `#graphql
     name: String!
   }
 
+  input ImageUrlsInput {
+    desktop: String!
+    mobile: String
+    mobile2x: String
+    tablet: String
+  }
+
   input SyncUserInput {
     firebaseUid: String!
     email: String!
@@ -96,7 +110,7 @@ const typeDefs = `#graphql
     placeName: String!
     content: String
     location: String
-    imageUrl: String
+    imageUrls: ImageUrlsInput
     ratingId: ID!
     tags: [String]  
   }
@@ -106,7 +120,7 @@ const typeDefs = `#graphql
     placeName: String
     content: String
     location: String
-    imageUrl: String
+    imageUrls: ImageUrlsInput
   }
 
   input PostFilter {
@@ -134,7 +148,7 @@ const typeDefs = `#graphql
   type Mutation {
     # User mutations
     syncUser(input: SyncUserInput!): User!
-    # updateUserProfile(input: UpdateUserProfileInput!): User! # TODO: for scalability
+    updateUserProfile(input: UpdateUserProfileInput!): User!
     
     # Post mutations
     createPost(input: CreatePostInput!): Post!

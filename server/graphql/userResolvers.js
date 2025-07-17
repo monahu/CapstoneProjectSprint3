@@ -17,8 +17,19 @@ const userResolvers = {
 
   Mutation: {
     syncUser: async (_, { input }, { user }) => {
-      const userData = buildUserDataFromInput(input, user)
-      return await upsertUser(userData, user)
+      // Add null check to prevent "Cannot use 'in' operator to search for 'firebaseUid' in undefined"
+      if (!user) {
+        console.log('❌ syncUser: No authenticated user found')
+        throw new Error('Authentication required for user sync')
+      }
+
+      try {
+        const userData = buildUserDataFromInput(input, user)
+        return await upsertUser(userData, user, input)
+      } catch (error) {
+        console.error('❌ syncUser error:', error)
+        throw error
+      }
     },
 
     updateUserProfile: async (_, { input }, { user, currentUser }) => {

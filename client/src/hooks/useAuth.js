@@ -1,14 +1,14 @@
-import { useState } from "react"
-import { auth } from "../utils/firebase"
+import { useState } from 'react'
+import { auth } from '../utils/firebase'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-} from "firebase/auth"
-import { useDispatch } from "react-redux"
-import { addUser } from "../utils/userSlice"
-import { useSyncUser } from "./useUser"
-import { AUTH_CONFIG } from "../utils/constants/auth"
+} from 'firebase/auth'
+import { useDispatch } from 'react-redux'
+import { addUser } from '../utils/userSlice'
+import { useSyncUser } from './useUser'
+import { AUTH_CONFIG } from '../utils/constants/auth'
 
 /**
  * Custom hook for handling Firebase authentication
@@ -66,6 +66,7 @@ export const useAuth = () => {
       )
 
       // 4. Sync user data with GraphQL backend
+      console.log('🔄 Syncing user with backend') in signUp(useAuth)
       await syncUser({
         variables: {
           input: {
@@ -79,7 +80,7 @@ export const useAuth = () => {
           },
         },
       })
-
+      console.log('✅ User sync in signUp completed successfully')
       setErrorMessage(null)
       return user
     } catch (error) {
@@ -106,6 +107,7 @@ export const useAuth = () => {
         password
       )
       const user = userCredential.user
+
       setErrorMessage(null)
       return user
     } catch (error) {

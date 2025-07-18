@@ -4,21 +4,23 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-} from "firebase/auth"
-import { useDispatch } from "react-redux"
-import { addUser } from "../utils/userSlice"
-import { useSyncUser } from "./useUser"
-import { AUTH_CONFIG } from "../utils/constants/auth"
-import { useAuthContext } from "./AuthContext";
+} from 'firebase/auth'
+import { useDispatch } from 'react-redux'
+import { addUser } from '../utils/userSlice'
+import { useSyncUser } from './useUser'
+import { AUTH_CONFIG } from '../utils/constants/auth'
+import { useAuthContext } from './AuthContext'
 
 /**
- * Custom hook for handling Firebase authentication
+ * ? Custom hook for handling Firebase authentication for the sign up and sign in if using Rest API don't use this hook
  * Manages user sign-up, sign-in, and error states
  * Also syncs user data with Redux store and GraphQL backend
  * @returns {signIn, signUp, errorMessage,} Auth methods and state
  */
 export const useAuth = () => {
-  const { user, loading, signOut } = useAuthContext();
+  // TODO: remove this useAuthContext and get the user from redux store instead
+
+  const { user, loading, signOut } = useAuthContext()
 
   // Track authentication error messages
   const [errorMessage, setErrorMessage] = useState(null)
@@ -128,6 +130,5 @@ export const useAuth = () => {
     user,
     loading,
     signOut,
-
   }
 }

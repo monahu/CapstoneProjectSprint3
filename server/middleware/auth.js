@@ -27,7 +27,6 @@ if (!admin.apps.length) {
 // Middleware to authenticate Firebase ID tokens
 const authenticateFirebaseIdToken = async (req, res, next) => {
   const authHeader = req.headers.authorization
-  console.log('🔑 Auth Header:', authHeader ? 'Present' : 'Missing')
 
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     console.log('❌ No valid authorization header')
@@ -35,11 +34,12 @@ const authenticateFirebaseIdToken = async (req, res, next) => {
   }
 
   const idToken = authHeader.split('Bearer ')[1]
-  console.log('🎫 Token length:', idToken?.length || 0)
+  if (idToken.length < 10) {
+    console.log('❌ Token length:', idToken?.length || 0)
+  }
 
   try {
     const decodedToken = await admin.auth().verifyIdToken(idToken)
-    console.log('✅ Token verified for user:', decodedToken.uid)
     req.user = decodedToken
     next()
   } catch (error) {
@@ -66,7 +66,7 @@ const smartAuth = async (req, res, next) => {
     operationName === 'IntrospectionQuery'
 
   if (isPublicQuery) {
-    console.log('✅ Public query detected')
+    // console.log('✅ Public query detected')
 
     // If user has token, authenticate them for better experience
     if (authHeader && authHeader.startsWith('Bearer ')) {

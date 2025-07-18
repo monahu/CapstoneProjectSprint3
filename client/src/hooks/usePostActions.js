@@ -18,7 +18,7 @@ export const usePostActions = ({
   const [currentShareCount, setCurrentShareCount] = useState(initialShareCount)
 
   const navigate = useNavigate()
-  const isLoggedIn = useSelector((state) => state.user !== null)
+  const isLoggedIn = useSelector((state) => state.user.data !== null)
 
   // GraphQL mutations with cache updates
   const { likePost: toggleLike } = useLikePost()

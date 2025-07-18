@@ -9,6 +9,40 @@ export const postImage = {
   restaurant3: resJam_post_3,
 }
 
+export const POST_QUERY_CONFIG = {
+  DEFAULT_LIMIT: 10,
+  DEFAULT_OFFSET: 0,
+  DEFAULT_FILTER: {},
+}
+
+// Default variables used by Home component and cache updates
+export const DEFAULT_POSTS_VARIABLES = {
+  limit: POST_QUERY_CONFIG.DEFAULT_LIMIT,
+  offset: POST_QUERY_CONFIG.DEFAULT_OFFSET,
+  filter: POST_QUERY_CONFIG.DEFAULT_FILTER,
+}
+
+// Helper function to create refetch queries configuration
+export const createPostsRefetchConfig = (
+  variables = DEFAULT_POSTS_VARIABLES
+) => ({
+  include: [
+    {
+      query: null, // Will be set by the calling code
+      variables,
+    },
+  ],
+})
+
+// Helper function to create cache update variables
+export const createCacheUpdateConfig = (
+  query,
+  variables = DEFAULT_POSTS_VARIABLES
+) => ({
+  query,
+  variables,
+})
+
 export const POSTS_DATA = [
   {
     id: 1,

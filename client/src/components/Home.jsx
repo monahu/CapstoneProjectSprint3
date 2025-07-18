@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router'
-import { useDispatch, useSelector } from 'react-redux'
-import { onAuthStateChanged } from 'firebase/auth'
+import { useSelector } from 'react-redux'
+import { useEffect, useRef } from 'react'
 
 import Hero from './Hero'
 import LoadingState from './LoadingState'
@@ -11,63 +10,35 @@ import RestaurantCard from './Post/RestaurantCard'
 import { PostCardSkeleton, ImageSkeleton } from './Skeleton'
 import { UI_TEXT } from '../utils/constants/ui'
 import { usePosts } from '../hooks/usePost'
-import { auth } from '../utils/firebase'
-import { addUser, removeUser } from '../utils/userSlice'
 import heroImage from '../assets/img/restJam_hero1.webp'
+import { POST_QUERY_CONFIG } from '../utils/constants/posts'
 
 const Home = () => {
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const user = useSelector((state) => state.user)
-  const [authInitialized, setAuthInitialized] = useState(false)
+  const user = useSelector((state) => state.user.data)
+  const authInitialized = useSelector((state) => state.user.authInitialized)
+  const previousUserRef = useRef(user)
 
   // Always fetch posts, but refetch when auth changes
-  const { posts, loading, error, refetch } = usePosts(10, 0)
+  const { posts, loading, error, refetch } = usePosts(
+    POST_QUERY_CONFIG.DEFAULT_LIMIT,
+    POST_QUERY_CONFIG.DEFAULT_OFFSET
+  )
 
   // hero button link to login or share post
   const handleNavigateToLogin = () => {
     navigate(user ? UI_TEXT.hero.buttonLinkLoggedIn : UI_TEXT.hero.buttonLink)
   }
 
-  // ===========================
-  // AUTH STATE MANAGEMENT
-  // ===========================
+  // Refetch posts when user auth state changes (login/logout)
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('🔥 Auth state changed:', user ? 'Logged in' : 'Logged out')
-
-      if (user) {
-        // User is signed in
-        dispatch(
-          addUser({
-            uid: user.uid,
-            email: user.email,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          })
-        )
-      } else {
-        // User is signed out
-        dispatch(removeUser())
-      }
-
-      // Refetch posts when auth state changes to update isLiked/isWantToGo
-      if (authInitialized && refetch) {
-        console.log('🔄 Refetching posts with fresh network data')
-        // Use refetch with fetchPolicy to force network request
-        refetch({
-          fetchPolicy: 'network-only',
-        })
-      }
-
-      // Mark auth as initialized after first check
-      if (!authInitialized) {
-        setAuthInitialized(true)
-      }
-    })
-
-    return () => unsubscribe()
-  }, [dispatch, authInitialized, refetch])
+    if (authInitialized && previousUserRef.current !== user && refetch) {
+      refetch({
+        fetchPolicy: 'network-only',
+      })
+      previousUserRef.current = user
+    }
+  }, [user, authInitialized, refetch])
 
   // ===========================
   // RENDER LOGIC

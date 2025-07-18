@@ -1,7 +1,7 @@
 const User = require('../../models/User')
 const Rating = require('../../models/Rating')
 const WantToGo = require('../../models/WantToGo')
-const Like = require('../../models/Likes')
+const Likes = require('../../models/Likes')
 const PostsTags = require('../../models/PostsTags')
 const Tag = require('../../models/Tags')
 const {
@@ -20,72 +20,71 @@ const postFieldResolvers = {
    */
   author: async (parent) => {
     try {
-      console.log('🔍 Author resolver - Post userId:', parent.userId)
-
-      // Get the user ID (handle both ObjectId and populated object)
+      // Handle different sources of user ID
       let userId
-      if (parent.userId._id) {
-        userId = parent.userId._id
-      } else if (parent.userId) {
-        userId = parent.userId
-      } else {
-        console.log('❌ No userId found in post')
-        return null
+
+      // First, check if the parent has the populated author data
+      if (parent.author && typeof parent.author === 'object') {
+        // Author is already populated (from aggregation or populate)
+        return parent.author
       }
 
-      console.log('🔍 Looking up user with ID:', userId)
+      // Get userId from different possible sources
+      if (parent.userId) {
+        userId = parent.userId
+      } else if (parent.author && typeof parent.author === 'string') {
+        userId = parent.author
+      }
 
-      // Always fetch fresh user data from database
+      if (!userId) {
+        return {
+          _id: null,
+          displayName: 'Unknown User',
+          email: '',
+          photoURL: 'https://i.pravatar.cc/150?img=1',
+        }
+      }
+
+      // Try to get fresh user data from database
       const freshUser = await User.findById(userId)
-      //debug  console.log('👤 Fresh user found:', freshUser ? 'Yes' : 'No')
 
       if (freshUser) {
+        return freshUser
+      }
+
+      // Check if author is populated but doesn't have all needed fields
+      if (parent.author && typeof parent.author === 'object') {
         const result = {
-          id: freshUser._id.toString(),
-          displayName: freshUser.displayName || DEFAULT_USER_DISPLAY_NAME,
-          photoURL: freshUser.photoURL || DEFAULT_USER_PHOTO_URL,
-          firstName: freshUser.firstName || '',
-          lastName: freshUser.lastName || '',
-          email: freshUser.email || '',
+          _id: parent.author._id || userId,
+          displayName: parent.author.displayName || 'Unknown User',
+          email: parent.author.email || '',
+          photoURL: parent.author.photoURL || 'https://i.pravatar.cc/150?img=1',
+          firstName: parent.author.firstName || '',
+          lastName: parent.author.lastName || '',
+          phone: parent.author.phone || '',
+        }
+
+        if (!result.displayName || result.displayName === 'Unknown User') {
+          console.log('⚠️ Using fallback populated data:', result)
         }
 
         return result
       }
 
-      // Fallback to populated data if fresh lookup fails
-      if (parent.userId._id && parent.userId.displayName) {
-        const result = {
-          id: parent.userId._id.toString(),
-          displayName: parent.userId.displayName || DEFAULT_USER_DISPLAY_NAME,
-          photoURL: parent.userId.photoURL || DEFAULT_USER_PHOTO_URL,
-          firstName: parent.userId.firstName || '',
-          lastName: parent.userId.lastName || '',
-          email: parent.userId.email || '',
-        }
-        console.log('⚠️ Using fallback populated data:', result)
-        return result
-      }
-
-      // If all fails, return a default author
       console.log('❌ User not found, returning default author')
       return {
-        id: userId.toString(),
-        displayName: DEFAULT_USER_DISPLAY_NAME,
-        photoURL: DEFAULT_USER_PHOTO_URL,
-        firstName: '',
-        lastName: '',
+        _id: userId,
+        displayName: 'Unknown User',
         email: '',
+        photoURL: 'https://i.pravatar.cc/150?img=1',
       }
     } catch (error) {
-      console.error('❌ Author resolver error:', error)
-      // Return a safe default to prevent null errors
+      console.error('❌ Error resolving author:', error)
       return {
-        id: 'unknown',
-        displayName: DEFAULT_USER_DISPLAY_NAME,
-        photoURL: DEFAULT_USER_PHOTO_URL,
-        firstName: '',
-        lastName: '',
+        _id: null,
+        displayName: 'Unknown User',
         email: '',
+        photoURL: 'https://i.pravatar.cc/150?img=1',
       }
     }
   },
@@ -173,7 +172,7 @@ const postFieldResolvers = {
    * Get the count of likes for this post
    */
   likeCount: async (parent) => {
-    return await Like.countDocuments({ postId: parent._id })
+    return await Likes.countDocuments({ postId: parent._id })
   },
 
   /**
@@ -185,7 +184,7 @@ const postFieldResolvers = {
       return false
     }
 
-    const like = await Like.findOne({
+    const like = await Likes.findOne({
       userId: currentUser._id,
       postId: parent._id,
     })

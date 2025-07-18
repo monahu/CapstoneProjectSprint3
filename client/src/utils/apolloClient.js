@@ -6,26 +6,57 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
+import { RetryLink } from '@apollo/client/link/retry'
 import { auth } from './firebase'
+import appStore from './appStore'
 
-// HTTP link for GraphQL endpoint
+// =============================================================================
+// CONFIGURATION
+// =============================================================================
+
+const isDevelopmentMode = import.meta.env.VITE_APP_MODE === 'development'
+const hasBackend = import.meta.env.VITE_HAS_BACKEND === 'true'
+
+// =============================================================================
+// HTTP LINK - GraphQL Endpoint Connection
+// =============================================================================
+
 const httpLink = createHttpLink({
   uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:3500/graphql',
 })
 
-// Auth link to include Firebase token
+// =============================================================================
+// AUTH LINK - Automatic Firebase Token Injection
+// It uses setContext (from @apollo/client/link/context) to modify the request context before each request is sent.
+// =============================================================================
+
 const authLink = setContext(async (_, { headers }) => {
   let token = ''
 
   try {
     const currentUser = auth.currentUser
     if (currentUser) {
-      token = await currentUser.getIdToken()
+      // Use cached token first for performance
+      token = await currentUser.getIdToken(false)
     } else {
-      console.log('🔓 Apollo Auth - No current user')
+      // Only log if auth has definitely initialized (not just starting up)
+      const { authInitialized } = appStore.getState().user
+      if (authInitialized) {
+        console.log('🔓 Apollo Auth - No current user')
+      }
     }
   } catch (error) {
     console.error('❌ Apollo Auth - Error getting token:', error)
+
+    // Fallback: Try to get fresh token on error
+    try {
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken(true) // Force refresh
+        console.log('🔄 Fallback token refresh successful')
+      }
+    } catch (refreshError) {
+      console.error('❌ Token refresh failed:', refreshError)
+    }
   }
 
   return {
@@ -36,57 +67,116 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 
-const isDevelopmentMode = import.meta.env.VITE_APP_MODE === 'development'
-const hasBackend = import.meta.env.VITE_HAS_BACKEND === 'true'
+// =============================================================================
+// ERROR LINK - Smart Error Handling with Token Refresh
+// =============================================================================
 
-// Error link for handling GraphQL errors
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path }) =>
-      console.error(
-        `GraphQL error: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
-    )
-  }
-
-  if (networkError) {
-    console.error(`Network error: ${networkError}`)
-
-    // In development without backend, just log and continue
-    if (isDevelopmentMode && !hasBackend) {
-      console.log('🚧 Backend not ready - this is expected in development')
-      return
+const errorLink = onError(
+  ({ graphQLErrors, networkError, operation, forward }) => {
+    // Handle GraphQL errors (validation, business logic, etc.)
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message, locations, path }) => {
+        console.error(
+          `GraphQL error: Message: ${message}, Location: ${locations}, Path: ${path}`
+        )
+      })
     }
 
-    // Handle 401 errors - redirect to login
-    if (networkError.statusCode === 401) {
-      window.location.href = '/login'
+    // Handle network errors (HTTP status codes, connection issues, etc.)
+    if (networkError) {
+      console.error(`Network error:`, networkError)
+
+      // Development mode: Allow operation without backend
+      if (isDevelopmentMode && !hasBackend) {
+        console.log('🚧 Backend not ready - this is expected in development')
+        return
+      }
+
+      // Handle authentication errors (401 Unauthorized)
+      if (networkError.statusCode === 401) {
+        return handleAuthenticationError(networkError, operation, forward)
+      }
     }
   }
+)
+
+/**
+ * Handle 401 authentication errors with smart token refresh
+ */
+const handleAuthenticationError = (networkError, operation, forward) => {
+  const errorBody = networkError.result || {}
+
+  // Check if this is a token expiration error
+  if (errorBody.code === 'TOKEN_EXPIRED') {
+    console.log('🔄 Token expired, attempting refresh...')
+
+    if (auth.currentUser) {
+      // Force token refresh and retry the operation
+      return auth.currentUser
+        .getIdToken(true)
+        .then(() => {
+          console.log('✅ Token refreshed, retrying operation')
+          // The authLink will automatically pick up the fresh token
+          return forward(operation)
+        })
+        .catch((refreshError) => {
+          console.error('❌ Token refresh failed:', refreshError)
+          redirectToLogin('Token refresh failed')
+        })
+    } else {
+      redirectToLogin('No current user for token refresh')
+    }
+  } else {
+    // For other 401 errors, redirect to login immediately
+    redirectToLogin('Authentication required')
+  }
+}
+
+/**
+ * Redirect user to login page with logging
+ */
+const redirectToLogin = (reason) => {
+  console.log(`🔐 ${reason}, redirecting to login`)
+  window.location.href = '/login'
+}
+
+// =============================================================================
+// RETRY LINK - Network Failure Recovery
+// =============================================================================
+
+const retryLink = new RetryLink({
+  delay: {
+    initial: 300, // Start with 300ms delay
+    max: Infinity, // No maximum delay
+    jitter: true, // Add randomness to prevent thundering herd
+  },
+  attempts: {
+    max: 3, // Maximum 3 retry attempts
+    retryIf: (error) => {
+      // Only retry on network errors, not authentication errors
+      return !!error && !error.statusCode
+    },
+  },
 })
 
-// Apollo Client instance
+// =============================================================================
+// APOLLO CLIENT INSTANCE
+// =============================================================================
+
 const client = new ApolloClient({
-  link: from([errorLink, authLink, httpLink]),
-  cache: new InMemoryCache(/* {
-    typePolicies: {
-      Query: {
-        fields: {
-          posts: {
-            merge(existing = [], incoming) {
-              return [...existing, ...incoming];
-            },
-          },
-        },
-      },
-    },
-  } */),
+  // Link chain: Error handling → Retries → Authentication → HTTP
+  link: from([errorLink, retryLink, authLink, httpLink]),
+
+  // Cache configuration
+  cache: new InMemoryCache(),
+
+  // Default options for all queries/mutations
   defaultOptions: {
     watchQuery: {
-      errorPolicy: 'all',
+      errorPolicy: 'all', // Return both data and errors
     },
     query: {
-      errorPolicy: 'all',
+      errorPolicy: 'all', // Return both data and errors
     },
   },
 })

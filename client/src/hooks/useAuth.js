@@ -67,8 +67,17 @@ export const useAuth = () => {
           },
         })
       } catch (syncError) {
-        // Server handles duplicates gracefully, just warn and continue
-        console.warn('Signup sync failed (non-critical):', syncError.message)
+        // If sync fails during signup, this is critical - the user exists in Firebase but not in our DB
+        console.error('Failed to sync user to database during signup:', syncError.message)
+        
+        // Clean up the Firebase user since we couldn't sync to database
+        try {
+          await auth.currentUser.delete()
+        } catch (deleteError) {
+          console.error('Failed to clean up Firebase user after sync failure:', deleteError.message)
+        }
+        
+        throw new Error('Account creation failed. Please try again.')
       }
 
       // Note: Redux store updates are handled by useAuthChange hook

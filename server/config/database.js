@@ -8,15 +8,18 @@ const connectDB = async () => {
 
     // Import all models to ensure they're registered with mongoose
     const User = require('../models/User')
-    /*     const Post = require("../models/posts")
-    const Rating = require("../models/Rating")
-    const WantToGo = require("../models/WantToGo") */
+    const Post = require('../models/posts')
+    const Rating = require('../models/Rating')
+    const WantToGo = require('../models/WantToGo')
     const Like = require('../models/Likes')
 
     const PostsTags = require('../models/PostsTags')
 
     // Create indexes
     await User.createIndexes()
+    await Post.createIndexes()
+    await Rating.createIndexes()
+    await WantToGo.createIndexes()
     await Like.createIndexes() // has compound index
     await PostsTags.createIndexes() // has compound index
   } catch (error) {

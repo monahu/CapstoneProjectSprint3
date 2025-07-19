@@ -1,7 +1,17 @@
 const User = require('../models/User')
 const { syncUserToDatabase } = require('./userHelpers')
+const { getUserProfile } = require('../services/userService')
 
 const userResolvers = {
+  Query: {
+    me: async (parent, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new Error('Authentication required')
+      }
+
+      return await getUserProfile(currentUser)
+    },
+  },
   Mutation: {
     syncUser: async (parent, { input }, { user }) => {
       if (!user) {

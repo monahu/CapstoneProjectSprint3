@@ -1,27 +1,24 @@
-import { Formik, Form } from "formik";
-import { getValidationSchema } from "../../utils/validationSchema";
-import {
-  SignUpFields,
-  ConfirmPasswordField,
-} from "./FormFields";
-import { UI_TEXT } from "../../utils/constants/ui";
-import { FORM_CONFIG } from "../../utils/constants/form";
-import { FieldWithMic, SpeechButton } from "../Speech";
+import { Formik, Form } from 'formik'
+import { getValidationSchema } from '../../utils/validationSchema'
+import { SignUpFields, ConfirmPasswordField } from './FormFields'
+import { UI_TEXT } from '../../utils/constants/ui'
+import { FORM_CONFIG, FORM_PLACEHOLDERS } from '../../utils/constants/form'
+import { FieldWithMic, SpeechButton } from '../Speech'
 
 const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
   const handleSubmit = async (values, { setSubmitting }) => {
     try {
       if (onSubmit) {
-        await onSubmit(values);
+        await onSubmit(values)
       }
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
   return (
     <Formik
-      key={isSignInForm ? "signin" : "signup"}
+      key={isSignInForm ? 'signin' : 'signup'}
       initialValues={
         isSignInForm
           ? FORM_CONFIG.initialValues.signIn
@@ -31,30 +28,44 @@ const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
       onSubmit={handleSubmit}
     >
       {({ setFieldValue }) => (
-        <Form className="space-y-6">
+        <Form className='space-y-6'>
           {!isSignInForm && <SignUpFields setFieldValue={setFieldValue} />}
 
-          <FieldWithMic name="email" type="email">
+          <FieldWithMic
+            name='email'
+            type='email'
+            label={UI_TEXT.labels.email}
+            placeholder={FORM_PLACEHOLDERS.email}
+            required
+          >
             <SpeechButton
-              fieldName="email"
+              fieldName='email'
               setFieldValue={setFieldValue}
             />
           </FieldWithMic>
 
-          <FieldWithMic name="password" type="password">
+          <FieldWithMic
+            name='password'
+            type='password'
+            label={UI_TEXT.labels.password}
+            placeholder={FORM_PLACEHOLDERS.password}
+            required
+          >
             <SpeechButton
-              fieldName="password"
+              fieldName='password'
               setFieldValue={setFieldValue}
             />
           </FieldWithMic>
 
-          {!isSignInForm && <ConfirmPasswordField setFieldValue={setFieldValue} />}
+          {!isSignInForm && (
+            <ConfirmPasswordField setFieldValue={setFieldValue} />
+          )}
 
-          <div className="flex items-center justify-between">
-            <div className="text-sm/6">
+          <div className='flex items-center justify-between'>
+            <div className='text-sm/6'>
               <a
-                href="#"
-                className="font-semibold text-indigo-600 hover:text-indigo-500"
+                href='#'
+                className='font-semibold text-indigo-600 hover:text-indigo-500'
               >
                 {UI_TEXT.login.forgotPassword}
               </a>
@@ -63,21 +74,21 @@ const LoginForm = ({ isSignInForm, onSubmit, isLoading }) => {
 
           <div>
             <button
-              type="submit"
+              type='submit'
               disabled={isLoading}
-              className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50"
+              className='flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:opacity-50'
             >
               {isLoading
                 ? UI_TEXT.login.processing
                 : isSignInForm
-                ? UI_TEXT.buttons.logIn
-                : UI_TEXT.buttons.signUp}
+                  ? UI_TEXT.buttons.logIn
+                  : UI_TEXT.buttons.signUp}
             </button>
           </div>
         </Form>
       )}
     </Formik>
-  );
-};
+  )
+}
 
-export default LoginForm;
+export default LoginForm

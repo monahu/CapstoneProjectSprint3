@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import { useApolloClient } from '@apollo/client'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../utils/firebase'
 import {
@@ -13,6 +14,7 @@ export const useAuthChange = (options = {}) => {
   const dispatch = useDispatch()
   const { syncUser } = useSyncUser()
   const [authInitialized, setAuthInitialized] = useState(false)
+  const apolloClient = useApolloClient()
 
   const {
     onAuthSuccess,
@@ -68,6 +70,16 @@ export const useAuthChange = (options = {}) => {
             })
           )
 
+          // Clear Apollo cache to ensure fresh data with correct current user related values
+          if (authInitialized) {
+            apolloClient.cache.reset()
+          } else {
+            // If auth not initialized yet, clear cache after a delay
+            setTimeout(() => {
+              apolloClient.cache.reset()
+            }, 500)
+          }
+
           // Sync user to database if enabled
           // Only sync for existing users (not new signups, which are handled by useAuth.signUp)
           if (shouldSyncUser) {
@@ -111,6 +123,12 @@ export const useAuthChange = (options = {}) => {
         } else {
           // User is signed out
           dispatch(removeUser())
+
+          // Clear Apollo cache on logout to ensure fresh data
+          if (authInitialized) {
+            apolloClient.cache.reset()
+          }
+
           onAuthFailure?.()
         }
 

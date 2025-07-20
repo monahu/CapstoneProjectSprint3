@@ -33,9 +33,12 @@ const Home = () => {
   // Refetch posts when user auth state changes (login/logout)
   useEffect(() => {
     if (authInitialized && previousUserRef.current !== user && refetch) {
-      refetch({
-        fetchPolicy: 'network-only',
-      })
+      // Add a small delay to ensure auth token is ready
+      setTimeout(() => {
+        refetch({
+          fetchPolicy: 'network-only',
+        })
+      }, 100)
       previousUserRef.current = user
     }
   }, [user, authInitialized, refetch])

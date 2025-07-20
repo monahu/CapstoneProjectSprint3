@@ -15,6 +15,12 @@
   <!-- Module preloading -->
   <link rel="modulepreload" href="/src/main.jsx">
   <link rel="modulepreload" href="/src/App.jsx">
+  <link rel="modulepreload" href="/src/components/Body.jsx">
+  <link rel="modulepreload" href="/src/components/Browse.jsx">
+  <link rel="modulepreload" href="/src/components/Home.jsx">
+
+  <!-- Preload critical CSS -->
+  <link rel="preload" href="/src/index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
 
   <!-- Hero image preloads - match Hero component cascade exactly -->
   <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px)">

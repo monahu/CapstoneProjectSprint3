@@ -2,6 +2,16 @@
 @plugin "daisyui";
 @import 'prosemirror-view/style/prosemirror.css';
 
+/* Critical LCP optimization for mobile hero background */
+@media (max-width: 768px) {
+  .hero-lcp-mobile {
+    background-image: url('/src/assets/img/restJam_hero1_mobile.webp') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+}
+
 .gradient-bg {
     background: radial-gradient(circle,
             rgba(224, 202, 211, 0.1) 18%,

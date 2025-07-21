@@ -94,14 +94,15 @@ const Hero = ({
   const mobile2xImage = variants.mobile2x || heroImage
   const tabletImage = variants.tablet || heroImage
 
-  // Choose the right image size based on device
+  // LCP optimization: Use preloaded mobile image immediately for fast LCP
+  // Mobile image is always preloaded, so prioritize it for mobile devices
   const getOptimalImageUrl = () => {
     if (typeof window === 'undefined') return mobileImage
     const width = window.innerWidth
-    const dpr = window.devicePixelRatio || 1
     
+    // For LCP optimization, use preloaded mobile image on mobile
     if (width <= 768) {
-      return dpr > 1.5 ? mobile2xImage : mobileImage
+      return mobileImage // Always use preloaded mobile image for fastest LCP
     } else if (width <= 1024) {
       return tabletImage
     } else {
@@ -125,10 +126,14 @@ const Hero = ({
     })
   }
 
+  // Add LCP class for immediate mobile background
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const lcpClass = !useColorBackground && isMobile ? 'hero-lcp-mobile' : ''
+
   return (
     <div 
-      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''}`}
-      style={!useColorBackground ? {
+      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''} ${lcpClass}`}
+      style={!useColorBackground && !isMobile ? {
         backgroundImage: `url(${optimalImageUrl})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',

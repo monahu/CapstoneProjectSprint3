@@ -44,6 +44,7 @@ const PostActions = ({
                 <button
                   onClick={handleShareClick}
                   className='btn btn-circle btn-outline btn-success shadow-lg hover:shadow-xl transition-shadow md:my-auto'
+                  aria-label="Share this post"
                 >
                   <Share className='w-5 h-5' />
                 </button>
@@ -66,6 +67,7 @@ const PostActions = ({
                   className={`btn btn-circle shadow-lg hover:shadow-xl transition-shadow ${
                     isLiked ? 'btn-secondary' : 'btn-outline btn-secondary'
                   }`}
+                  aria-label={isLiked ? "Unlike this post" : "Like this post"}
                 >
                   <Heart
                     className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`}

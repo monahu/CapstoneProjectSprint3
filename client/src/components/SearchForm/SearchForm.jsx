@@ -11,6 +11,7 @@ export default function SearchForm({
   mobilePlaceholder = UI_TEXT.searchForm.mobileSearchPlaceholder,
   showAdvanced = false,
   hideClearButton = false,
+  id = 'search-input',
 }) {
   const {
     searchTerm,
@@ -34,13 +35,13 @@ export default function SearchForm({
         <div className='flex gap-2 md:flex-row flex-col'>
           <div className='relative flex-1'>
             <label
-              htmlFor='search-input'
+              htmlFor={id}
               className='sr-only'
             >
               Search
             </label>
             <input
-              id='search-input'
+              id={id}
               name='search'
               type='search'
               value={searchTerm}

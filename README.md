@@ -59,22 +59,35 @@ FigJam Design Board: https://www.figma.com/board/dfU3ZlTdQUzOBkqz3kDND7/Capstone
    **Server (.env in `/server` directory):**
 
    ```env
+   # Server Configuration
    PORT=3500
    NODE_ENV=development
-   MONGO_URI=mongodb+srv://your-connection-string
 
-   # Firebase Admin SDK
+   # Database
+   MONGO_URI=mongodb://localhost:27017/restjam
+
+   # Firebase Admin SDK (for authentication)
    FIREBASE_PROJECT_ID=your-project-id
+   FIREBASE_PRIVATE_KEY_ID=your-private-key-id
    FIREBASE_PRIVATE_KEY="your-private-key"
    FIREBASE_CLIENT_EMAIL=your-client-email
+   FIREBASE_CLIENT_ID=your-client-id
+   FIREBASE_AUTH_URI=https://accounts.google.com/o/oauth2/auth
+   FIREBASE_TOKEN_URI=https://oauth2.googleapis.com/token
+   FIREBASE_AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
+   FIREBASE_CLIENT_X509_CERT_URL=your-client-cert-url
 
-   # Cloudinary
+   # Cloudinary (for image uploads)
    CLOUDINARY_CLOUD_NAME=your-cloud-name
    CLOUDINARY_API_KEY=your-api-key
    CLOUDINARY_API_SECRET=your-api-secret
 
-   # Stripe
-   STRIPE_SECRET_KEY=your-stripe-secret-key
+   # Stripe (for payments)
+   STRIPE_SECRET_KEY=sk_test_...
+
+   # Client Configuration (for CORS and Stripe redirects)
+   CLIENT_URL=https://your-deployed-client-domain.com
+   FRONTEND_URL=http://localhost:5173
 
    # Rate Limiting
    RATE_LIMIT_WINDOW_MS=900000
@@ -84,7 +97,7 @@ FigJam Design Board: https://www.figma.com/board/dfU3ZlTdQUzOBkqz3kDND7/Capstone
    **Client (.env in `/client` directory):**
 
    ```env
-   VITE_GRAPHQL_ENDPOINT=http://localhost:3500/graphql
+   VITE_API_URL=http://localhost:3500
    VITE_APP_MODE=development
    VITE_HAS_BACKEND=true
 

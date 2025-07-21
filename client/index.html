@@ -18,12 +18,7 @@
   
   <!-- Critical CSS will be handled by Vite build -->
 
-  <!-- Hero image preloads - optimized for 480x320 (1x) and 960x640 (2x) -->
-  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px) and (-webkit-max-device-pixel-ratio: 1.5)" imagesizes="480x320">
-  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile@2x.webp" as="image" media="(max-width: 768px) and (-webkit-min-device-pixel-ratio: 2)" imagesizes="960x640">
-  <link rel="preload" href="/src/assets/img/restJam_hero1_tablet.webp" as="image"
-    media="(min-width: 769px) and (max-width: 1024px)">
-  <link rel="preload" href="/src/assets/img/restJam_hero1.webp" as="image" media="(min-width: 1025px)">
+  <!-- Hero image preloads will be handled by component-level preloading -->
 </head>
 
 <body>

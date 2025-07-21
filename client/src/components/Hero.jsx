@@ -1,3 +1,4 @@
+import React from 'react'
 import { UI_TEXT } from '../utils/constants/ui'
 
 // Import all hero image variants to ensure Vite includes them in the build
@@ -91,6 +92,36 @@ const Hero = ({
   const mobile2xImage = variants.mobile2x || heroImage
   const tabletImage = variants.tablet || heroImage
 
+  // Preload critical hero images for faster LCP
+  React.useEffect(() => {
+    const isMobile = window.innerWidth <= 768
+    const isHighDPI = window.devicePixelRatio >= 1.5
+    
+    let priorityImage = heroImage // Default to desktop
+    if (isMobile && isHighDPI && mobile2xImage !== heroImage) {
+      priorityImage = mobile2xImage
+    } else if (isMobile && mobileImage !== heroImage) {
+      priorityImage = mobileImage
+    } else if (window.innerWidth <= 1024 && tabletImage !== heroImage) {
+      priorityImage = tabletImage
+    }
+
+    // Create preload link for the priority image
+    const link = document.createElement('link')
+    link.rel = 'preload'
+    link.as = 'image'
+    link.href = priorityImage
+    link.type = 'image/webp'
+    document.head.appendChild(link)
+
+    // Cleanup function
+    return () => {
+      if (document.head.contains(link)) {
+        document.head.removeChild(link)
+      }
+    }
+  }, [heroImage, mobileImage, mobile2xImage, tabletImage])
+
   // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
     console.log('Hero Debug:', {
@@ -98,7 +129,9 @@ const Hero = ({
       mobileImage,
       mobile2xImage,
       tabletImage,
-      hasVariants: !!variants.mobile
+      hasVariants: !!variants.mobile,
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'SSR',
+      devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 'SSR'
     })
   }
 
@@ -134,9 +167,9 @@ const Hero = ({
           sizes='100vw'
           type='image/webp'
         />
-        {/* Fallback */}
+        {/* Fallback - use smallest appropriate image */}
         <img
-          src={mobileImage}
+          src={typeof window !== 'undefined' && window.innerWidth <= 768 ? mobileImage : heroImage}
           alt='Hero background'
           className='w-full h-full object-cover rounded-2xl'
           loading='eager'
@@ -144,14 +177,16 @@ const Hero = ({
           decoding='sync'
           onError={(e) => {
             console.error('Hero image failed to load:', e.target.src)
-            // Fallback to desktop image if mobile fails
-            if (e.target.src !== heroImage) {
+            // Fallback hierarchy: mobile -> desktop -> original
+            if (e.target.src === mobileImage && mobileImage !== heroImage) {
+              e.target.src = heroImage
+            } else if (e.target.src !== heroImage) {
               e.target.src = heroImage
             }
           }}
-          onLoad={() => {
+          onLoad={(e) => {
             if (process.env.NODE_ENV === 'development') {
-              console.log('Hero image loaded successfully')
+              console.log('Hero image loaded successfully:', e.target.src)
             }
           }}
         />

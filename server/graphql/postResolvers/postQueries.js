@@ -1,6 +1,10 @@
-const Post = require('../../models/posts')
-const Tag = require('../../models/Tags')
-const PostsTags = require('../../models/PostsTags')
+const {
+  getPosts,
+  getPostById,
+  getPostsByUserId,
+  searchPostsByTags,
+  searchPosts,
+} = require('../../services/postService')
 
 /**
  * Post Query Resolvers
@@ -11,20 +15,14 @@ const postQueries = {
    * Get all posts with pagination and filtering
    */
   posts: async (_, { limit = 10, offset = 0, filter = {} }) => {
-    const safeLimit = Math.min(limit, 50) // Max 50 posts per request
-
-    return await Post.find(filter)
-      .sort({ createdAt: -1 })
-      .limit(safeLimit)
-      .skip(offset)
-      .populate('userId', 'displayName photoURL')
+    return await getPosts(limit, offset, filter)
   },
 
   /**
    * Get a single post by its ID
    */
   post: async (_, { id }) => {
-    return await Post.findById(id).populate('userId', 'displayName photoURL')
+    return await getPostById(id)
   },
 
   /**
@@ -35,38 +33,14 @@ const postQueries = {
       throw new Error('Authentication required')
     }
 
-    return await Post.find({ userId: currentUser._id })
-      .sort({ createdAt: -1 })
-      .populate('userId', 'displayName photoURL')
+    return await getPostsByUserId(currentUser._id)
   },
 
   /**
    * Search posts by tag names
    */
   searchPostsByTags: async (_, { tags, limit = 10, offset = 0 }) => {
-    if (!tags || tags.length === 0) return []
-
-    // Find tags that match the search terms (case insensitive)
-    const matchingTags = await Tag.find({
-      name: { $in: tags.map((tag) => new RegExp(tag.trim(), 'i')) },
-    })
-
-    if (matchingTags.length === 0) return []
-
-    // Find post-tag associations for matching tags
-    const postTagRecords = await PostsTags.find({
-      tagId: { $in: matchingTags.map((tag) => tag._id) },
-    })
-
-    // Get unique post IDs
-    const postIds = [...new Set(postTagRecords.map((record) => record.postId))]
-
-    // Find and return posts
-    return await Post.find({ _id: { $in: postIds } })
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip(offset)
-      .populate('userId', 'displayName photoURL')
+    return await searchPostsByTags(tags, limit, offset)
   },
 
   /**
@@ -77,88 +51,7 @@ const postQueries = {
     _,
     { searchTerm, tags, location, limit = 10, offset = 0 }
   ) => {
-    // If no search criteria provided, return empty array
-    if (
-      (!searchTerm || searchTerm.trim() === '') &&
-      (!tags || tags.length === 0) &&
-      (!location || location.trim() === '')
-    ) {
-      return []
-    }
-
-    const searchConditions = []
-
-    // Handle search term
-    if (searchTerm && searchTerm.trim() !== '') {
-      const trimmedTerm = searchTerm.trim()
-
-      // Find tags that match search term
-      const matchingTags = await Tag.find({
-        name: { $regex: trimmedTerm, $options: 'i' },
-      })
-
-      // Get post IDs that have matching tags
-      let tagPostIds = []
-      if (matchingTags.length > 0) {
-        const postTagRecords = await PostsTags.find({
-          tagId: { $in: matchingTags.map((tag) => tag._id) },
-        })
-        tagPostIds = postTagRecords.map((record) => record.postId)
-      }
-
-      // Add search term conditions
-      searchConditions.push({
-        $or: [
-          { title: { $regex: trimmedTerm, $options: 'i' } },
-          { placeName: { $regex: trimmedTerm, $options: 'i' } },
-          { content: { $regex: trimmedTerm, $options: 'i' } },
-          ...(tagPostIds.length > 0 ? [{ _id: { $in: tagPostIds } }] : []),
-        ],
-      })
-    }
-
-    // Handle specific tags filter
-    if (tags && tags.length > 0) {
-      const matchingTags = await Tag.find({
-        name: { $in: tags.map((tag) => new RegExp(tag.trim(), 'i')) },
-      })
-
-      if (matchingTags.length > 0) {
-        const postTagRecords = await PostsTags.find({
-          tagId: { $in: matchingTags.map((tag) => tag._id) },
-        })
-        const tagPostIds = postTagRecords.map((record) => record.postId)
-
-        if (tagPostIds.length > 0) {
-          searchConditions.push({ _id: { $in: tagPostIds } })
-        }
-      }
-    }
-
-    // Handle location filter
-    if (location && location.trim() !== '') {
-      const trimmedLocation = location.trim()
-      searchConditions.push({
-        location: { $regex: trimmedLocation, $options: 'i' },
-      })
-    }
-
-    // If no valid search conditions, return empty array
-    if (searchConditions.length === 0) {
-      return []
-    }
-
-    // Build final search filter
-    const searchFilter =
-      searchConditions.length === 1
-        ? searchConditions[0]
-        : { $and: searchConditions }
-
-    return await Post.find(searchFilter)
-      .sort({ createdAt: -1 })
-      .limit(limit)
-      .skip(offset)
-      .populate('userId', 'displayName photoURL')
+    return await searchPosts(searchTerm, tags, location, limit, offset)
   },
 }
 

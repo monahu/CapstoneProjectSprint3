@@ -97,7 +97,7 @@ const ExploreResults = ({
           ) : (
             /* Results list */
             <div className='space-y-6'>
-              {posts.map((post) => (
+              {posts.map((post, index) => (
                 <RestaurantCard
                   key={post.id}
                   id={post.id}
@@ -121,6 +121,7 @@ const ExploreResults = ({
                   isWantToGo={post.isWantToGo}
                   isLiked={post.isLiked}
                   className='max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto'
+                  priority={index < 2}
                 />
               ))}
             </div>

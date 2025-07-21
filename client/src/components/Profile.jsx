@@ -60,7 +60,7 @@ const Profile = () => {
               </div>
             ) : (
               <div className='grid gap-6'>
-                {userPosts.map((post) => (
+                {userPosts.map((post, index) => (
                   <RestaurantCard
                     key={post.id}
                     id={post.id}
@@ -88,6 +88,7 @@ const Profile = () => {
                     isWantToGo={post.isWantToGo}
                     isLiked={post.isLiked}
                     className='max-w-full'
+                    priority={index < 2}
                   />
                 ))}
               </div>

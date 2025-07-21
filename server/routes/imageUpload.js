@@ -48,7 +48,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     const sizes = [
       { name: '', width: 1200 }, // desktop
       { name: '_mobile', width: 480 },
-      { name: '_mobile@2x', width: 960 },
+      { name: '_mobile@2x', width: 750 },
       { name: '_tablet', width: 800 },
     ];
     const urls = {};

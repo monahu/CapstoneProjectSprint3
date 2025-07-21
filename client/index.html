@@ -11,13 +11,16 @@
   <!-- Essential preconnects only -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://res.cloudinary.com">
+  <link rel="dns-prefetch" href="https://res.cloudinary.com">
 
   <!-- Module preloading will be handled by Vite build -->
   
   <!-- Critical CSS will be handled by Vite build -->
 
-  <!-- Hero image preloads - match Hero component cascade exactly -->
-  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px)">
+  <!-- Hero image preloads - optimized for 480x320 (1x) and 960x640 (2x) -->
+  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px) and (-webkit-max-device-pixel-ratio: 1.5)" imagesizes="480x320">
+  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile@2x.webp" as="image" media="(max-width: 768px) and (-webkit-min-device-pixel-ratio: 2)" imagesizes="960x640">
   <link rel="preload" href="/src/assets/img/restJam_hero1_tablet.webp" as="image"
     media="(min-width: 769px) and (max-width: 1024px)">
   <link rel="preload" href="/src/assets/img/restJam_hero1.webp" as="image" media="(min-width: 1025px)">

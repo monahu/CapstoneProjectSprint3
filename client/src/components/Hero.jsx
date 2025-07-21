@@ -16,13 +16,21 @@ const Hero = ({
       <picture className='absolute inset-0 w-full h-full'>
         <source
           media='(max-width: 768px)'
-          srcSet={`${heroImage.replace('.webp', '_mobile.webp')} 720w`}
+          srcSet={`${heroImage.replace('.webp', '_mobile.webp')} 1x, ${heroImage.replace('.webp', '_mobile@2x.webp')} 2x`}
           sizes='100vw'
+          type='image/webp'
         />
         <source
           media='(max-width: 1024px)'
-          srcSet={`${heroImage.replace('.webp', '_tablet.webp')} 1024w`}
+          srcSet={`${heroImage.replace('.webp', '_tablet.webp')}`}
           sizes='100vw'
+          type='image/webp'
+        />
+        <source
+          media='(min-width: 1025px)'
+          srcSet={heroImage}
+          sizes='100vw'
+          type='image/webp'
         />
         <img
           src={heroImage}

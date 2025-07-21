@@ -87,7 +87,7 @@ FigJam Design Board: https://www.figma.com/board/dfU3ZlTdQUzOBkqz3kDND7/Capstone
 
    # Client Configuration (for CORS and Stripe redirects)
    CLIENT_URL=https://your-deployed-client-domain.com
-   FRONTEND_URL=http://localhost:5173
+   FRONTEND_URL=http://localhost:5173 your-client
 
    # Rate Limiting
    RATE_LIMIT_WINDOW_MS=900000

@@ -12,6 +12,7 @@ const userResolvers = {
       return await getUserProfile(currentUser)
     },
   },
+
   Mutation: {
     syncUser: async (parent, { input }, { user }) => {
       if (!user) {

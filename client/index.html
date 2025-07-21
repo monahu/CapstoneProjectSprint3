@@ -12,15 +12,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-  <!-- Module preloading -->
-  <link rel="modulepreload" href="/src/main.jsx">
-  <link rel="modulepreload" href="/src/App.jsx">
-  <link rel="modulepreload" href="/src/components/Body.jsx">
-  <link rel="modulepreload" href="/src/components/Browse.jsx">
-  <link rel="modulepreload" href="/src/components/Home.jsx">
-
-  <!-- Preload critical CSS -->
-  <link rel="preload" href="/src/index.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <!-- Module preloading will be handled by Vite build -->
+  
+  <!-- Critical CSS will be handled by Vite build -->
 
   <!-- Hero image preloads - match Hero component cascade exactly -->
   <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px)">

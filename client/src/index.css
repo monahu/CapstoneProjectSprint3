@@ -2,12 +2,22 @@
 @plugin "daisyui";
 @import 'prosemirror-view/style/prosemirror.css';
 
+/* Critical LCP optimization for mobile hero background */
+@media (max-width: 768px) {
+  .hero-lcp-mobile {
+    background-image: url('/src/assets/img/restJam_hero1_mobile.webp') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
+}
+
 .gradient-bg {
-    background: radial-gradient(circle,
-            rgba(224, 202, 211, 0.1) 18%,
-            rgba(204, 198, 217, 0.1) 42%,
-            rgba(148, 187, 233, 0.1) 87%);
-    color: #000;
+  background: radial-gradient(circle,
+      rgba(224, 202, 211, 0.1) 18%,
+      rgba(204, 198, 217, 0.1) 42%,
+      rgba(148, 187, 233, 0.1) 87%);
+  color: #000;
 }
 
 .tiptap-editor :is(ul, ol) {
@@ -17,21 +27,24 @@
 }
 
 .tiptap-editor h1 {
-  font-size: 2.25rem; /* Tailwind's text-4xl */
+  font-size: 2.25rem;
+  /* Tailwind's text-4xl */
   font-weight: 700;
   margin-top: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .tiptap-editor h2 {
-  font-size: 1.875rem; /* text-3xl */
+  font-size: 1.875rem;
+  /* text-3xl */
   font-weight: 600;
   margin-top: 1.25rem;
   margin-bottom: 0.75rem;
 }
 
 .tiptap-editor h3 {
-  font-size: 1.5rem; /* text-2xl */
+  font-size: 1.5rem;
+  /* text-2xl */
   font-weight: 600;
   margin-top: 1rem;
   margin-bottom: 0.5rem;

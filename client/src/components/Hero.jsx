@@ -1,7 +1,11 @@
+import React from 'react'
 import { UI_TEXT } from '../utils/constants/ui'
+import { getOptimalHeroImage } from '../utils/heroImages'
 
 const Hero = ({
   heroImage,
+  useColorBackground = false,
+  backgroundColor = 'bg-gradient-to-br from-blue-600 to-purple-700',
   title = UI_TEXT.hero.title,
   description = UI_TEXT.hero.description,
   buttonText = UI_TEXT.hero.button,
@@ -10,33 +14,32 @@ const Hero = ({
   className = 'min-h-[40vh]',
   contentClassName = '',
 }) => {
-  return (
-    <div className={`hero rounded-2xl relative overflow-hidden ${className}`}>
-      {/* Background Image */}
-      <picture className='absolute inset-0 w-full h-full'>
-        <source
-          media='(max-width: 768px)'
-          srcSet={`${heroImage.replace('.webp', '_mobile.webp')} 720w`}
-          sizes='100vw'
-        />
-        <source
-          media='(max-width: 1024px)'
-          srcSet={`${heroImage.replace('.webp', '_tablet.webp')} 1024w`}
-          sizes='100vw'
-        />
-        <img
-          src={heroImage}
-          alt='Hero background'
-          className='w-full h-full object-cover rounded-2xl'
-          loading='eager'
-          fetchPriority='high'
-          decoding='sync'
-        />
-      </picture>
+  const optimalImageUrl = !useColorBackground
+    ? getOptimalHeroImage(heroImage)
+    : null
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const lcpClass = !useColorBackground && isMobile ? 'hero-lcp-mobile' : ''
 
-      {/* Content - needs to be on top */}
-      <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>
-      <div className='relative z-20 hero-content text-neutral-content text-center py-6'>
+  return (
+    <div
+      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''} ${lcpClass}`}
+      style={
+        !useColorBackground && !isMobile
+          ? {
+              backgroundImage: `url(${optimalImageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }
+          : {}
+      }
+    >
+      {!useColorBackground && (
+        <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>
+      )}
+      <div
+        className={`${useColorBackground ? '' : 'relative z-20'} hero-content text-neutral-content text-center py-6`}
+      >
         <div className={`max-w-md ${contentClassName}`}>
           <h1 className='mb-5 text-6xl font-bold'>{title}</h1>
           <p className='mb-5 text-[1.2rem]'>{description}</p>

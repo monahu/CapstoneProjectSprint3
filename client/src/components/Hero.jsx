@@ -114,30 +114,32 @@ const Hero = ({
       {/* Background - either color or image */}
       {!useColorBackground && (
         <picture className='absolute inset-0 w-full h-full'>
-          {/* Mobile - simplified for faster discovery */}
+          {/* Mobile - optimized srcset with proper widths */}
           <source
             media='(max-width: 768px)'
-            srcSet={`${mobileImage} 1x, ${mobile2xImage} 2x`}
+            srcSet={`${mobileImage} 480w, ${mobile2xImage} 960w`}
             sizes='100vw'
             type='image/webp'
           />
-          {/* Tablet */}
+          {/* Tablet - responsive sizes */}
           <source
             media='(min-width: 769px) and (max-width: 1024px)'
-            srcSet={tabletImage}
-            sizes='100vw'
+            srcSet={`${tabletImage} 800w, ${heroImage} 1200w`}
+            sizes='(min-width: 769px) 100vw, 800px'
             type='image/webp'
           />
-          {/* Desktop */}
+          {/* Desktop - full srcset with multiple options */}
           <source
             media='(min-width: 1025px)'
-            srcSet={heroImage}
-            sizes='100vw'
+            srcSet={`${tabletImage} 800w, ${heroImage} 1200w`}
+            sizes='(min-width: 1025px) 100vw, 1200px'
             type='image/webp'
           />
-          {/* Fallback - prioritize mobile for LCP */}
+          {/* Fallback - prioritize mobile for LCP with proper srcset */}
           <img
             src={mobileImage}
+            srcSet={`${mobileImage} 480w, ${mobile2xImage} 960w, ${tabletImage} 800w, ${heroImage} 1200w`}
+            sizes='(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 1200px'
             alt='Hero background'
             className='w-full h-full object-cover rounded-2xl'
             loading='eager'

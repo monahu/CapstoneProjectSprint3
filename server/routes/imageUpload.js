@@ -44,11 +44,11 @@ router.post('/', upload.single('image'), async (req, res) => {
     const baseName = uuidv4();
     const folder = 'restjam-posts';
 
-    // Generate all sizes
+    // Generate all sizes - optimized for modern devices
     const sizes = [
       { name: '', width: 1200 }, // desktop
-      { name: '_mobile', width: 480 },
-      { name: '_mobile@2x', width: 750 },
+      { name: '_mobile', width: 390 }, // optimized for modern mobile screens
+      { name: '_mobile@2x', width: 780 }, // optimized 2x for mobile retina
       { name: '_tablet', width: 800 },
     ];
     const urls = {};

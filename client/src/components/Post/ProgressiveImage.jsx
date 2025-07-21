@@ -24,12 +24,12 @@ const ProgressiveImage = ({
     ? getCloudinaryUrl('w_50,h_50,c_fill,f_webp,q_auto:low,e_blur:300')
     : null
 
-  // Optimized URLs for different screen sizes
+  // Optimized URLs for different screen sizes - modern mobile optimized
   const mobileUrl = isCloudinaryUrl
-    ? getCloudinaryUrl('w_480,h_320,c_fill,f_webp,q_auto:eco')
+    ? getCloudinaryUrl('w_390,h_260,c_fill,f_webp,q_auto:eco')
     : imageUrl
   const mobileUrl2x = isCloudinaryUrl
-    ? getCloudinaryUrl('w_750,h_500,c_fill,f_webp,q_auto:eco')
+    ? getCloudinaryUrl('w_780,h_520,c_fill,f_webp,q_auto:eco')
     : imageUrl
   const tabletUrl = isCloudinaryUrl
     ? getCloudinaryUrl('w_768,h_512,c_fill,f_webp,q_auto:good')
@@ -125,7 +125,7 @@ const ProgressiveImage = ({
         />
         {/* Fallback */}
         <img
-          src={isCloudinaryUrl ? getCloudinaryUrl('w_480,h_320,c_fill,q_auto:eco') : imageUrl}
+          src={isCloudinaryUrl ? getCloudinaryUrl('w_390,h_260,c_fill,q_auto:eco') : imageUrl}
           alt={alt}
           className={`${className} transition-opacity duration-300 ${
             isLoaded ? 'opacity-100' : 'opacity-0'

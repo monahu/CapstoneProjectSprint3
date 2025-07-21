@@ -54,95 +54,114 @@ const Hero = ({
     [restJamHero1]: {
       mobile: restJamHero1Mobile,
       mobile2x: restJamHero1Mobile2x,
-      tablet: restJamHero1Tablet
+      tablet: restJamHero1Tablet,
     },
     [createHero1]: {
       mobile: createHero1Mobile,
       mobile2x: createHero1Mobile2x,
-      tablet: createHero1Tablet
+      tablet: createHero1Tablet,
     },
     [detailHero1]: {
       mobile: detailHero1Mobile,
       mobile2x: detailHero1Mobile2x,
-      tablet: detailHero1Tablet
+      tablet: detailHero1Tablet,
     },
     [exploreHero1]: {
       mobile: exploreHero1Mobile,
       mobile2x: exploreHero1Mobile2x,
-      tablet: exploreHero1Tablet
+      tablet: exploreHero1Tablet,
     },
     [loginHero1]: {
       mobile: loginHero1Mobile,
       mobile2x: loginHero1Mobile2x,
-      tablet: loginHero1Tablet
+      tablet: loginHero1Tablet,
     },
     [profileHero1]: {
       mobile: profileHero1Mobile,
       mobile2x: profileHero1Mobile2x,
-      tablet: profileHero1Tablet
+      tablet: profileHero1Tablet,
     },
     [resJamPost1]: {
       mobile: resJamPost1Mobile,
       mobile2x: resJamPost1Mobile2x,
-      tablet: resJamPost1Tablet
-    }
+      tablet: resJamPost1Tablet,
+    },
   }
 
   // Get responsive variants for the current hero image
   const variants = imageMap[heroImage] || {}
   const mobileImage = variants.mobile || heroImage
-  const mobile2xImage = variants.mobile2x || heroImage
   const tabletImage = variants.tablet || heroImage
 
-  // LCP optimization: Use preloaded mobile image immediately for fast LCP
-  // Mobile image is always preloaded, so prioritize it for mobile devices
-  const getOptimalImageUrl = () => {
-    if (typeof window === 'undefined') return mobileImage
-    const width = window.innerWidth
-    
-    // For LCP optimization, use preloaded mobile image on mobile
-    if (width <= 768) {
-      return mobileImage // Always use preloaded mobile image for fastest LCP
-    } else if (width <= 1024) {
-      return tabletImage
-    } else {
-      return heroImage
+  // Check if this is the main hero (LCP element)
+  const isMainHero = heroImage === restJamHero1
+
+  // Use critical CSS class for main hero to avoid JS blocking LCP
+  if (isMainHero && !useColorBackground) {
+    return (
+      <div className={`hero-critical ${className}`}>
+        <div className='hero-overlay'></div>
+        <div className='hero-content'>
+          <div className={`max-w-md ${contentClassName}`}>
+            <h1 className='hero-title'>{title}</h1>
+            <p className='hero-description'>{description}</p>
+            {showButton && (
+              <button
+                className='btn-critical'
+                onClick={onButtonClick}
+                aria-label={`${buttonText} - Get started with your account`}
+              >
+                {buttonText}
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // For other heroes, use the optimized approach with minimal JS
+  const getBackgroundStyle = () => {
+    if (useColorBackground) return {}
+
+    // Use CSS custom properties for better performance
+    return {
+      '--hero-mobile': `url(${mobileImage})`,
+      '--hero-tablet': `url(${tabletImage})`,
+      '--hero-desktop': `url(${heroImage})`,
+      backgroundImage: `var(--hero-mobile)`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
     }
   }
 
-  const optimalImageUrl = !useColorBackground ? getOptimalImageUrl() : null
-
-  // Debug logging in development
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Hero Debug:', {
-      heroImage,
-      mobileImage,
-      mobile2xImage,
-      tabletImage,
-      optimalImageUrl,
-      hasVariants: !!variants.mobile,
-      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'SSR',
-      devicePixelRatio: typeof window !== 'undefined' ? window.devicePixelRatio : 'SSR'
-    })
-  }
-
-  // Add LCP class for immediate mobile background
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-  const lcpClass = !useColorBackground && isMobile ? 'hero-lcp-mobile' : ''
-
   return (
-    <div 
-      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''} ${lcpClass}`}
-      style={!useColorBackground && !isMobile ? {
-        backgroundImage: `url(${optimalImageUrl})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      } : {}}
+    <div
+      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''}`}
+      style={getBackgroundStyle()}
     >
-      {/* Content - needs to be on top */}
-      {!useColorBackground && <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>}
-      <div className={`${useColorBackground ? '' : 'relative z-20'} hero-content text-neutral-content text-center py-6`}>
+      {/* Responsive background images via CSS */}
+      {!useColorBackground && (
+        <style>
+          {`
+            @media (min-width: 769px) and (max-width: 1024px) {
+              .hero { background-image: var(--hero-tablet) !important; }
+            }
+            @media (min-width: 1025px) {
+              .hero { background-image: var(--hero-desktop) !important; }
+            }
+          `}
+        </style>
+      )}
+
+      {/* Content overlay */}
+      {!useColorBackground && (
+        <div className='absolute inset-0 bg-black bg-opacity-20 rounded-2xl'></div>
+      )}
+      <div
+        className={`${useColorBackground ? '' : 'relative z-20'} hero-content text-neutral-content text-center py-6`}
+      >
         <div className={`max-w-md ${contentClassName}`}>
           <h1 className='mb-5 text-6xl font-bold'>{title}</h1>
           <p className='mb-5 text-[1.2rem]'>{description}</p>

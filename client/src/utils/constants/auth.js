@@ -46,7 +46,7 @@ export const VALIDATION_MESSAGES = {
   },
   phone: {
     invalid: 'Please provide a valid phone number', // Match MongoDB message
-    pattern: /^[+]?[1-9][\d]{0,15}$/, // More flexible phone pattern
+    pattern: /^[+]?[1-9][\d\s\-()]{0,15}$/, // Allow spaces, hyphens, and parentheses
   },
 }
 

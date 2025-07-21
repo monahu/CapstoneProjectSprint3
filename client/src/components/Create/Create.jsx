@@ -6,6 +6,7 @@ import { PostCardSkeleton, ImageSkeleton } from '../Skeleton'
 import { UI_TEXT } from '../../utils/constants/ui'
 import CreateForm from './CreateForm'
 import { useCacheRefresh } from '../../hooks/useCacheRefresh'
+import { getApiUrl } from '../../utils/config'
 
 const Create = () => {
   const { id } = useParams()
@@ -73,7 +74,7 @@ const Create = () => {
                 // Upload image to backend to get all URLs
                 const formData = new FormData()
                 formData.append('image', values.image)
-                const res = await fetch('/api/upload-image', {
+                const res = await fetch(getApiUrl('/api/upload-image'), {
                   method: 'POST',
                   body: formData,
                 })
@@ -124,7 +125,7 @@ const Create = () => {
               console.log('🟡 Submitting post:', postPayload)
 
               try {
-                const res = await fetch('/api/posts', {
+                const res = await fetch(getApiUrl('/api/posts'), {
                   method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',

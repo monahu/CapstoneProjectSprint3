@@ -47,7 +47,21 @@ const app = express()
 // Apply basic middleware
 app.use(express.json({ limit: '10mb' }))
 app.use(cookieParser())
-app.use(cors())
+
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',  // Vite dev server
+    'http://localhost:3000',  // Alternative dev port
+    'http://127.0.0.1:5173',  // Alternative localhost
+    process.env.CLIENT_URL || 'https://your-deployed-client-domain.com'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}
+
+app.use(cors(corsOptions))
 
 // Image upload route (Cloudinary)
 const imageUploadRoute = require('./routes/imageUpload')

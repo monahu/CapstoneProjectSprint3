@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import axios from 'axios'
 import { auth } from '../../utils/firebase'
 import { ImageUploadField, RichTextField } from '../Create/FormFields'
+import { getApiUrl } from '../../utils/config'
 
 const EditForm = ({ postId, onSuccess }) => {
   const [initialValues, setInitialValues] = useState(null)
@@ -19,7 +20,7 @@ const EditForm = ({ postId, onSuccess }) => {
     const fetchPost = async () => {
       try {
         setLoading(true)
-        const res = await axios.get(`/api/posts/${postId}`)
+        const res = await axios.get(getApiUrl(`/api/posts/${postId}`))
         setPostData(res.data)
       } catch {
         setError('Failed to load post')
@@ -32,15 +33,7 @@ const EditForm = ({ postId, onSuccess }) => {
 
   // Fetch ratings list
   useEffect(() => {
-    let url = '/api/ratings'
-    if (
-      window.location.hostname === 'localhost' ||
-      window.location.hostname === '127.0.0.1'
-    ) {
-      url = 'http://localhost:3500/api/ratings'
-    }
-
-    fetch(url)
+    fetch(getApiUrl('/api/ratings'))
       .then((res) => res.json())
       .then((data) => {
         setRatings(data)
@@ -106,7 +99,7 @@ const EditForm = ({ postId, onSuccess }) => {
         const formData = new FormData()
         formData.append('image', values.image)
 
-        const res = await fetch('/api/upload-image', {
+        const res = await fetch(getApiUrl('/api/upload-image'), {
           method: 'POST',
           body: formData,
         })
@@ -138,7 +131,7 @@ const EditForm = ({ postId, onSuccess }) => {
         content: values.content,
       }
 
-      await axios.put(`/api/posts/${postId}`, payload, {
+      await axios.put(getApiUrl(`/api/posts/${postId}`), payload, {
         headers: {
           Authorization: `Bearer ${idToken}`,
           'Content-Type': 'application/json',

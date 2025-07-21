@@ -6,6 +6,7 @@ import Hero from "./Hero";
 import heroImage from "./../assets/img/login_hero1.webp";
 import { UI_TEXT } from "./../utils/constants/ui";
 import { loadStripe } from "@stripe/stripe-js";
+import { getApiUrl } from "../utils/config";
 
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -63,7 +64,7 @@ const Donate = () => {
                     onSubmit={async (values) => {
                         try {
                             const response = await fetch(
-                                "http://localhost:3500/api/payment/create-checkout-session",
+                                getApiUrl("/api/payment/create-checkout-session"),
                                 {
                                     method: "POST",
                                     headers: {

@@ -5,6 +5,7 @@ const PostImage = ({
   imageUrl,
   alt,
   className = "w-full h-64 object-cover",
+  priority = false,
 }) => {
   // Use default image if imageUrl is null/undefined
   const safeImageUrl = imageUrl || postImage.default;
@@ -25,8 +26,9 @@ const PostImage = ({
         src={safeImageUrl}
         alt={alt}
         className={className}
-        loading="lazy"
+        loading={priority ? "eager" : "lazy"}
         decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
       />
     </picture>
   )

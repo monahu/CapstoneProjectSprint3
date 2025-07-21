@@ -39,6 +39,8 @@ import resJamPost1Tablet from '../assets/img/resJam_post_1_tablet.webp'
 
 const Hero = ({
   heroImage,
+  useColorBackground = false,
+  backgroundColor = 'bg-gradient-to-br from-blue-600 to-purple-700',
   title = UI_TEXT.hero.title,
   description = UI_TEXT.hero.description,
   buttonText = UI_TEXT.hero.button,
@@ -108,56 +110,58 @@ const Hero = ({
   }
 
   return (
-    <div className={`hero rounded-2xl relative overflow-hidden ${className}`}>
-      {/* Background Image */}
-      <picture className='absolute inset-0 w-full h-full'>
-        {/* Mobile - simplified for faster discovery */}
-        <source
-          media='(max-width: 768px)'
-          srcSet={`${mobileImage} 1x, ${mobile2xImage} 2x`}
-          sizes='100vw'
-          type='image/webp'
-        />
-        {/* Tablet */}
-        <source
-          media='(min-width: 769px) and (max-width: 1024px)'
-          srcSet={tabletImage}
-          sizes='100vw'
-          type='image/webp'
-        />
-        {/* Desktop */}
-        <source
-          media='(min-width: 1025px)'
-          srcSet={heroImage}
-          sizes='100vw'
-          type='image/webp'
-        />
-        {/* Fallback - prioritize mobile for LCP */}
-        <img
-          src={mobileImage}
-          alt='Hero background'
-          className='w-full h-full object-cover rounded-2xl'
-          loading='eager'
-          fetchPriority='high'
-          decoding='sync'
-          onError={(e) => {
-            console.error('Hero image failed to load:', e.target.src)
-            // Fallback to desktop if mobile fails
-            if (e.target.src !== heroImage) {
-              e.target.src = heroImage
-            }
-          }}
-          onLoad={(e) => {
-            if (process.env.NODE_ENV === 'development') {
-              console.log('Hero image loaded successfully:', e.target.src)
-            }
-          }}
-        />
-      </picture>
+    <div className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''}`}>
+      {/* Background - either color or image */}
+      {!useColorBackground && (
+        <picture className='absolute inset-0 w-full h-full'>
+          {/* Mobile - simplified for faster discovery */}
+          <source
+            media='(max-width: 768px)'
+            srcSet={`${mobileImage} 1x, ${mobile2xImage} 2x`}
+            sizes='100vw'
+            type='image/webp'
+          />
+          {/* Tablet */}
+          <source
+            media='(min-width: 769px) and (max-width: 1024px)'
+            srcSet={tabletImage}
+            sizes='100vw'
+            type='image/webp'
+          />
+          {/* Desktop */}
+          <source
+            media='(min-width: 1025px)'
+            srcSet={heroImage}
+            sizes='100vw'
+            type='image/webp'
+          />
+          {/* Fallback - prioritize mobile for LCP */}
+          <img
+            src={mobileImage}
+            alt='Hero background'
+            className='w-full h-full object-cover rounded-2xl'
+            loading='eager'
+            fetchPriority='high'
+            decoding='sync'
+            onError={(e) => {
+              console.error('Hero image failed to load:', e.target.src)
+              // Fallback to desktop if mobile fails
+              if (e.target.src !== heroImage) {
+                e.target.src = heroImage
+              }
+            }}
+            onLoad={(e) => {
+              if (process.env.NODE_ENV === 'development') {
+                console.log('Hero image loaded successfully:', e.target.src)
+              }
+            }}
+          />
+        </picture>
+      )}
 
       {/* Content - needs to be on top */}
-      <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>
-      <div className='relative z-20 hero-content text-neutral-content text-center py-6'>
+      {!useColorBackground && <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>}
+      <div className={`${useColorBackground ? '' : 'relative z-20'} hero-content text-neutral-content text-center py-6`}>
         <div className={`max-w-md ${contentClassName}`}>
           <h1 className='mb-5 text-6xl font-bold'>{title}</h1>
           <p className='mb-5 text-[1.2rem]'>{description}</p>

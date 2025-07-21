@@ -14,13 +14,6 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 }
 
-// Initialize Firebase with optimizations
+// Initialize Firebase
 const app = initializeApp(firebaseConfig)
-
-// Configure auth with optimizations for better caching
-export const auth = getAuth(app)
-
-// Configure auth persistence and caching optimizations
-auth.settings = {
-  appVerificationDisabledForTesting: false,
-}
+export const auth = getAuth()

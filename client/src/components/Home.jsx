@@ -57,6 +57,8 @@ const Home = () => {
     <div className='min-h-screen'>
       <Hero
         heroImage={heroImage}
+        useColorBackground={true}
+        backgroundColor="bg-gradient-to-br from-blue-600 to-purple-700"
         buttonText={user ? UI_TEXT.hero.buttonLoggedIn : UI_TEXT.hero.button}
         onButtonClick={handleNavigateToLogin}
       />

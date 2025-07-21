@@ -99,10 +99,16 @@ const ProgressiveImage = ({
       
       {/* Main responsive image */}
       <picture className="w-full h-full">
-        {/* Mobile */}
+        {/* Mobile 1x (standard displays) */}
         <source
-          media="(max-width: 768px)"
-          srcSet={`${mobileUrl} 1x, ${mobileUrl2x} 2x`}
+          media="(max-width: 768px) and (-webkit-max-device-pixel-ratio: 1.5)"
+          srcSet={mobileUrl}
+          type="image/webp"
+        />
+        {/* Mobile 2x (retina displays) */}
+        <source
+          media="(max-width: 768px) and (-webkit-min-device-pixel-ratio: 1.5)"
+          srcSet={mobileUrl2x}
           type="image/webp"
         />
         {/* Tablet */}
@@ -119,7 +125,7 @@ const ProgressiveImage = ({
         />
         {/* Fallback */}
         <img
-          src={isCloudinaryUrl ? getCloudinaryUrl('w_1024,c_fill,q_auto:good') : imageUrl}
+          src={isCloudinaryUrl ? getCloudinaryUrl('w_480,h_320,c_fill,q_auto:eco') : imageUrl}
           alt={alt}
           className={`${className} transition-opacity duration-300 ${
             isLoaded ? 'opacity-100' : 'opacity-0'

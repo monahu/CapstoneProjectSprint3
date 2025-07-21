@@ -91,73 +91,63 @@ const Hero = ({
   // Get responsive variants for the current hero image
   const variants = imageMap[heroImage] || {}
   const mobileImage = variants.mobile || heroImage
+  const mobile2xImage = variants.mobile2x || heroImage
   const tabletImage = variants.tablet || heroImage
 
-  // Check if this is the main hero (LCP element)
-  const isMainHero = heroImage === restJamHero1
+  // LCP optimization: Use preloaded mobile image immediately for fast LCP
+  // Mobile image is always preloaded, so prioritize it for mobile devices
+  const getOptimalImageUrl = () => {
+    if (typeof window === 'undefined') return mobileImage
+    const width = window.innerWidth
 
-  // Use critical CSS class for main hero to avoid JS blocking LCP
-  if (isMainHero && !useColorBackground) {
-    return (
-      <div className={`hero-critical ${className}`}>
-        <div className='hero-overlay'></div>
-        <div className='hero-content'>
-          <div className={`max-w-md ${contentClassName}`}>
-            <h1 className='hero-title'>{title}</h1>
-            <p className='hero-description'>{description}</p>
-            {showButton && (
-              <button
-                className='btn-critical'
-                onClick={onButtonClick}
-                aria-label={`${buttonText} - Get started with your account`}
-              >
-                {buttonText}
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  // For other heroes, use the optimized approach with minimal JS
-  const getBackgroundStyle = () => {
-    if (useColorBackground) return {}
-
-    // Use CSS custom properties for better performance
-    return {
-      '--hero-mobile': `url(${mobileImage})`,
-      '--hero-tablet': `url(${tabletImage})`,
-      '--hero-desktop': `url(${heroImage})`,
-      backgroundImage: `var(--hero-mobile)`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
+    // For LCP optimization, use preloaded mobile image on mobile
+    if (width <= 768) {
+      return mobileImage // Always use preloaded mobile image for fastest LCP
+    } else if (width <= 1024) {
+      return tabletImage
+    } else {
+      return heroImage
     }
   }
 
+  const optimalImageUrl = !useColorBackground ? getOptimalImageUrl() : null
+
+  // Debug logging in development
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Hero Debug:', {
+      heroImage,
+      mobileImage,
+      mobile2xImage,
+      tabletImage,
+      optimalImageUrl,
+      hasVariants: !!variants.mobile,
+      windowWidth: typeof window !== 'undefined' ? window.innerWidth : 'SSR',
+      devicePixelRatio:
+        typeof window !== 'undefined' ? window.devicePixelRatio : 'SSR',
+    })
+  }
+
+  // Add LCP class for immediate mobile background
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+  const lcpClass = !useColorBackground && isMobile ? 'hero-lcp-mobile' : ''
+
   return (
     <div
-      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''}`}
-      style={getBackgroundStyle()}
+      className={`hero rounded-2xl relative overflow-hidden ${className} ${useColorBackground ? backgroundColor : ''} ${lcpClass}`}
+      style={
+        !useColorBackground && !isMobile
+          ? {
+              backgroundImage: `url(${optimalImageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }
+          : {}
+      }
     >
-      {/* Responsive background images via CSS */}
+      {/* Content - needs to be on top */}
       {!useColorBackground && (
-        <style>
-          {`
-            @media (min-width: 769px) and (max-width: 1024px) {
-              .hero { background-image: var(--hero-tablet) !important; }
-            }
-            @media (min-width: 1025px) {
-              .hero { background-image: var(--hero-desktop) !important; }
-            }
-          `}
-        </style>
-      )}
-
-      {/* Content overlay */}
-      {!useColorBackground && (
-        <div className='absolute inset-0 bg-black bg-opacity-20 rounded-2xl'></div>
+        <div className='relative z-10 hero-overlay bg-opacity-20 rounded-2xl'></div>
       )}
       <div
         className={`${useColorBackground ? '' : 'relative z-20'} hero-content text-neutral-content text-center py-6`}

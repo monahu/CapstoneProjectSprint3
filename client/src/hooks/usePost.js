@@ -16,12 +16,7 @@ import { DEFAULT_POSTS_VARIABLES } from '../utils/constants/posts'
 export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
   const { data, loading, error, fetchMore, refetch } = useQuery(GET_ALL_POSTS, {
     variables: { limit, offset, filter },
-    // Performance optimizations
-    fetchPolicy: 'cache-first', // Use cache-first for better perceived performance
-    nextFetchPolicy: 'cache-first',
-    errorPolicy: 'partial', // Still return partial data on error
-    // Don't block rendering for data updates
-    notifyOnNetworkStatusChange: false,
+    notifyOnNetworkStatusChange: true,
     ...options,
     onError: (error) => {
       console.error('GET_ALL_POSTS error:', error)
@@ -49,9 +44,6 @@ export const usePost = (id) => {
   const { data, loading, error } = useQuery(GET_POST_BY_ID, {
     variables: { id },
     skip: !id,
-    // Performance optimizations for single post
-    fetchPolicy: 'cache-first',
-    errorPolicy: 'partial',
   })
 
   return {
@@ -80,18 +72,18 @@ export const useCreatePost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
           })
         }
       } catch {
-        // If cache update fails, just refetch instead
+        // If cache read fails, just refetch instead
         console.log('Cache update failed, will refetch posts')
       }
     },
-    // Reduce refetch frequency for better performance
+    // Also refetch to ensure consistency
     refetchQueries: [
       {
         query: GET_ALL_POSTS,
         variables: cacheVariables,
       },
     ],
-    awaitRefetchQueries: false, // Don't block UI for refetch
+    awaitRefetchQueries: true,
   })
 
   return { createPost, loading, error }
@@ -99,15 +91,6 @@ export const useCreatePost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
 
 export const useLikePost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
   const [likePost, { loading, error }] = useMutation(TOGGLE_LIKE, {
-    // Optimistic updates for better UX
-    optimisticResponse: (variables) => ({
-      toggleLike: {
-        __typename: 'Post',
-        id: variables.postId,
-        likeCount: 0, // Will be updated with actual count from server
-        isLiked: !variables.currentIsLiked,
-      },
-    }),
     // Force refetch the posts to get fresh data from server
     refetchQueries: [
       {
@@ -115,22 +98,13 @@ export const useLikePost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
         variables: cacheVariables,
       },
     ],
-    awaitRefetchQueries: false, // Don't block UI
+    awaitRefetchQueries: true,
   })
   return { likePost, loading, error }
 }
 
 export const useWantToGoPost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
   const [wantToGoPost, { loading, error }] = useMutation(TOGGLE_WANT_TO_GO, {
-    // Optimistic updates
-    optimisticResponse: (variables) => ({
-      toggleWantToGo: {
-        __typename: 'Post',
-        id: variables.postId,
-        attendeeCount: 0, // Will be updated with actual count
-        isWantToGo: !variables.currentIsWantToGo,
-      },
-    }),
     // Force refetch the posts to get fresh data from server
     refetchQueries: [
       {
@@ -138,7 +112,7 @@ export const useWantToGoPost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
         variables: cacheVariables,
       },
     ],
-    awaitRefetchQueries: false, // Don't block UI
+    awaitRefetchQueries: true,
   })
   return { wantToGoPost, loading, error }
 }
@@ -171,7 +145,6 @@ export const useSearchPosts = () => {
     {
       notifyOnNetworkStatusChange: true,
       fetchPolicy: 'cache-and-network',
-      errorPolicy: 'partial',
       onError: (error) => {
         console.error('SEARCH_POSTS error:', error)
       },
@@ -217,7 +190,6 @@ export const useSearchPostsByTags = () => {
       skip: true,
       notifyOnNetworkStatusChange: true,
       fetchPolicy: 'cache-and-network',
-      errorPolicy: 'partial',
       onError: (error) => {
         console.error('SEARCH_POSTS_BY_TAGS error:', error)
       },
@@ -249,11 +221,6 @@ export const useSearchPostsByTags = () => {
 
 export const useTags = () => {
   const { data, loading, error } = useQuery(GET_ALL_TAGS, {
-    // Cache tags aggressively since they don't change often
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-first',
-    errorPolicy: 'partial',
-    staleTime: 300000, // 5 minutes
     onError: (error) => {
       console.error('GET_ALL_TAGS error:', error)
     },

@@ -15,58 +15,36 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Core vendor chunks - keep these small for fast loading
-          'vendor-react': ['react', 'react-dom'],
-          'vendor-router': ['react-router'],
-          'vendor-state': ['react-redux', '@reduxjs/toolkit'],
-
-          // Apollo Client - separate for potential lazy loading
-          'vendor-apollo': ['@apollo/client', 'graphql'],
-
-          // Firebase - separate chunk for auth features
-          'vendor-firebase': ['firebase/app', 'firebase/auth'],
-
-          // UI libraries - can be loaded after critical path
-          'vendor-ui': ['@headlessui/react', 'lucide-react'],
-
-          // Forms - only loaded when needed
-          'vendor-forms': ['formik', 'yup'],
-
-          // Heavy features - load only when needed
-          'vendor-editor': [
-            '@tiptap/react',
-            '@tiptap/starter-kit',
-            'prosemirror-view',
-          ],
-
-          // External services - lazy load these
-          'vendor-stripe': ['@stripe/stripe-js'],
-          'vendor-utils': ['axios', 'dompurify'],
+          // Core vendor chunks
+          vendor: ['react', 'react-dom'],
+          router: ['react-router', 'react-router-dom'],
+          state: ['react-redux', '@reduxjs/toolkit'],
+          // Apollo Client with its dependencies
+          apollo: ['@apollo/client', 'graphql'],
+          // Firebase separately for code splitting
+          firebase: ['firebase/app', 'firebase/auth'],
+          // UI libraries
+          ui: ['daisyui', '@headlessui/react', 'tailwindcss'],
+          forms: ['formik', 'yup'],
+          // Heavy features - split separately
+          editor: ['@tiptap/react', '@tiptap/starter-kit', 'prosemirror-view'],
+          icons: ['lucide-react', 'react-icons'],
+          // External services - keep separate for lazy loading
+          utils: ['axios', 'dompurify'],
+          // Dynamic imports for payment
+          stripe: ['@stripe/stripe-js'],
         },
       },
     },
-    // Enhanced optimizations for LCP
+    // Enhanced tree shaking and optimization
     target: 'esnext',
     minify: 'esbuild',
-    sourcemap: false,
-    chunkSizeWarningLimit: 600, // Stricter limit to catch large chunks
+    sourcemap: false, // Disable source maps in production for smaller bundle
+    chunkSizeWarningLimit: 800, // Stricter chunk size limit
+    // Enable advanced optimizations
     cssCodeSplit: true,
-    assetsInlineLimit: 2048, // Inline smaller assets for fewer requests
-
-    // Optimize for modern browsers
-    modulePreload: {
-      polyfill: false, // Reduce polyfill overhead for modern browsers
-    },
+    assetsInlineLimit: 4096, // Inline small assets
   },
-
-  // Optimize dependencies
-  optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router'],
-    exclude: [
-      '@stripe/stripe-js', // Don't pre-bundle Stripe, load when needed
-    ],
-  },
-
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/setupTests.js'],

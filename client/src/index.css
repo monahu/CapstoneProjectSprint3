@@ -2,12 +2,14 @@
 @plugin "daisyui";
 @import 'prosemirror-view/style/prosemirror.css';
 
-/* Font optimization */
-@font-face {
-  font-family: 'Inter';
-  font-weight: 400 700;
-  font-display: swap;
-  src: url('https://fonts.gstatic.com/s/inter/v13/UcCO3FwrK3iLTeHuS_fvQtMwCp50KnMw2boKoduKmMEVuLyfAZ9hiA.woff2') format('woff2');
+/* Critical LCP optimization for mobile hero background */
+@media (max-width: 768px) {
+  .hero-lcp-mobile {
+    background-image: url('/src/assets/img/restJam_hero1_mobile.webp') !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-repeat: no-repeat !important;
+  }
 }
 
 .gradient-bg {

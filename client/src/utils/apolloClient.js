@@ -8,12 +8,14 @@ import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
 import { auth } from './firebase'
+import appStore from './appStore'
 import { getApiUrl } from './config'
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
 
 const isDevelopmentMode = import.meta.env.VITE_APP_MODE === 'development'
+const hasBackend = import.meta.env.VITE_HAS_BACKEND === 'true'
 
 // =============================================================================
 // HTTP LINK - GraphQL Endpoint Connection
@@ -21,186 +23,139 @@ const isDevelopmentMode = import.meta.env.VITE_APP_MODE === 'development'
 
 const httpLink = createHttpLink({
   uri: getApiUrl('/graphql'),
-  // Performance optimizations
-  fetchOptions: {
-    keepalive: true, // Keep connections alive for better performance
-  },
 })
 
 // =============================================================================
-// AUTH LINK - Attach Firebase Token to Requests
+// AUTH LINK - Automatic Firebase Token Injection
+// It uses setContext (from @apollo/client/link/context) to modify the request context before each request is sent.
 // =============================================================================
 
 const authLink = setContext(async (_, { headers }) => {
+  let token = ''
+
   try {
-    // Get current user from Firebase
     const currentUser = auth.currentUser
-
-    // If no user, proceed without token
-    if (!currentUser) {
-      return {
-        headers: {
-          ...headers,
-        },
+    if (currentUser) {
+      // Use cached token first for performance
+      token = await currentUser.getIdToken(false)
+    } else {
+      // Only log if auth has definitely initialized (not just starting up)
+      const { authInitialized } = appStore.getState().user
+      if (authInitialized) {
+        console.log('🔓 Apollo Auth - No current user')
       }
-    }
-
-    // Get the ID token (force refresh if near expiry for better UX)
-    const token = await currentUser.getIdToken(false) // Don't force refresh unless needed
-
-    return {
-      headers: {
-        ...headers,
-        Authorization: token ? `Bearer ${token}` : '',
-      },
     }
   } catch (error) {
-    console.warn('Auth token retrieval failed:', error.message)
-    return { headers }
-  }
-})
+    console.error('❌ Apollo Auth - Error getting token:', error)
 
-// =============================================================================
-// ERROR LINK - Global Error Handling
-// =============================================================================
-
-const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
-  // Handle GraphQL errors
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, locations, path, extensions }) => {
-      const errorInfo = {
-        message,
-        locations,
-        path,
-        operation: operation.operationName,
-        extensions,
+    // Fallback: Try to get fresh token on error
+    try {
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken(true) // Force refresh
+        console.log('🔄 Fallback token refresh successful')
       }
-
-      // Don't log auth errors in production (reduce noise)
-      if (extensions?.code !== 'UNAUTHENTICATED' || isDevelopmentMode) {
-        console.error('GraphQL Error:', errorInfo)
-      }
-
-      // Handle authentication errors
-      if (extensions?.code === 'UNAUTHENTICATED') {
-        // Let auth manager handle this
-        return
-      }
-    })
-  }
-
-  // Handle network errors
-  if (networkError) {
-    console.error('Network Error:', {
-      message: networkError.message,
-      operation: operation.operationName,
-      statusCode: networkError.statusCode,
-    })
-
-    // Handle specific network errors
-    if (networkError.statusCode === 401) {
-      // Token might be expired, let auth manager handle
-      return
+    } catch (refreshError) {
+      console.error('❌ Token refresh failed:', refreshError)
     }
   }
+
+  return {
+    headers: {
+      ...headers,
+      authorization: token ? `Bearer ${token}` : '',
+    },
+  }
 })
 
 // =============================================================================
-// RETRY LINK - Intelligent Retry Logic
+// ERROR LINK - Smart Error Handling with Token Refresh
+// =============================================================================
+
+const errorLink = onError(
+  ({ graphQLErrors, networkError, operation, forward }) => {
+    // Handle GraphQL errors (validation, business logic, etc.)
+    if (graphQLErrors) {
+      graphQLErrors.forEach(({ message, locations, path }) => {
+        console.error(
+          `GraphQL error: Message: ${message}, Location: ${locations}, Path: ${path}`
+        )
+      })
+    }
+
+    // Handle network errors (HTTP status codes, connection issues, etc.)
+    if (networkError) {
+      console.error(`Network error:`, networkError)
+
+      // Development mode: Allow operation without backend
+      if (isDevelopmentMode && !hasBackend) {
+        console.log('🚧 Backend not ready - this is expected in development')
+        return
+      }
+
+      // Handle authentication errors (401 Unauthorized)
+      if (networkError.statusCode === 401) {
+        return handleAuthenticationError(networkError, operation, forward)
+      }
+    }
+  }
+)
+
+/**
+ * Handle 401 authentication errors with smart token refresh
+ */
+const handleAuthenticationError = (networkError, operation, forward) => {
+  const errorBody = networkError.result || {}
+
+  // Check if this is a token expiration error
+  if (errorBody.code === 'TOKEN_EXPIRED') {
+    console.log('🔄 Token expired, attempting refresh...')
+
+    if (auth.currentUser) {
+      // Force token refresh and retry the operation
+      return auth.currentUser
+        .getIdToken(true)
+        .then(() => {
+          console.log('✅ Token refreshed, retrying operation')
+          // The authLink will automatically pick up the fresh token
+          return forward(operation)
+        })
+        .catch((refreshError) => {
+          console.error('❌ Token refresh failed:', refreshError)
+          redirectToLogin('Token refresh failed')
+        })
+    } else {
+      redirectToLogin('No current user for token refresh')
+    }
+  } else {
+    // For other 401 errors, redirect to login immediately
+    redirectToLogin('Authentication required')
+  }
+}
+
+/**
+ * Redirect user to login page with logging
+ */
+const redirectToLogin = (reason) => {
+  console.log(`🔐 ${reason}, redirecting to login`)
+  window.location.href = '/login'
+}
+
+// =============================================================================
+// RETRY LINK - Network Failure Recovery
 // =============================================================================
 
 const retryLink = new RetryLink({
   delay: {
-    initial: 300,
-    max: Infinity,
-    jitter: true,
+    initial: 300, // Start with 300ms delay
+    max: Infinity, // No maximum delay
+    jitter: true, // Add randomness to prevent thundering herd
   },
   attempts: {
-    max: 3,
+    max: 3, // Maximum 3 retry attempts
     retryIf: (error) => {
-      // Only retry on network errors or 5xx server errors
-      return (
-        !!error &&
-        (error.networkError?.statusCode >= 500 ||
-          error.networkError?.name === 'ServerError' ||
-          !error.networkError) // Retry on network connectivity issues
-      )
+      // Only retry on network errors, not authentication errors
+      return !!error && !error.statusCode
     },
-  },
-})
-
-// =============================================================================
-// CACHE CONFIGURATION
-// =============================================================================
-
-const cache = new InMemoryCache({
-  // Performance optimizations
-  resultCaching: true,
-  addTypename: true,
-
-  typePolicies: {
-    Query: {
-      fields: {
-        // Implement proper pagination for posts
-        posts: {
-          keyArgs: ['filter'], // Cache based on filter
-          merge(existing = [], incoming, { args }) {
-            // For offset-based pagination
-            if (args?.offset === 0) {
-              return incoming // Fresh query, replace existing
-            }
-            return [...existing, ...incoming] // Append for pagination
-          },
-        },
-        // Cache search results separately
-        searchPosts: {
-          keyArgs: ['searchTerm', 'tags', 'location'],
-          merge(_, incoming) {
-            return incoming // Always replace search results
-          },
-        },
-        // Cache tags aggressively
-        tags: {
-          merge(_, incoming) {
-            return incoming
-          },
-        },
-      },
-    },
-    Post: {
-      fields: {
-        // Optimistic updates for likes and want-to-go
-        likeCount: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        attendeeCount: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        isLiked: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-        isWantToGo: {
-          merge(existing, incoming) {
-            return incoming
-          },
-        },
-      },
-    },
-  },
-
-  // Garbage collection for better memory management
-  possibleTypes: {},
-  dataIdFromObject: (object) => {
-    // Ensure consistent cache IDs
-    return object.__typename && object.id
-      ? `${object.__typename}:${object.id}`
-      : null
   },
 })
 
@@ -208,48 +163,22 @@ const cache = new InMemoryCache({
 // APOLLO CLIENT INSTANCE
 // =============================================================================
 
-const apolloClient = new ApolloClient({
+const client = new ApolloClient({
+  // Link chain: Error handling → Retries → Authentication → HTTP
   link: from([errorLink, retryLink, authLink, httpLink]),
-  cache,
 
-  // Performance and development settings
+  // Cache configuration
+  cache: new InMemoryCache(),
+
+  // Default options for all queries/mutations
   defaultOptions: {
     watchQuery: {
-      fetchPolicy: 'cache-first',
-      errorPolicy: 'partial',
-      notifyOnNetworkStatusChange: false, // Reduce re-renders
+      errorPolicy: 'all', // Return both data and errors
     },
     query: {
-      fetchPolicy: 'cache-first',
-      errorPolicy: 'partial',
-    },
-    mutate: {
-      errorPolicy: 'partial',
-      awaitRefetchQueries: false, // Don't block UI
+      errorPolicy: 'all', // Return both data and errors
     },
   },
-
-  // Development features
-  connectToDevTools: isDevelopmentMode,
-
-  // Performance optimizations
-  assumeImmutableResults: true, // Assume data is immutable for better performance
 })
 
-// =============================================================================
-// CACHE PERSISTENCE (Optional for better offline experience)
-// =============================================================================
-
-// Clear cache on app version changes to prevent stale data
-const APP_VERSION = import.meta.env.VITE_APP_VERSION || '1.0.0'
-const CACHE_VERSION_KEY = 'apollo-cache-version'
-
-if (typeof window !== 'undefined') {
-  const storedVersion = localStorage.getItem(CACHE_VERSION_KEY)
-  if (storedVersion !== APP_VERSION) {
-    apolloClient.clearStore()
-    localStorage.setItem(CACHE_VERSION_KEY, APP_VERSION)
-  }
-}
-
-export default apolloClient
+export default client

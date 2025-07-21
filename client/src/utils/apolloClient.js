@@ -41,8 +41,6 @@ const authLink = setContext(async (_, { headers }) => {
       return {
         headers: {
           ...headers,
-          // Add cache headers for unauthenticated requests
-          'Cache-Control': 'public, max-age=300',
         },
       }
     }
@@ -54,8 +52,6 @@ const authLink = setContext(async (_, { headers }) => {
       headers: {
         ...headers,
         Authorization: token ? `Bearer ${token}` : '',
-        // Add cache headers for authenticated requests
-        'Cache-Control': 'private, max-age=60',
       },
     }
   } catch (error) {

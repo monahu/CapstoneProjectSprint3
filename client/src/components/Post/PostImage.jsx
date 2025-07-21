@@ -1,5 +1,5 @@
 import { postImage } from '../../utils/constants/posts'
-import ProgressiveImage from './ProgressiveImage'
+import SimpleImage from './SimpleImage'
 
 const PostImage = ({
   imageUrl,
@@ -11,7 +11,7 @@ const PostImage = ({
   const safeImageUrl = imageUrl || postImage.default
   
   return (
-    <ProgressiveImage
+    <SimpleImage
       imageUrl={safeImageUrl}
       alt={alt}
       className={className}

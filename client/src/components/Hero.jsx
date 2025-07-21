@@ -10,30 +10,59 @@ const Hero = ({
   className = 'min-h-[40vh]',
   contentClassName = '',
 }) => {
+  // Generate all responsive image URLs from base heroImage
+  const getResponsiveImage = (suffix) => {
+    if (!heroImage || typeof heroImage !== 'string') return heroImage
+    
+    // Handle different image naming patterns
+    if (heroImage.includes('.webp')) {
+      return heroImage.replace('.webp', `${suffix}.webp`)
+    }
+    
+    // Fallback for other formats
+    const extension = heroImage.split('.').pop()
+    return heroImage.replace(`.${extension}`, `${suffix}.${extension}`)
+  }
+
+  const mobileImage = getResponsiveImage('_mobile')
+  const mobile2xImage = getResponsiveImage('_mobile@2x') 
+  const tabletImage = getResponsiveImage('_tablet')
+
   return (
     <div className={`hero rounded-2xl relative overflow-hidden ${className}`}>
       {/* Background Image */}
       <picture className='absolute inset-0 w-full h-full'>
+        {/* Mobile 1x (standard displays) */}
         <source
-          media='(max-width: 768px)'
-          srcSet={`${heroImage.replace('.webp', '_mobile.webp')} 1x, ${heroImage.replace('.webp', '_mobile@2x.webp')} 2x`}
+          media='(max-width: 768px) and (-webkit-max-device-pixel-ratio: 1.5)'
+          srcSet={mobileImage}
           sizes='100vw'
           type='image/webp'
         />
+        {/* Mobile 2x (retina displays) */}
+        <source
+          media='(max-width: 768px) and (-webkit-min-device-pixel-ratio: 1.5)'
+          srcSet={mobile2xImage}
+          sizes='100vw'
+          type='image/webp'
+        />
+        {/* Tablet */}
         <source
           media='(max-width: 1024px)'
-          srcSet={`${heroImage.replace('.webp', '_tablet.webp')}`}
+          srcSet={tabletImage}
           sizes='100vw'
           type='image/webp'
         />
+        {/* Desktop */}
         <source
           media='(min-width: 1025px)'
           srcSet={heroImage}
           sizes='100vw'
           type='image/webp'
         />
+        {/* Fallback */}
         <img
-          src={heroImage}
+          src={mobileImage}
           alt='Hero background'
           className='w-full h-full object-cover rounded-2xl'
           loading='eager'

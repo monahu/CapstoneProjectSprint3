@@ -18,19 +18,8 @@
   
   <!-- Critical CSS will be handled by Vite build -->
 
-  <!-- Critical LCP hero image preloads with proper srcset and sizes -->
-  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" 
-        imagesrcset="/src/assets/img/restJam_hero1_mobile.webp 480w, /src/assets/img/restJam_hero1_mobile@2x.webp 960w" 
-        imagesizes="(max-width: 768px) 100vw" 
-        media="(max-width: 768px)" fetchpriority="high">
-  <link rel="preload" href="/src/assets/img/restJam_hero1_tablet.webp" as="image" 
-        imagesrcset="/src/assets/img/restJam_hero1_tablet.webp 800w, /src/assets/img/restJam_hero1.webp 1200w" 
-        imagesizes="(min-width: 769px) and (max-width: 1024px) 100vw" 
-        media="(min-width: 769px) and (max-width: 1024px)" fetchpriority="high">
-  <link rel="preload" href="/src/assets/img/restJam_hero1.webp" as="image" 
-        imagesrcset="/src/assets/img/restJam_hero1_tablet.webp 800w, /src/assets/img/restJam_hero1.webp 1200w" 
-        imagesizes="(min-width: 1025px) 100vw" 
-        media="(min-width: 1025px)" fetchpriority="high">
+  <!-- Single critical hero image preload for fastest rendering -->
+  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" fetchpriority="high">
 </head>
 
 <body>

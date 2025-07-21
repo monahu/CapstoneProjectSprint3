@@ -18,7 +18,10 @@
   
   <!-- Critical CSS will be handled by Vite build -->
 
-  <!-- Hero image preloads will be handled by component-level preloading -->
+  <!-- Critical LCP hero image preloads with fetchpriority=high -->
+  <link rel="preload" href="/src/assets/img/restJam_hero1_mobile.webp" as="image" media="(max-width: 768px)" fetchpriority="high">
+  <link rel="preload" href="/src/assets/img/restJam_hero1_tablet.webp" as="image" media="(min-width: 769px) and (max-width: 1024px)" fetchpriority="high">
+  <link rel="preload" href="/src/assets/img/restJam_hero1.webp" as="image" media="(min-width: 1025px)" fetchpriority="high">
 </head>
 
 <body>

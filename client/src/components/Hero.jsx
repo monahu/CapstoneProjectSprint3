@@ -92,35 +92,7 @@ const Hero = ({
   const mobile2xImage = variants.mobile2x || heroImage
   const tabletImage = variants.tablet || heroImage
 
-  // Preload critical hero images for faster LCP
-  React.useEffect(() => {
-    const isMobile = window.innerWidth <= 768
-    const isHighDPI = window.devicePixelRatio >= 1.5
-    
-    let priorityImage = heroImage // Default to desktop
-    if (isMobile && isHighDPI && mobile2xImage !== heroImage) {
-      priorityImage = mobile2xImage
-    } else if (isMobile && mobileImage !== heroImage) {
-      priorityImage = mobileImage
-    } else if (window.innerWidth <= 1024 && tabletImage !== heroImage) {
-      priorityImage = tabletImage
-    }
-
-    // Create preload link for the priority image
-    const link = document.createElement('link')
-    link.rel = 'preload'
-    link.as = 'image'
-    link.href = priorityImage
-    link.type = 'image/webp'
-    document.head.appendChild(link)
-
-    // Cleanup function
-    return () => {
-      if (document.head.contains(link)) {
-        document.head.removeChild(link)
-      }
-    }
-  }, [heroImage, mobileImage, mobile2xImage, tabletImage])
+  // No JavaScript preloading needed - handled by HTML preload links
 
   // Debug logging in development
   if (process.env.NODE_ENV === 'development') {
@@ -139,17 +111,10 @@ const Hero = ({
     <div className={`hero rounded-2xl relative overflow-hidden ${className}`}>
       {/* Background Image */}
       <picture className='absolute inset-0 w-full h-full'>
-        {/* Mobile 1x (standard displays) */}
+        {/* Mobile - simplified for faster discovery */}
         <source
-          media='(max-width: 768px) and (-webkit-max-device-pixel-ratio: 1.5)'
-          srcSet={mobileImage}
-          sizes='100vw'
-          type='image/webp'
-        />
-        {/* Mobile 2x (retina displays) */}
-        <source
-          media='(max-width: 768px) and (-webkit-min-device-pixel-ratio: 1.5)'
-          srcSet={mobile2xImage}
+          media='(max-width: 768px)'
+          srcSet={`${mobileImage} 1x, ${mobile2xImage} 2x`}
           sizes='100vw'
           type='image/webp'
         />
@@ -167,9 +132,9 @@ const Hero = ({
           sizes='100vw'
           type='image/webp'
         />
-        {/* Fallback - use smallest appropriate image */}
+        {/* Fallback - prioritize mobile for LCP */}
         <img
-          src={typeof window !== 'undefined' && window.innerWidth <= 768 ? mobileImage : heroImage}
+          src={mobileImage}
           alt='Hero background'
           className='w-full h-full object-cover rounded-2xl'
           loading='eager'
@@ -177,10 +142,8 @@ const Hero = ({
           decoding='sync'
           onError={(e) => {
             console.error('Hero image failed to load:', e.target.src)
-            // Fallback hierarchy: mobile -> desktop -> original
-            if (e.target.src === mobileImage && mobileImage !== heroImage) {
-              e.target.src = heroImage
-            } else if (e.target.src !== heroImage) {
+            // Fallback to desktop if mobile fails
+            if (e.target.src !== heroImage) {
               e.target.src = heroImage
             }
           }}

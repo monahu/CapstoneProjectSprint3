@@ -218,6 +218,7 @@ const SidebarContent = ({ user }) => {
               <SearchForm
                 className=' md:hidden border-t border-gray-200 pt-4'
                 hideClearButton={true}
+                id='sidebar-search-input'
               />
             )}
           </ul>

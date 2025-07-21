@@ -9,7 +9,7 @@ import { onError } from '@apollo/client/link/error'
 import { RetryLink } from '@apollo/client/link/retry'
 import { auth } from './firebase'
 import appStore from './appStore'
-
+import { getApiUrl } from './config'
 // =============================================================================
 // CONFIGURATION
 // =============================================================================
@@ -22,7 +22,7 @@ const hasBackend = import.meta.env.VITE_HAS_BACKEND === 'true'
 // =============================================================================
 
 const httpLink = createHttpLink({
-  uri: import.meta.env.VITE_GRAPHQL_ENDPOINT || 'http://localhost:3500/graphql',
+  uri: getApiUrl('/graphql'),
 })
 
 // =============================================================================

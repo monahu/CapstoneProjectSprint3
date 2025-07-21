@@ -15,28 +15,35 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // Vendor chunks
+          // Core vendor chunks
           vendor: ['react', 'react-dom'],
           router: ['react-router', 'react-router-dom'],
           state: ['react-redux', '@reduxjs/toolkit'],
+          // Apollo Client with its dependencies
           apollo: ['@apollo/client', 'graphql'],
-          // Large UI libraries
-          ui: ['daisyui', '@headlessui/react'],
+          // Firebase separately for code splitting
+          firebase: ['firebase/app', 'firebase/auth'],
+          // UI libraries
+          ui: ['daisyui', '@headlessui/react', 'tailwindcss'],
           forms: ['formik', 'yup'],
-          // Heavy features
+          // Heavy features - split separately
           editor: ['@tiptap/react', '@tiptap/starter-kit', 'prosemirror-view'],
-          emoji: ['emoji-mart', 'emoji-picker-react'],
           icons: ['lucide-react', 'react-icons'],
-          // External services (firebase auto-chunks, stripe dynamic)
+          // External services - keep separate for lazy loading
+          utils: ['axios', 'dompurify'],
+          // Dynamic imports for payment
           stripe: ['@stripe/stripe-js'],
         },
       },
     },
-    // Enable tree shaking
+    // Enhanced tree shaking and optimization
     target: 'esnext',
     minify: 'esbuild',
-    // Optimize chunks
-    chunkSizeWarningLimit: 1000,
+    sourcemap: false, // Disable source maps in production for smaller bundle
+    chunkSizeWarningLimit: 800, // Stricter chunk size limit
+    // Enable advanced optimizations
+    cssCodeSplit: true,
+    assetsInlineLimit: 4096, // Inline small assets
   },
   test: {
     environment: 'jsdom',

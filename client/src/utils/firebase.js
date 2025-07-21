@@ -17,8 +17,3 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig)
 export const auth = getAuth()
-window.auth = auth
-/* auth.currentUser.getIdToken().then(token => {
-  console.log('Token:', token)
-  navigator.clipboard.writeText(token)
-}) */

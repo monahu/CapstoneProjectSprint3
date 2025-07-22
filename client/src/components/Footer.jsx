@@ -115,7 +115,7 @@ export default function Footer() {
                         {donateItem && (
                             <Link
                                 to={donateItem.href}
-                                className="rounded-md bg-green-600 px-4 py-2 text-white hover:bg-green-700 text-sm font-medium flex items-center gap-2"
+                                className="rounded-md bg-green-700 px-4 py-2 text-white hover:bg-green-800 text-sm font-medium flex items-center gap-2"
                             >
                                 <span className="text-lg">🧋</span>
                                 {donateItem.name}

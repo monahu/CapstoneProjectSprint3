@@ -122,3 +122,9 @@ FigJam Design Board: https://www.figma.com/board/dfU3ZlTdQUzOBkqz3kDND7/Capstone
 
    - Backend runs on http://localhost:3500
    - Frontend runs on http://localhost:5173
+
+### (test production mode)
+
+npm run build
+npm run preview -- --port 3000
+npx serve dist

@@ -24,6 +24,7 @@ const RestaurantCard = ({
   isWantToGo = false,
   isLiked = false,
   className = '',
+  priority = false,
 }) => {
   const navigate = useNavigate()
 
@@ -53,6 +54,7 @@ const RestaurantCard = ({
       <PostImage
         imageUrl={mainImage}
         alt={placeName}
+        priority={priority}
       />
 
       {/* Content */}

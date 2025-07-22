@@ -50,7 +50,7 @@ const Navbar = ({ setSidebarOpen }) => {
             </Link>
           </div>
 
-          <SearchForm className='hidden md:grid' />
+          <SearchForm className='hidden md:grid' id='navbar-search-input' />
         </>
       )}
 

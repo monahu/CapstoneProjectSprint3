@@ -74,7 +74,7 @@ const Home = () => {
         />
       )}
       {/* Posts List */}
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <RestaurantCard
           key={post.id}
           id={post.id}
@@ -98,6 +98,7 @@ const Home = () => {
           isWantToGo={post.isWantToGo}
           isLiked={post.isLiked}
           className='mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4'
+          priority={index === 0}
         />
       ))}
     </div>

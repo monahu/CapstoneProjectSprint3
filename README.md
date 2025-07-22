@@ -1,130 +1,149 @@
-# RestJam - Restaurant Social Media Application
+# RestJAM - Restaurant Social Media Application
 
-A full-stack social media platform for sharing restaurant experiences and recommendations.
+A full-stack social media platform for sharing restaurant experiences and recommendations, built by students at Conestoga College as a capstone project.
 
-## Project Links
+## 🚀 Live Application
 
-FigJam Design Board: https://www.figma.com/board/dfU3ZlTdQUzOBkqz3kDND7/Capstone-FIgJam?node-id=0-1&t=5dUhe3uWqOWyfBnV-1
+**✅ Sprint 3 - Currently Deployed**
+- **Frontend**: https://capstone-project-sprint3-niq2.vercel.app/
+- **Backend API**: https://capstone-project-sprint3.vercel.app/
 
-## Tech Stack
+## 📋 Project Status
 
-### Frontend
+**Current Phase**: Sprint 3 Complete ✅  
+**Status**: Production Ready & Deployed  
+**Last Updated**: July 2025
 
-- **React** with Vite for fast development
-- **TailwindCSS** + **DaisyUI** for responsive styling
-- **Apollo Client** for GraphQL state management
-- **Redux Toolkit** for app state
-- **Firebase Auth** for authentication
-- **React Router** for navigation
+## 🔗 Project Links
 
-### Backend
+- **Design Board**: https://www.figma.com/board/dfU3ZlTdQUzOBkqz3kDND7/Capstone-FIgJam?node-id=0-1&t=5dUhe3uWqOWyfBnV-1
+- **Live Frontend**: https://capstone-project-sprint3-niq2.vercel.app/
+- **Live Backend**: https://capstone-project-sprint3.vercel.app/
 
-- **Node.js** + **Express** server
-- **Apollo Server** for GraphQL API
-- **MongoDB** with Mongoose ODM
-- **Firebase Admin SDK** for auth verification
-- **Cloudinary** for image storage
-- **Stripe** for payment processing
+## ✨ Completed Features
 
-## Getting Started
+### 🔐 User Management & Authentication
+- ✅ Firebase Authentication (Email/Password)
+- ✅ User profile management with encrypted sensitive data
+- ✅ Secure session management and token validation
+- ✅ Profile creation and editing functionality
+
+### 📝 Content Management
+- ✅ Full CRUD operations for restaurant posts
+- ✅ Rich post creation form with validation
+- ✅ Multi-resolution image upload and optimization
+- ✅ Post editing (owner-only) and deletion
+- ✅ Responsive image serving via Cloudinary CDN
+
+### 🌟 Social Features
+- ✅ Like/Unlike posts with real-time counters
+- ✅ "Want to Go" functionality for restaurant interest
+- ✅ Share tracking and social engagement metrics
+- ✅ User interaction history and preferences
+
+### 🔍 Search & Discovery
+- ✅ Advanced full-text search across posts and restaurants
+- ✅ Tag-based filtering and content categorization
+- ✅ Location-based search capabilities
+- ✅ Voice search integration with Web Speech API
+- ✅ Advanced filters with multiple search criteria
+
+### ⭐ Rating System
+- ✅ Restaurant rating system (Recommended, New, So-so)
+- ✅ Visual rating displays and components
+- ✅ Rating integration with post creation
+
+### 🏷️ Tagging System
+- ✅ Dynamic tag creation and management
+- ✅ Tag-based search and filtering
+- ✅ Visual tag display components
+
+### 🎙️ Voice Features
+- ✅ Web Speech API integration
+- ✅ Voice-to-text for search and content creation
+- ✅ Real-time speech transcription
+
+### 💳 Payment Integration
+- ✅ Stripe Checkout for donation functionality
+- ✅ CAD currency support
+- ✅ Secure payment processing
+
+### 📱 User Interface & Experience
+- ✅ Mobile-first responsive design
+- ✅ Accessibility features (ARIA, keyboard navigation)
+- ✅ Loading states and error handling
+- ✅ Hero sections and compelling imagery
+- ✅ Touch-friendly interface elements
+
+### 🧪 Testing & Quality Assurance
+- ✅ Comprehensive Playwright E2E test suite
+- ✅ Unit testing setup with Vitest
+- ✅ Code quality enforcement with ESLint
+- ✅ Error boundaries and comprehensive error handling
+
+## 🛠️ Tech Stack
+
+**Frontend**: React 19 + Vite, TailwindCSS + DaisyUI, Apollo Client, Redux Toolkit  
+**Backend**: Node.js + Express, Apollo Server, GraphQL  
+**Database**: MongoDB + Mongoose ODM  
+**Authentication**: Firebase Auth  
+**Payments**: Stripe  
+**Storage**: Cloudinary CDN  
+**Testing**: Playwright E2E + Vitest Unit Tests  
+
+> 📋 **For complete technology details**: See [TECH_STACK.md](./TECH_STACK.md)
+
+## 🏗️ Architecture & Technical Details
+
+**Database**: MongoDB with 7 models (Users, Posts, Ratings, Likes, WantToGo, Tags, PostsTags)  
+**Security**: Field-level encryption, Firebase token validation, rate limiting  
+**Performance**: CDN image delivery, code splitting, GraphQL caching, bundle optimization  
+
+> 📊 **For detailed architecture, security, and patterns**: See [TECH_STACK.md](./TECH_STACK.md)
+
+## 🚧 Development Setup
 
 ### Prerequisites
+- Node.js 18+, MongoDB, Firebase project, Cloudinary account
+- Git, 4GB RAM minimum, 2GB storage
 
-- Node.js 18+
-- MongoDB database
-- Firebase project with Auth enabled
-- Cloudinary account (for image uploads)
+### Quick Start
+```bash
+git clone <repository-url> && cd CapstoneProject
+cd server && npm install
+cd ../client && npm install
+# Copy .env.example to .env in both directories and configure
+cd server && npm start  # Backend (port 3500)
+cd client && npm run dev  # Frontend (port 5173)
+```
 
-### Installation
+> 🔧 **For detailed setup instructions**: See [SETUP_GUIDE.md](./SETUP_GUIDE.md)  
+> Includes environment configuration, Firebase setup, Cloudinary integration, and troubleshooting.
 
-1. **Clone the repository**
+## 🧪 Testing
 
-   ```bash
-   git clone <repository-url>
-   cd CapstoneProject0718Fork
-   ```
+### Run Tests
+```bash
+# Unit tests
+cd client && npm run test
 
-2. **Install dependencies**
+# End-to-End tests
+cd client && npm run test:e2e
 
-   ```bash
-   # Install server dependencies
-   cd server && npm install
+# Test with UI
+cd client && npm run test:e2e:ui
+```
 
-   # Install client dependencies
-   cd ../client && npm install
-   ```
+### Test Coverage
+- Authentication workflows
+- Post creation and interaction
+- Responsive design validation
+- Search and filtering functionality
+- Social features (likes, want-to-go)
 
-3. **Set up environment variables**
+## 📦 Deployment
 
-   **Server (.env in `/server` directory):**
+**Production Environment**: Vercel (Frontend + Backend), MongoDB Atlas, Cloudinary CDN  
+**Build**: `npm run build` → Optimized bundles with code splitting  
 
-   ```env
-   # Server Configuration
-   PORT=3500
-   NODE_ENV=development
-
-   # Database
-   MONGO_URI=mongodb://localhost:27017/restjam
-
-   # Firebase Admin SDK (for authentication)
-   FIREBASE_PROJECT_ID=your-project-id
-   FIREBASE_PRIVATE_KEY_ID=your-private-key-id
-   FIREBASE_PRIVATE_KEY="your-private-key"
-   FIREBASE_CLIENT_EMAIL=your-client-email
-   FIREBASE_CLIENT_ID=your-client-id
-   FIREBASE_AUTH_URI=https://accounts.google.com/o/oauth2/auth
-   FIREBASE_TOKEN_URI=https://oauth2.googleapis.com/token
-   FIREBASE_AUTH_PROVIDER_X509_CERT_URL=https://www.googleapis.com/oauth2/v1/certs
-   FIREBASE_CLIENT_X509_CERT_URL=your-client-cert-url
-
-   # Cloudinary (for image uploads)
-   CLOUDINARY_CLOUD_NAME=your-cloud-name
-   CLOUDINARY_API_KEY=your-api-key
-   CLOUDINARY_API_SECRET=your-api-secret
-
-   # Stripe (for payments)
-   STRIPE_SECRET_KEY=sk_test_...
-
-   # Client Configuration (for CORS and Stripe redirects)
-   CLIENT_URL=https://your-deployed-client-domain.com
-   FRONTEND_URL=http://localhost:5173
-
-   # Rate Limiting
-   RATE_LIMIT_WINDOW_MS=900000
-   RATE_LIMIT_MAX_REQUESTS=100
-   ```
-
-   **Client (.env in `/client` directory):**
-
-   ```env
-   VITE_API_URL=http://localhost:3500
-   VITE_APP_MODE=development
-   VITE_HAS_BACKEND=true
-
-   # Firebase Client Config
-   VITE_FIREBASE_API_KEY=your-api-key
-   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-   VITE_FIREBASE_PROJECT_ID=your-project-id
-   VITE_FIREBASE_STORAGE_BUCKET=your-project.appspot.com
-   VITE_FIREBASE_MESSAGING_SENDER_ID=your-sender-id
-   VITE_FIREBASE_APP_ID=your-app-id
-   ```
-
-4. **Start the development servers**
-
-   ```bash
-   # Start backend server (from /server directory)
-   npm start
-
-   # Start frontend development server (from /client directory)
-   npm run dev
-   ```
-
-   - Backend runs on http://localhost:3500
-   - Frontend runs on http://localhost:5173
-
-### (test production mode)
-
-npm run build
-npm run preview -- --port 3000
-npx serve dist
+> 🚀 **Live URLs**: See deployment links at the top of this README

@@ -39,9 +39,9 @@ const Profile = () => {
                             Hello, {user?.displayName || "Guest"}!
                         </h2>
 
-                        <div className="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-16">
+                        <div className="flex flex-col md:flex-row justify-center items-center gap-x-10 gap-y-4">
                             {/* Total Posts */}
-                            <div>
+                            <div className="min-w-[100px] text-center">
                                 <div className="text-gray-500 text-sm">
                                     Total posts
                                 </div>
@@ -63,7 +63,7 @@ const Profile = () => {
                             </div>
 
                             {/* Total Want to Go */}
-                            <div>
+                            <div className="min-w-[100px] text-center">
                                 <div className="text-gray-500 text-sm">
                                     Total want to go
                                 </div>

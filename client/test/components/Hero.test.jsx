@@ -18,8 +18,8 @@ describe('Hero Component', () => {
     const heroDiv = document.querySelector('.hero')
     expect(heroDiv).toBeInTheDocument()
 
-    const img = screen.getByAltText('Hero background')
-    expect(img).toHaveAttribute('src', 'test-image.jpg')
+    // Check that the background-image style is applied (Hero uses CSS background, not img element)
+    expect(heroDiv).toHaveStyle('background-image: url("test-image.jpg")')
   })
 
   it('renders with custom content', () => {

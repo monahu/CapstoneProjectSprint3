@@ -61,21 +61,49 @@ test.describe('Sidebar Authentication States', () => {
       expect(isVisibleOnMobile).toBeFalsy();
     }
     
-    // Look for mobile menu button
-    const menuButton = page.locator('button').filter({ hasText: /menu|☰/ }).first();
-    if (await menuButton.count() === 0) {
-      // Try other common mobile menu selectors
-      const altMenuButton = page.locator('button[aria-label*="menu"], .hamburger, [data-testid*="menu"]').first();
-      if (await altMenuButton.count() > 0) {
-        await altMenuButton.click();
-        await page.waitForTimeout(500);
-        
-        // Check for dialog
-        const dialog = page.locator('[role="dialog"]');
-        if (await dialog.count() > 0) {
-          await expect(dialog).toBeVisible();
-        }
+    // Look for the specific mobile menu button with aria-label
+    const menuButton = page.locator('button[aria-label="Open sidebar menu"]');
+    
+    // Check if the mobile menu button exists and is visible
+    if (await menuButton.count() > 0) {
+      await expect(menuButton).toBeVisible();
+      
+      // Click the mobile menu button
+      await menuButton.click();
+      
+      // Wait for dialog animation to complete
+      await page.waitForTimeout(800);
+      
+      // Check for dialog backdrop (which should be visible)
+      const dialogBackdrop = page.locator('.fixed.inset-0.bg-gray-900\\/80');
+      await expect(dialogBackdrop).toBeVisible();
+      
+      // Check for dialog panel (the actual sidebar content)
+      const dialogPanel = page.locator('[role="dialog"] .max-w-xs');
+      await expect(dialogPanel).toBeVisible();
+      
+      // Verify dialog has proper accessibility attributes
+      const dialog = page.locator('[role="dialog"]');
+      await expect(dialog).toHaveAttribute('aria-modal', 'true');
+      
+      // Test closing the dialog - try close button first, then backdrop
+      const closeButton = page.locator('[role="dialog"] button').filter({ hasText: /close|×|✕/ }).first();
+      
+      if (await closeButton.count() > 0) {
+        // Use the close button if available
+        await closeButton.click();
+      } else {
+        // Click on the right edge of the viewport (outside the panel)
+        await page.mouse.click(370, 100); // Far right edge on 375px viewport
       }
+      
+      await page.waitForTimeout(500);
+      
+      // Dialog should be closed/hidden
+      await expect(dialogBackdrop).toBeHidden();
+    } else {
+      // If no menu button found, skip this test
+      console.log('Mobile menu button not found, skipping dialog test');
     }
   });
 

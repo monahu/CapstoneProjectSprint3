@@ -1,37 +1,48 @@
-const {
-  requireAuthAndCurrentUser,
-  buildUserDataFromInput,
-  upsertUser,
-  buildUpdateData,
-} = require('./userHelpers')
-const { getUserProfile } = require('../utils/userService')
+const User = require('../models/User')
+const { syncUserToDatabase } = require('./userHelpers')
+const { getUserProfile } = require('../services/userService')
 
 const userResolvers = {
   Query: {
-    // *Users viewing their own profiles
-    me: async (_, __, { user, currentUser }) => {
-      requireAuthAndCurrentUser(user, currentUser)
+    me: async (parent, args, { currentUser }) => {
+      if (!currentUser) {
+        throw new Error('Authentication required')
+      }
+
       return await getUserProfile(currentUser)
     },
   },
 
   Mutation: {
-    syncUser: async (_, { input }, { user }) => {
-      const userData = buildUserDataFromInput(input, user)
-      return await upsertUser(userData, user)
+    syncUser: async (parent, { input }, { user }) => {
+      if (!user) {
+        // Just return error without logging
+        throw new Error('Authentication required')
+      }
+
+      try {
+        const firebaseUser = {
+          uid: user.uid,
+          email: input.email || user.email,
+        }
+
+        const syncedUser = await syncUserToDatabase(firebaseUser, input)
+        return syncedUser
+      } catch (error) {
+        throw new Error(`Sync failed: ${error.message}`)
+      }
     },
 
-    updateUserProfile: async (_, { input }, { user, currentUser }) => {
-      requireAuthAndCurrentUser(user, currentUser)
+    updateUserProfile: async (parent, { input }, { currentUser }) => {
+      if (!currentUser) {
+        throw new Error('Authentication required')
+      }
 
-      console.log('✏️ Updating user profile:', currentUser._id)
-      const updateData = buildUpdateData(input)
+      // Update user profile
+      const updatedUser = await User.findByIdAndUpdate(currentUser._id, input, {
+        new: true,
+      })
 
-      console.log('📦 Fields to update:', updateData)
-      Object.assign(currentUser, updateData)
-
-      const updatedUser = await currentUser.save()
-      console.log('✅ Profile updated successfully')
       return updatedUser
     },
   },

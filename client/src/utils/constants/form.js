@@ -48,10 +48,12 @@ export const FORM_CONFIG = {
 }
 
 export const FORM_PLACEHOLDERS = {
-  username: 'Username',
-  firstName: 'enter your first name...',
-  lastName: 'enter your last name...',
-  phone: 'xxx xxx xxxx',
+  username: 'e.g. john123, mary_doe',
+  firstName: 'e.g. John, Mary-Jane',
+  lastName: "e.g. Smith, O'Connor",
+  phone: '+1234567890 (optional)',
+  email: 'your.email@example.com',
+  password: 'Enter your password',
   confirmPassword: 'Confirm your password',
   search: 'Search',
 }

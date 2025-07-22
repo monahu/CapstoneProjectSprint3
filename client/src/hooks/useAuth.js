@@ -1,26 +1,24 @@
-import { useState } from "react"
-import { auth } from "../utils/firebase"
+import { useState } from 'react'
+import { auth } from '../utils/firebase'
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-} from "firebase/auth"
-import { useDispatch } from "react-redux"
-import { addUser } from "../utils/userSlice"
-import { useSyncUser } from "./useUser"
-import { AUTH_CONFIG } from "../utils/constants/auth"
+} from 'firebase/auth'
+
+import { useSyncUser } from './useUser'
+import { AUTH_CONFIG } from '../utils/constants/auth'
 
 /**
- * Custom hook for handling Firebase authentication
+ * Custom hook for handling Firebase authentication sign up and sign in
  * Manages user sign-up, sign-in, and error states
- * Also syncs user data with Redux store and GraphQL backend
- * @returns {signIn, signUp, errorMessage,} Auth methods and state
+ * Note: User syncing and Redux updates are handled by useAuthChange hook
+ * @returns {signIn, signUp, errorMessage} Auth methods and state
  */
 export const useAuth = () => {
   // Track authentication error messages
   const [errorMessage, setErrorMessage] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
-  const dispatch = useDispatch()
   // Hook for syncing user data with GraphQL backend
   const { syncUser } = useSyncUser()
 
@@ -47,39 +45,42 @@ export const useAuth = () => {
       await updateProfile(user, {
         displayName: userName,
         photoURL: `${AUTH_CONFIG.avatarBaseUrl}${Math.floor(Math.random() * AUTH_CONFIG.maxAvatarNumber) + 1}`,
-        email: email,
       })
 
+      // 3. Force refresh the current user to get updated profile
+      await auth.currentUser.reload()
+
+      // Sync complete user data with additional signup fields
       const { uid, displayName, photoURL } = auth.currentUser
-
-      // 3. Update Redux store with user data
-      dispatch(
-        addUser({
-          uid,
-          email,
-          displayName,
-          photoURL,
-          firstName,
-          lastName,
-          phone,
-        })
-      )
-
-      // 4. Sync user data with GraphQL backend
-      await syncUser({
-        variables: {
-          input: {
-            firebaseUid: uid,
-            email,
-            displayName,
-            photoURL,
-            firstName,
-            lastName,
-            phone,
+      try {
+        await syncUser({
+          variables: {
+            input: {
+              firebaseUid: uid,
+              email,
+              displayName,
+              photoURL,
+              firstName,
+              lastName,
+              phone,
+            },
           },
-        },
-      })
+        })
+      } catch (syncError) {
+        // If sync fails during signup, this is critical - the user exists in Firebase but not in our DB
+        console.error('Failed to sync user to database during signup:', syncError.message)
+        
+        // Clean up the Firebase user since we couldn't sync to database
+        try {
+          await auth.currentUser.delete()
+        } catch (deleteError) {
+          console.error('Failed to clean up Firebase user after sync failure:', deleteError.message)
+        }
+        
+        throw new Error('Account creation failed. Please try again.')
+      }
 
+      // Note: Redux store updates are handled by useAuthChange hook
       setErrorMessage(null)
       return user
     } catch (error) {
@@ -106,6 +107,7 @@ export const useAuth = () => {
         password
       )
       const user = userCredential.user
+
       setErrorMessage(null)
       return user
     } catch (error) {
@@ -120,5 +122,6 @@ export const useAuth = () => {
     signIn,
     signUp,
     errorMessage,
+    isLoading,
   }
 }

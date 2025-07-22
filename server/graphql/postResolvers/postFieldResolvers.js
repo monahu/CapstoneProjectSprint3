@@ -1,13 +1,14 @@
-const User = require('../../models/User')
-const Rating = require('../../models/Rating')
-const WantToGo = require('../../models/WantToGo')
-const Like = require('../../models/Likes')
-const PostsTags = require('../../models/PostsTags')
-const Tag = require('../../models/Tags')
 const {
-  DEFAULT_USER_DISPLAY_NAME,
-  DEFAULT_USER_PHOTO_URL,
-} = require('../../utils/constant')
+  getPostAuthor,
+  getPostRating,
+  getPostAttendees,
+  getPostAttendeeCount,
+  checkUserWantToGo,
+  getPostLikeCount,
+  checkUserLiked,
+  getPostTags,
+  checkPostOwner,
+} = require('../../services/postFieldService')
 
 /**
  * Post Field Resolvers
@@ -19,84 +20,14 @@ const postFieldResolvers = {
    * Resolve the author of a post
    */
   author: async (parent) => {
-    try {
-      console.log('🔍 Author resolver - Post userId:', parent.userId)
-
-      // Get the user ID (handle both ObjectId and populated object)
-      let userId
-      if (parent.userId._id) {
-        userId = parent.userId._id
-      } else if (parent.userId) {
-        userId = parent.userId
-      } else {
-        console.log('❌ No userId found in post')
-        return null
-      }
-
-      console.log('🔍 Looking up user with ID:', userId)
-
-      // Always fetch fresh user data from database
-      const freshUser = await User.findById(userId)
-      //debug  console.log('👤 Fresh user found:', freshUser ? 'Yes' : 'No')
-
-      if (freshUser) {
-        const result = {
-          id: freshUser._id.toString(),
-          displayName: freshUser.displayName || DEFAULT_USER_DISPLAY_NAME,
-          photoURL: freshUser.photoURL || DEFAULT_USER_PHOTO_URL,
-          firstName: freshUser.firstName || '',
-          lastName: freshUser.lastName || '',
-          email: freshUser.email || '',
-        }
-
-        return result
-      }
-
-      // Fallback to populated data if fresh lookup fails
-      if (parent.userId._id && parent.userId.displayName) {
-        const result = {
-          id: parent.userId._id.toString(),
-          displayName: parent.userId.displayName || DEFAULT_USER_DISPLAY_NAME,
-          photoURL: parent.userId.photoURL || DEFAULT_USER_PHOTO_URL,
-          firstName: parent.userId.firstName || '',
-          lastName: parent.userId.lastName || '',
-          email: parent.userId.email || '',
-        }
-        console.log('⚠️ Using fallback populated data:', result)
-        return result
-      }
-
-      // If all fails, return a default author
-      console.log('❌ User not found, returning default author')
-      return {
-        id: userId.toString(),
-        displayName: DEFAULT_USER_DISPLAY_NAME,
-        photoURL: DEFAULT_USER_PHOTO_URL,
-        firstName: '',
-        lastName: '',
-        email: '',
-      }
-    } catch (error) {
-      console.error('❌ Author resolver error:', error)
-      // Return a safe default to prevent null errors
-      return {
-        id: 'unknown',
-        displayName: DEFAULT_USER_DISPLAY_NAME,
-        photoURL: DEFAULT_USER_PHOTO_URL,
-        firstName: '',
-        lastName: '',
-        email: '',
-      }
-    }
+    return await getPostAuthor(parent)
   },
 
   /**
    * Resolve the rating details for a post
    */
   rating: async (parent) => {
-    const rating = await Rating.findById(parent.ratingId)
-
-    return rating
+    return await getPostRating(parent.ratingId)
   },
 
   /**
@@ -105,29 +36,14 @@ const postFieldResolvers = {
    */
   // attendees: async (parent, _, { user, currentUser }) => {
   attendees: async (parent) => {
-    /*     if (!user || !currentUser) {
-      console.log("❌ No authenticated/current user, returning empty array")
-      return []
-    } */
-
-    const records = await WantToGo.find({ postId: parent._id })
-
-    const userIds = records.map((r) => r.userId)
-    const attendees = await User.find({ _id: { $in: userIds } })
-
-    // Only return the fields defined in type - AttendeeInfo
-    return attendees.map((attendee) => ({
-      id: attendee._id.toString(),
-      displayName: attendee.displayName,
-      photoURL: attendee.photoURL,
-    }))
+    return await getPostAttendees(parent._id)
   },
 
   /**
    * Get the count of users who want to go to this post's location
    */
   attendeeCount: async (parent) => {
-    return await WantToGo.countDocuments({ postId: parent._id })
+    return await getPostAttendeeCount(parent._id)
   },
 
   /**
@@ -139,12 +55,7 @@ const postFieldResolvers = {
       return false
     }
 
-    const wantToGo = await WantToGo.findOne({
-      userId: currentUser._id,
-      postId: parent._id,
-    })
-
-    return !!wantToGo
+    return await checkUserWantToGo(currentUser._id, parent._id)
   },
 
   /**
@@ -173,7 +84,7 @@ const postFieldResolvers = {
    * Get the count of likes for this post
    */
   likeCount: async (parent) => {
-    return await Like.countDocuments({ postId: parent._id })
+    return await getPostLikeCount(parent._id)
   },
 
   /**
@@ -185,27 +96,14 @@ const postFieldResolvers = {
       return false
     }
 
-    const like = await Like.findOne({
-      userId: currentUser._id,
-      postId: parent._id,
-    })
-
-    return !!like
+    return await checkUserLiked(currentUser._id, parent._id)
   },
 
   /**
    * Get all tags associated with this post
    */
   tags: async (parent) => {
-    const records = await PostsTags.find({ postId: parent._id })
-
-    const tagIds = records.map((r) => r.tagId)
-    const tags = await Tag.find({ _id: { $in: tagIds } })
-
-    return tags.map((tag) => ({
-      id: tag._id.toString(),
-      name: tag.name,
-    }))
+    return await getPostTags(parent._id)
   },
 
   /**
@@ -214,54 +112,12 @@ const postFieldResolvers = {
    * Returns false for unauthenticated users
    */
   isOwner: async (parent, _, { user, currentUser }) => {
-    if (!user) {
+    if (!user || !currentUser) {
       return false
     }
 
-    if (!currentUser) {
-      return false
-    }
-
-    // Direct comparison using populated userId
-    if (!parent.userId || !parent.userId._id) {
-      return false
-    }
-
-    const postUserId = parent.userId._id.toString()
-    const currentUserId = currentUser._id.toString()
-
-    const isOwner = postUserId === currentUserId
-
-    return isOwner
+    return await checkPostOwner(parent, currentUser._id)
   },
 }
 
 module.exports = postFieldResolvers
-
-/*  
-  likes: async (parent, _, { user, currentUser }) => {
-    console.log("🔍 Likes resolver - Post ID:", parent._id)
-    console.log("👤 User context:", user ? "Present" : "Missing")
-
-    if (!user || !currentUser) {
-      console.log("❌ No user, returning empty array")
-      return []
-    }
-
-    const records = await Like.find({ postId: parent._id })
-    console.log("❤️ Like records found:", records.length)
-
-    const userIds = records.map((r) => r.userId)
-    const likers = await User.find({ _id: { $in: userIds } })
-    console.log("👥 Likers found:", likers.length)
-
-    return likers.map((liker) => ({
-      id: liker._id.toString(),
-      displayName: liker.displayName,
-      photoURL: liker.photoURL,
-      email: liker.email,
-      firstName: liker.firstName,
-      lastName: liker.lastName,
-      phone: liker.phone,
-    }))
-  } */

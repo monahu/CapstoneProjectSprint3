@@ -1,4 +1,4 @@
-const { encrypt, decrypt, createHash } = require('./encryption')
+const { encrypt, decrypt, createHash, isEncrypted } = require('./encryption')
 
 /**
  * Mongoose plugin for automatic field encryption
@@ -37,8 +37,8 @@ function encryptionPlugin(schema, options = {}) {
   schema.pre('save', function (next) {
     allEncryptedFields.forEach((field) => {
       if (this.isModified(field) && this[field]) {
-        // Only encrypt if not already encrypted (doesn't contain ':')
-        if (!this[field].includes(':')) {
+        // Only encrypt if not already encrypted
+        if (!isEncrypted(this[field])) {
           const originalValue = this[field]
           this[field] = encrypt(originalValue)
 
@@ -57,7 +57,7 @@ function encryptionPlugin(schema, options = {}) {
     const update = this.getUpdate()
 
     allEncryptedFields.forEach((field) => {
-      if (update[field] && !update[field].includes(':')) {
+      if (update[field] && !isEncrypted(update[field])) {
         const originalValue = update[field]
         update[field] = encrypt(originalValue)
 

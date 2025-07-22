@@ -7,7 +7,7 @@ import {
 } from '../utils/graphql/user'
 
 export const useUserProfile = () => {
-  const user = useSelector((state) => state.user)
+  const user = useSelector((state) => state.user.data)
 
   const { data, loading, error } = useQuery(GET_USER_PROFILE, {
     variables: { firebaseUid: user?.uid },

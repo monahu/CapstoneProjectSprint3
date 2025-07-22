@@ -7,6 +7,7 @@ import {
 import { useEffect, useState } from 'react';
 import { UI_TEXT } from '../../utils/constants/ui'
 import { FORM_CONFIG } from '../../utils/constants/form'
+import { getApiUrl } from '../../utils/config'
 
 const CreateForm = ({ onSubmit, isLoading }) => {
   const handleSubmit = async (values, { setSubmitting }) => {
@@ -23,12 +24,7 @@ const CreateForm = ({ onSubmit, isLoading }) => {
   const [ratings, setRatings] = useState([]);
   const [ratingsLoading, setRatingsLoading] = useState(true);
   useEffect(() => {
-    // Use absolute URL in development if window.location.hostname is not localhost
-    let url = '/api/ratings';
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-      url = 'http://localhost:3500/api/ratings';
-    }
-    fetch(url)
+    fetch(getApiUrl('/api/ratings'))
       .then(res => res.json())
       .then(data => {
         setRatings(data);

@@ -11,6 +11,7 @@ import {
   SEARCH_POSTS_BY_TAGS,
   GET_ALL_TAGS,
 } from '../utils/graphql/post'
+import { DEFAULT_POSTS_VARIABLES } from '../utils/constants/posts'
 
 export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
   const { data, loading, error, fetchMore, refetch } = useQuery(GET_ALL_POSTS, {
@@ -52,37 +53,65 @@ export const usePost = (id) => {
   }
 }
 
-export const useCreatePost = () => {
+export const useCreatePost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
   const [createPost, { loading, error }] = useMutation(CREATE_POST, {
     update(cache, { data: { createPost } }) {
-      const existingPosts = cache.readQuery({ query: GET_ALL_POSTS })
-      if (existingPosts) {
-        cache.writeQuery({
+      try {
+        // Update cache for the query used by Home component (with variables)
+        const existingPosts = cache.readQuery({
           query: GET_ALL_POSTS,
-          data: {
-            posts: [createPost, ...existingPosts.posts],
-          },
+          variables: cacheVariables,
         })
+        if (existingPosts) {
+          cache.writeQuery({
+            query: GET_ALL_POSTS,
+            variables: cacheVariables,
+            data: {
+              posts: [createPost, ...existingPosts.posts],
+            },
+          })
+        }
+      } catch {
+        // If cache read fails, just refetch instead
+        console.log('Cache update failed, will refetch posts')
       }
     },
+    // Also refetch to ensure consistency
+    refetchQueries: [
+      {
+        query: GET_ALL_POSTS,
+        variables: cacheVariables,
+      },
+    ],
+    awaitRefetchQueries: true,
   })
 
   return { createPost, loading, error }
 }
 
-export const useLikePost = () => {
+export const useLikePost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
   const [likePost, { loading, error }] = useMutation(TOGGLE_LIKE, {
     // Force refetch the posts to get fresh data from server
-    refetchQueries: [{ query: GET_ALL_POSTS }],
+    refetchQueries: [
+      {
+        query: GET_ALL_POSTS,
+        variables: cacheVariables,
+      },
+    ],
     awaitRefetchQueries: true,
   })
   return { likePost, loading, error }
 }
 
-export const useWantToGoPost = () => {
+export const useWantToGoPost = (cacheVariables = DEFAULT_POSTS_VARIABLES) => {
   const [wantToGoPost, { loading, error }] = useMutation(TOGGLE_WANT_TO_GO, {
     // Force refetch the posts to get fresh data from server
-    refetchQueries: [{ query: GET_ALL_POSTS }],
+    refetchQueries: [
+      {
+        query: GET_ALL_POSTS,
+        variables: cacheVariables,
+      },
+    ],
     awaitRefetchQueries: true,
   })
   return { wantToGoPost, loading, error }

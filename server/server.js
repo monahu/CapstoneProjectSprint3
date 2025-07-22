@@ -1,4 +1,16 @@
 require('dotenv').config()
+
+// Handle unhandled promise rejections and uncaught exceptions
+process.on('unhandledRejection', (err) => {
+  console.error('❌ Unhandled Promise Rejection:', err)
+  process.exit(1)
+})
+
+process.on('uncaughtException', (err) => {
+  console.error('❌ Uncaught Exception:', err)
+  process.exit(1)
+})
+
 const express = require('express')
 const mongoose = require('mongoose')
 const connectDB = require('./config/database')
@@ -33,9 +45,23 @@ const resolvers = merge(
 const app = express()
 
 // Apply basic middleware
-app.use(express.json())
+app.use(express.json({ limit: '10mb' }))
 app.use(cookieParser())
-app.use(cors())
+
+// CORS configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:5173',  // Vite dev server
+    'http://localhost:3000',  // Alternative dev port
+    'http://127.0.0.1:5173',  // Alternative localhost
+    process.env.CLIENT_URL || 'https://your-deployed-client-domain.com'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}
+
+app.use(cors(corsOptions))
 
 // Image upload route (Cloudinary)
 const imageUploadRoute = require('./routes/imageUpload')
@@ -57,6 +83,14 @@ const server = new ApolloServer({
 
 const stripeRoute = require('./routes/stripe')
 app.use('/api/payment', stripeRoute)
+
+// ! Global error handler - must be defined before server starts
+app.use((err, req, res, next) => {
+  console.error('❌ Error:', err.message)
+  res
+    .status(err.status || 500)
+    .json({ error: err.message || 'Internal Server Error' })
+})
 
 // Rate limiting for GraphQL endpoint
 const limiter = rateLimit({
@@ -116,10 +150,3 @@ async function startServer() {
 
 // Start the server
 startServer()
-
-app.use((err, req, res, next) => {
-  console.error('❌ Error:', err.message)
-  res
-    .status(err.status || 500)
-    .json({ error: err.message || 'Internal Server Error' })
-})

@@ -1,4 +1,6 @@
 export { useAuth } from './useAuth'
+export { useAuthChange } from './useAuthChange'
+export { AuthManager } from './AuthManager'
 export { useNavbar } from './useNavbar'
 export { usePost, useSearchPosts, useTags } from './usePost'
 export { usePostActions } from './usePostActions'

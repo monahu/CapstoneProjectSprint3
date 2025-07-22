@@ -1,19 +1,15 @@
 import { useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router'
-import { useSelector, useDispatch } from 'react-redux'
-import { onAuthStateChanged, signOut } from 'firebase/auth'
+import { useSelector } from 'react-redux'
+import { signOut } from 'firebase/auth'
 import { auth } from '../utils/firebase'
-import { addUser, removeUser } from '../utils/userSlice'
 import { ROUTES } from '../utils/constants/app'
 import { NAVIGATION } from '../utils/constants/navigation'
-import { useSyncUser } from './useUser'
 
 export const useNavbar = () => {
   const location = useLocation()
   const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const user = useSelector((store) => store.user)
-  const { syncUser } = useSyncUser()
+  const user = useSelector((store) => store.user.data)
 
   const handleSignOut = () => {
     signOut(auth)
@@ -37,78 +33,26 @@ export const useNavbar = () => {
   const hideLogoRoutes = NAVIGATION.hideLogoRoutes
   const protectedRoutes = NAVIGATION.protectedRoutes
 
-  // Authentication state management
+  // Navigation logic - runs when location or user changes
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        const {
-          uid,
-          email,
-          displayName,
-          photoURL,
-          firstName,
-          lastName,
-          phone,
-        } = user
-
-        // Update Redux store first
-        dispatch(
-          addUser({
-            uid,
-            email,
-            displayName,
-            photoURL,
-            firstName,
-            lastName,
-            phone,
-          })
-        )
-
-        // Silent sync to ensure database is up to date
-        // This ensures navbar and posts show same photo
-        try {
-          /* debug   console.log('🔄 Syncing user with:', {
-            firebaseUid: uid,
-            email,
-            displayName,
-            photoURL,
-          }) */
-          await syncUser({
-            variables: {
-              input: {
-                firebaseUid: uid,
-                email,
-                displayName,
-                photoURL,
-              },
-            },
-          })
-        } catch (error) {
-          // Silent fail - don't disrupt user experience
-          console.warn('User sync failed (non-critical):', error)
-        }
-
-        // Only redirect to home if user is on login page
-        if (location.pathname === ROUTES.LOGIN) {
-          navigate(ROUTES.HOME)
-        }
-      } else {
-        // no user logged in
-        dispatch(removeUser())
-        // Only redirect if they're trying to access protected routes
-        if (protectedRoutes.includes(location.pathname)) {
-          navigate(ROUTES.LOGIN)
-        }
+    if (user) {
+      // Only redirect to home if user is on login page
+      if (location.pathname === ROUTES.LOGIN) {
+        navigate(ROUTES.HOME)
       }
-    })
-    // Unsubscribe onAuthStateChanged when component unmount
-    return () => unsubscribe()
-  }, [location.pathname, navigate, dispatch, protectedRoutes, syncUser])
+    } else {
+      // Only redirect if they're trying to access protected routes
+      if (protectedRoutes.includes(location.pathname)) {
+        navigate(ROUTES.LOGIN)
+      }
+    }
+  }, [location.pathname, navigate, user, protectedRoutes]) // Separate effect for navigation
 
   return {
     user,
     userNavigation,
     hideLogoRoutes,
+    protectedRoutes,
     handleSignOut,
     location,
   }

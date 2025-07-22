@@ -1,5 +1,5 @@
 import { useSelector } from "react-redux";
-import { usePosts } from "../hooks/usePost"; // 🔄 Importa hook genérico
+import { usePosts } from "../hooks/usePost"; 
 import Hero from "./Hero";
 import RestaurantCard from "./Post/RestaurantCard";
 import heroImage from "../assets/img/resJam_post_1.webp";
@@ -8,9 +8,8 @@ import { useNavbar } from "../hooks/useNavbar";
 const Profile = () => {
     const { handleSignOut } = useNavbar();
     const user = useSelector((state) => state.user);
-    const { posts, loading } = usePosts(); // 🔄 Usa todos os posts
+    const { posts, loading } = usePosts(); 
 
-    // Filtra somente os posts do usuário logado (via userId)
     const userPosts =
         posts?.filter((post) => post?.author?.id === user?._id) || [];
 

@@ -14,7 +14,7 @@ import {
 import { DEFAULT_POSTS_VARIABLES } from '../utils/constants/posts'
 
 export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
-  const { data, loading, error, fetchMore, refetch } = useQuery(GET_ALL_POSTS, {
+  const { data, loading, error, fetchMore, refetch, networkStatus } = useQuery(GET_ALL_POSTS, {
     variables: { limit, offset, filter },
     notifyOnNetworkStatusChange: true,
     ...options,
@@ -33,16 +33,39 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
   const loadMore = () => {
     fetchMore({
       variables: {
-        offset: data?.posts?.length || 0,
+        offset: data?.posts?.posts?.length || 0,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return previousResult
+        
+        // Store the length of the new batch to determine if there are more posts
+        const newPosts = fetchMoreResult.posts?.posts || []
+        const updatedResult = {
+          ...previousResult,
+          posts: {
+            posts: [...previousResult.posts.posts, ...newPosts],
+            totalCount: fetchMoreResult.posts.totalCount
+          },
+          lastFetchCount: newPosts.length, // Track last fetch size
+        }
+        
+        return updatedResult
       },
     })
   }
 
   // Filter posts by authorId (uid) if provided
   const posts =
-    data?.posts?.filter((post) => {
+    data?.posts?.posts?.filter((post) => {
       return !filter.authorId || post.author?.id === filter.authorId
     }) || []
+  
+  const totalCount = data?.posts?.totalCount || 0
+
+  const isLoadingMore = networkStatus === 3 // NetworkStatus.fetchMore
+  // Check if we have loaded all posts by comparing current count with total
+  const hasMorePosts = posts.length < totalCount
+  const showLoadMoreButton = posts.length > 0
 
   return {
     posts, // Return filtered posts
@@ -50,6 +73,10 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
     error,
     loadMore,
     refetch,
+    isLoadingMore,
+    hasMorePosts,
+    showLoadMoreButton,
+    totalCount,
   }
 }
 

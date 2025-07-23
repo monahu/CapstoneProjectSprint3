@@ -70,7 +70,11 @@ const deletePost = async (postId) => {
 /**
  * Get all posts with pagination and filtering
  */
-const getPosts = async (limit = 10, offset = 0, filter = {}) => {
+const getPosts = async (limit = 10, offset = 0, filter = {}, countOnly = false) => {
+  if (countOnly) {
+    return await Post.countDocuments(filter)
+  }
+
   const safeLimit = Math.min(limit, 50) // Max 50 posts per request
 
   return await Post.find(filter)

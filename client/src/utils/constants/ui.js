@@ -24,6 +24,10 @@ export const UI_TEXT = {
     signOut: 'Sign out',
     profile: 'Your Profile',
     google: 'Google',
+    loading: 'Loading...',
+    loadMore: 'Load More Posts',
+    allLoaded: 'All Posts Loaded',
+    goToTop: 'Go to Top',
   },
   labels: {
     username: 'Username',

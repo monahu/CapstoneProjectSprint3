@@ -103,7 +103,7 @@ const Profile = () => {
                             </a>
                             <button
                                 onClick={handleSignOut}
-                                className="text-purple-600 font-medium underline flex items-center space-x-1"
+                                className="text-purple-600 cursor-pointer font-medium underline flex items-center space-x-1"
                             >
                                 <span>👤</span>
                                 <span>Logout</span>
@@ -188,7 +188,7 @@ const Profile = () => {
                                                     </td>
                                                     <td className="px-4 py-3 text-right space-x-2">
                                                         <button
-                                                            className="bg-gray-700 hover:bg-gray-800 text-white text-xs px-3 py-1 rounded-2xl"
+                                                            className="bg-gray-700 cursor-pointer hover:bg-gray-800 text-white text-xs px-3 py-1 rounded-2xl"
                                                             onClick={() =>
                                                                 navigate(
                                                                     `/edit/${post.id}`
@@ -198,7 +198,7 @@ const Profile = () => {
                                                             Edit
                                                         </button>
                                                         <button
-                                                            className="bg-purple-800 text-white hover:bg-purple-900 text-xs px-3 py-1 rounded-2xl"
+                                                            className="bg-purple-800 cursor-pointer text-white hover:bg-purple-900 text-xs px-3 py-1 rounded-2xl"
                                                             onClick={() =>
                                                                 navigate(
                                                                     `/post/${post.id}`
@@ -208,7 +208,7 @@ const Profile = () => {
                                                             Detail
                                                         </button>
                                                         <button
-                                                            className="bg-red-600 hover:bg-red-700 text-white text-xs px-3 py-1 rounded-2xl"
+                                                            className="bg-red-600 cursor-pointer hover:bg-red-700 text-white text-xs px-3 py-1 rounded-2xl"
                                                             onClick={() =>
                                                                 handleDelete(
                                                                     post.id
@@ -249,16 +249,16 @@ const Profile = () => {
 
                                 {posts.length > 0 && (
                                     <div className="mt-4 flex justify-center space-x-1">
-                                        <button className="px-3 py-1 rounded border border-gray-300 text-sm">
+                                        <button className="px-3 cursor-pointer py-1 rounded border border-gray-300 text-sm">
                                             1
                                         </button>
-                                        <button className="px-3 py-1 rounded border border-gray-300 text-sm">
+                                        <button className="px-3 cursor-pointer py-1 rounded border border-gray-300 text-sm">
                                             2
                                         </button>
-                                        <button className="px-3 py-1 rounded border border-gray-300 text-sm">
+                                        <button className="px-3 cursor-pointer py-1 rounded border border-gray-300 text-sm">
                                             3
                                         </button>
-                                        <button className="px-3 py-1 rounded border border-gray-300 text-sm">
+                                        <button className="px-3 cursor-pointer py-1 rounded border border-gray-300 text-sm">
                                             4
                                         </button>
                                     </div>

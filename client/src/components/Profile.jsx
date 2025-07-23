@@ -258,7 +258,7 @@ const Profile = () => {
                             </div>
                         )}
                     </section>
-
+                     {/* // ! TODO: Implement Going List Section */}
                     {/* Going List Section (placeholder) */}
                     <section className="mt-10">
                         <h3 className="text-lg font-semibold mb-4">

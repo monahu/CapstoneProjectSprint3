@@ -127,12 +127,12 @@ const Profile = () => {
                                 <table className="min-w-full text-sm text-left bg-white shadow-md rounded-xl overflow-hidden">
                                     <thead className="text-gray-700 uppercase bg-gray-100">
                                         <tr>
-                                            <th className="px-4 py-3 w-10">
+                                            {/*                                             <th className="px-4 py-3 w-10">
                                                 <input
                                                     type="checkbox"
                                                     className="form-checkbox bg-white appearance-none border rounded w-5 h-5 border-gray-300 checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition"
                                                 />
-                                            </th>
+                                            </th> */}
                                             <th className="px-4 py-3">ID</th>
                                             <th className="px-4 py-3">
                                                 Restaurant Recommendations
@@ -154,12 +154,12 @@ const Profile = () => {
                                                     key={post.id}
                                                     className="hover:bg-gray-50 border-b last:border-b-0"
                                                 >
-                                                    <td className="px-4 py-3">
+                                                    {/*                                                     <td className="px-4 py-3">
                                                         <input
                                                             type="checkbox"
                                                             className="form-checkbox bg-white appearance-none border rounded w-5 h-5 border-gray-300 checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition"
                                                         />
-                                                    </td>
+                                                    </td> */}
                                                     <td className="px-4 py-3 font-bold">
                                                         {index + 1}
                                                     </td>

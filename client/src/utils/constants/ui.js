@@ -105,4 +105,34 @@ export const UI_TEXT = {
       'Your contributions help us maintain and improve our platform. Every donation counts!',
     button: 'Donate Now',
   },
+  loading: {
+    posts: 'Loading delicious reviews...',
+    search: 'Searching for amazing places...',
+    profile: 'Loading your profile...',
+    detail: 'Loading post details...',
+    creating: 'Creating your review...',
+    updating: 'Updating your review...',
+    component: 'Loading page...',
+    tip: '💡 Pro tip: Use our filters to find exactly what you\'re craving!',
+    tips: [
+      '💡 Pro tip: Use our filters to find exactly what you\'re craving!',
+      '🍴 Did you know? You can save posts to visit later!',
+      '⭐ Rate restaurants to help others discover great places!',
+      '📍 Add location tags to help others find nearby spots!',
+      '📱 Our app works great on mobile devices too!'
+    ]
+  },
+  loadingTypes: {
+    COMPONENT: 'component',
+    DATA: 'data', 
+    SEARCH: 'search',
+    MINIMAL: 'minimal',
+    FULL: 'full'
+  },
+  defaults: {
+    userAvatar: 'https://img.daisyui.com/images/profile/demo/2@94.webp',
+    userName: 'Anonymous User',
+    authDelay: 100,
+    emptyStateActionText: 'Share Your Experience'
+  },
 }

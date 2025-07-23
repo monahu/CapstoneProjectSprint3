@@ -1,6 +1,63 @@
 @import "tailwindcss";
-@plugin "daisyui";
+
+@plugin "daisyui" {
+  themes: light --default;
+}
+
 @import 'prosemirror-view/style/prosemirror.css';
+
+/* Cross-browser CSS custom properties */
+:root {
+  --color-primary: #4338CA;
+  --color-primary-rgb: 67, 56, 202;
+  --color-primary-hover: #3730A3;
+  --color-primary-light: #6366F1;
+  --color-primary-dark: #312E81;
+}
+
+/* Cross-browser utility classes */
+.primary-color {
+  color: #4338CA;
+  /* Fallback */
+  color: var(--color-primary);
+  /* Modern browsers */
+}
+
+.primary-bg {
+  background-color: #4338CA;
+  /* Fallback */
+  background-color: var(--color-primary);
+  /* Modern browsers */
+}
+
+.primary-border {
+  border-color: #4338CA;
+  /* Fallback */
+  border-color: var(--color-primary);
+  /* Modern browsers */
+}
+
+.primary-hover:hover {
+  background-color: #3730A3;
+  /* Fallback */
+  background-color: var(--color-primary-hover);
+  /* Modern browsers */
+}
+
+/* CSS feature detection for older browsers */
+@supports not (color: var(--test)) {
+  .primary-color {
+    color: #4338CA !important;
+  }
+
+  .primary-bg {
+    background-color: #4338CA !important;
+  }
+
+  .primary-border {
+    border-color: #4338CA !important;
+  }
+}
 
 /* Critical LCP optimization for mobile hero background */
 @media (max-width: 768px) {

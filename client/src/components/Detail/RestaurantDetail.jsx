@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router'
 import { usePostActions } from '../../hooks/usePostActions'
 import LoadingState from '../LoadingState'
 import ErrorMessage from '../ErrorMessage'
+import { UI_TEXT } from '../../utils/constants/ui'
 import { PostImage, PostTags, PostActions } from '../Post'
 import PostMeta from './PostMeta'
 import PostHeader from './PostHeader'
@@ -26,7 +27,12 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
 
   // Loading state - use shared component
   if (loading) {
-    return <LoadingState skeletonCount={1} />
+    return (
+      <LoadingState
+        type={UI_TEXT.loadingTypes.MINIMAL}
+        skeletonCount={1}
+      />
+    )
   }
 
   // Error state - use shared component

@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import LoadingState from './LoadingState'
 import Browse from './Browse'
 import Home from './Home'
+import { UI_TEXT } from '../utils/constants/ui'
 
 // Lazy load heavy components
 const Login = lazy(() => import('./Login').then((m) => ({ default: m.Login })))
@@ -31,7 +32,7 @@ const Body = () => {
         {
           path: 'post/:id',
           element: (
-            <Suspense fallback={<LoadingState />}>
+            <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Detail />
             </Suspense>
           ),
@@ -39,7 +40,7 @@ const Body = () => {
         {
           path: 'create',
           element: (
-            <Suspense fallback={<LoadingState />}>
+            <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Create />
             </Suspense>
           ),
@@ -47,7 +48,7 @@ const Body = () => {
         {
           path: 'edit/:id',
           element: (
-            <Suspense fallback={<LoadingState />}>
+            <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Edit />
             </Suspense>
           ),
@@ -55,7 +56,7 @@ const Body = () => {
         {
           path: 'profile',
           element: (
-            <Suspense fallback={<LoadingState />}>
+            <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Profile />
             </Suspense>
           ),
@@ -63,7 +64,7 @@ const Body = () => {
         {
           path: 'donate',
           element: (
-            <Suspense fallback={<LoadingState />}>
+            <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Donate />
             </Suspense>
           ),
@@ -71,7 +72,7 @@ const Body = () => {
         {
           path: 'explore',
           element: (
-            <Suspense fallback={<LoadingState />}>
+            <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Explore />
             </Suspense>
           ),
@@ -81,7 +82,7 @@ const Body = () => {
     {
       path: '/login',
       element: (
-        <Suspense fallback={<LoadingState />}>
+        <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
           <Login />
         </Suspense>
       ),
@@ -89,7 +90,7 @@ const Body = () => {
     {
       path: '*', // Catch-all route for 404
       element: (
-        <Suspense fallback={<LoadingState />}>
+        <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
           <ErrorPage />
         </Suspense>
       ),

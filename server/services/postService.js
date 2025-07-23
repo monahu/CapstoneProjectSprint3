@@ -40,6 +40,10 @@ const updatePost = async (postId, input) => {
  * Delete a post and all associated data
  */
 const deletePost = async (postId) => {
+  // Get tag IDs associated with this post before deletion
+  const postTagRecords = await PostsTags.find({ postId: postId })
+  const tagIds = postTagRecords.map((record) => record.tagId)
+
   // Delete post and all associated records in parallel
   await Promise.all([
     Post.findByIdAndDelete(postId),
@@ -47,6 +51,19 @@ const deletePost = async (postId) => {
     Like.deleteMany({ postId: postId }),
     PostsTags.deleteMany({ postId: postId }),
   ])
+
+  // Clean up orphaned tags (tags no longer referenced by any posts)
+  if (tagIds.length > 0) {
+    for (const tagId of tagIds) {
+      const remainingReferences = await PostsTags.countDocuments({
+        tagId: tagId,
+      })
+      if (remainingReferences === 0) {
+        await Tag.findByIdAndDelete(tagId)
+      }
+    }
+  }
+
   return postId
 }
 
@@ -229,7 +246,13 @@ const searchPostsByTags = async (tags, limit = 10, offset = 0) => {
 /**
  * Advanced search posts by search term, tags, and location
  */
-const searchPosts = async (searchTerm, tags, location, limit = 10, offset = 0) => {
+const searchPosts = async (
+  searchTerm,
+  tags,
+  location,
+  limit = 10,
+  offset = 0
+) => {
   // If no search criteria provided, return empty array
   if (
     (!searchTerm || searchTerm.trim() === '') &&

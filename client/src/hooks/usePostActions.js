@@ -4,6 +4,7 @@ import { useMutation } from '@apollo/client'
 import { useNavigate } from 'react-router'
 import { TOGGLE_SHARE } from '../utils/graphql/post'
 import { useLikePost, useWantToGoPost } from './usePost'
+import { showSuccessToast, showErrorToast } from '../utils/toast'
 
 export const usePostActions = ({
   postId,
@@ -33,9 +34,10 @@ export const usePostActions = ({
 
     try {
       await toggleLike({ variables: { postId } })
+      // TODO: add a toast to the user that the post has been liked
     } catch (error) {
       console.error('Like error:', error.message)
-      alert(`Like failed: ${error.message}`)
+      showErrorToast(`Like failed: ${error.message}`)
     }
   }
 
@@ -47,9 +49,10 @@ export const usePostActions = ({
 
     try {
       await toggleWantToGo({ variables: { postId } })
+      // TODO: add a toast to the user that the post has been added to their want to go list
     } catch (error) {
       console.error('Want to go error:', error.message)
-      alert(`Want to go failed: ${error.message}`)
+      showErrorToast(`Want to go failed: ${error.message}`)
     }
   }
 
@@ -58,16 +61,37 @@ export const usePostActions = ({
       navigate('/login')
       return
     }
-
+    // TODO: change to an alert to the user that the link can be copied to the clipboard
     const postUrl = `${window.location.origin}/post/${postId}`
 
-    if (window.confirm(`Share this post?\n\n${postUrl}`)) {
-      try {
-        await toggleShare({ variables: { postId } })
-        setCurrentShareCount((prev) => prev + 1)
-      } catch (error) {
-        console.error('Share error:', error.message)
-        alert(`Share failed: ${error.message}`)
+    try {
+      // Copy URL to clipboard
+      await navigator.clipboard.writeText(postUrl)
+
+      // Update share count
+      await toggleShare({ variables: { postId } })
+      setCurrentShareCount((prev) => prev + 1)
+
+      // Show success feedback
+      showSuccessToast('🔗 Link copied to clipboard!')
+    } catch (clipboardError) {
+      // Fallback for browsers that don't support clipboard API
+      if (clipboardError.name === 'NotAllowedError' || !navigator.clipboard) {
+        // Fallback: show the URL in a prompt for manual copying
+        const copied = prompt('Copy this link to share:', postUrl)
+        if (copied !== null) {
+          try {
+            await toggleShare({ variables: { postId } })
+            setCurrentShareCount((prev) => prev + 1)
+            showSuccessToast('📋 Link shared!')
+          } catch (shareError) {
+            console.error('Share count update failed:', shareError.message)
+            showErrorToast('Failed to update share count')
+          }
+        }
+      } else {
+        console.error('Clipboard copy failed:', clipboardError.message)
+        showErrorToast('Failed to copy link to clipboard')
       }
     }
   }

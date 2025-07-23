@@ -7,9 +7,9 @@ import LoadingState from './LoadingState'
 import ErrorMessage from './ErrorMessage'
 import EmptyState from './EmptyState'
 import RestaurantCard from './Post/RestaurantCard'
-import { PostCardSkeleton, ImageSkeleton } from './Skeleton'
+import { PostCardSkeleton } from './Skeleton'
 import { UI_TEXT } from '../utils/constants/ui'
-import { usePosts } from '../hooks/usePost'
+import { useProgressivePosts } from '../hooks/usePost'
 import heroImage from '../assets/img/restJam_hero1.webp'
 import { POST_QUERY_CONFIG } from '../utils/constants/posts'
 
@@ -19,40 +19,98 @@ const Home = () => {
   const authInitialized = useSelector((state) => state.user.authInitialized)
   const previousUserRef = useRef(user)
 
-  // Always fetch posts, but refetch when auth changes
-  const { posts, loading, error, refetch } = usePosts(
+  const {
+    posts,
+    firstPost,
+    remainingPosts,
+    loading,
+    remainingLoading,
+    error,
+    hasFirstPost,
+    refetch,
+  } = useProgressivePosts(
     POST_QUERY_CONFIG.DEFAULT_LIMIT,
-    POST_QUERY_CONFIG.DEFAULT_OFFSET
+    POST_QUERY_CONFIG.DEFAULT_FILTER
   )
 
-  // hero button link to login or share post
   const handleNavigateToLogin = () => {
     navigate(user ? UI_TEXT.hero.buttonLinkLoggedIn : UI_TEXT.hero.buttonLink)
   }
 
-  // Refetch posts when user auth state changes (login/logout)
+  const getPostProps = (post, isPriority = false) => ({
+    key: post.id,
+    id: post.id,
+    image: post.imageUrls?.desktop || post.imageUrl,
+    user: {
+      name: post.author?.displayName || UI_TEXT.defaults.userName,
+      avatar: post.author?.photoURL || UI_TEXT.defaults.userAvatar
+    },
+    location: post.location,
+    title: post.title,
+    placeName: post.placeName,
+    description: post.content,
+    date: new Date(post.createdAt).toLocaleDateString(),
+    tags: post.tags?.map((tag) => tag.name) || [],
+    rating: post.rating?.type,
+    likeCount: post.likeCount,
+    shareCount: post.shareCount || 0,
+    wantToGoCount: post.attendeeCount,
+    isWantToGo: post.isWantToGo,
+    isLiked: post.isLiked,
+    className: 'mt-10 max-w-full md:max-w-5xl lg:max-w-4xl',
+    priority: isPriority
+  })
+
   useEffect(() => {
     if (authInitialized && previousUserRef.current !== user && refetch) {
-      // Add a small delay to ensure auth token is ready
       setTimeout(() => {
-        refetch({
-          fetchPolicy: 'network-only',
-        })
-      }, 100)
+        refetch({ fetchPolicy: 'network-only' })
+      }, UI_TEXT.defaults.authDelay)
       previousUserRef.current = user
     }
   }, [user, authInitialized, refetch])
 
-  // ===========================
-  // RENDER LOGIC
-  // ===========================
+  const renderPostsContent = () => {
+    if (loading) {
+      return <LoadingState type={UI_TEXT.loadingTypes.FULL} />
+    }
 
-  // Loading state
-  if (loading) {
-    return <LoadingState />
+    if (error) {
+      return <ErrorMessage error={error} onRetry={() => refetch()} />
+    }
+    
+    if (!posts || posts.length === 0) {
+      return (
+        <EmptyState
+          onAction={handleNavigateToLogin}
+          actionText={UI_TEXT.defaults.emptyStateActionText}
+        />
+      )
+    }
+
+    return (
+      <>
+        {firstPost && (() => {
+          const { key, ...restProps } = getPostProps(firstPost, true)
+          return <RestaurantCard key={key} {...restProps} />
+        })()}
+        
+        {hasFirstPost && remainingLoading && (
+          <div className='mt-10 max-w-full md:max-w-5xl lg:max-w-4xl mx-auto'>
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+            <PostCardSkeleton />
+          </div>
+        )}
+        
+        {remainingPosts.map((post) => {
+          const { key, ...restProps } = getPostProps(post)
+          return <RestaurantCard key={key} {...restProps} />
+        })}
+      </>
+    )
   }
 
-  // Main layout with Hero
   return (
     <div className='min-h-screen'>
       <Hero
@@ -60,47 +118,7 @@ const Home = () => {
         buttonText={user ? UI_TEXT.hero.buttonLoggedIn : UI_TEXT.hero.button}
         onButtonClick={handleNavigateToLogin}
       />
-      {/* Content based on state */}
-      {error && (
-        <ErrorMessage
-          error={error}
-          onRetry={() => refetch()}
-        />
-      )}
-      {!error && (!posts || posts.length === 0) && (
-        <EmptyState
-          onAction={handleNavigateToLogin}
-          actionText='Share Your Experience'
-        />
-      )}
-      {/* Posts List */}
-      {posts.map((post, index) => (
-        <RestaurantCard
-          key={post.id}
-          id={post.id}
-          image={post.imageUrls?.desktop || post.imageUrl}
-          user={{
-            name: post.author?.displayName || 'Anonymous User',
-            avatar:
-              post.author?.photoURL ||
-              'https://img.daisyui.com/images/profile/demo/2@94.webp',
-          }}
-          location={post.location}
-          title={post.title}
-          placeName={post.placeName}
-          description={post.content}
-          date={new Date(post.createdAt).toLocaleDateString()}
-          tags={post.tags?.map((tag) => tag.name) || []}
-          rating={post.rating?.type}
-          likeCount={post.likeCount}
-          shareCount={post.shareCount || 0}
-          wantToGoCount={post.attendeeCount}
-          isWantToGo={post.isWantToGo}
-          isLiked={post.isLiked}
-          className='mt-10 max-w-full md:max-w-5/6 lg:max-w-3/4'
-          priority={index === 0}
-        />
-      ))}
+      {renderPostsContent()}
     </div>
   )
 }

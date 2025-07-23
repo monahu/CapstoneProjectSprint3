@@ -90,7 +90,10 @@ const Home = () => {
 
     return (
       <>
-        {firstPost && <RestaurantCard {...getPostProps(firstPost, true)} />}
+        {firstPost && (() => {
+          const { key, ...restProps } = getPostProps(firstPost, true)
+          return <RestaurantCard key={key} {...restProps} />
+        })()}
         
         {hasFirstPost && remainingLoading && (
           <div className='mt-10 max-w-full md:max-w-5xl lg:max-w-4xl mx-auto'>
@@ -100,9 +103,10 @@ const Home = () => {
           </div>
         )}
         
-        {remainingPosts.map((post) => (
-          <RestaurantCard {...getPostProps(post)} />
-        ))}
+        {remainingPosts.map((post) => {
+          const { key, ...restProps } = getPostProps(post)
+          return <RestaurantCard key={key} {...restProps} />
+        })}
       </>
     )
   }

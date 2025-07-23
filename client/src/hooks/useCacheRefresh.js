@@ -1,86 +1,56 @@
 import { useApolloClient } from '@apollo/client'
 import { GET_ALL_POSTS } from '../utils/graphql/post'
-import { DEFAULT_POSTS_VARIABLES } from '../utils/constants/posts'
 
 /**
- * Custom hook for managing Apollo cache refreshes
- * Provides reusable functions for refreshing post-related queries
+ * Simple cache refresh hook - just refetches all posts queries
  */
 export const useCacheRefresh = () => {
   const client = useApolloClient()
 
   /**
-   * Refresh the main posts query used by Home component
-   * @param {Object} variables - Optional custom variables, defaults to HOME component variables
+   * Refresh all posts queries - aggressive approach to ensure cache invalidation
    */
-  const refreshPosts = async (variables = DEFAULT_POSTS_VARIABLES) => {
+  const refreshPosts = async () => {
     try {
+      // Method 1: Refetch all GET_ALL_POSTS queries
       await client.refetchQueries({
-        include: [
-          {
-            query: GET_ALL_POSTS,
-            variables,
-          },
-        ],
+        include: [GET_ALL_POSTS],
+        optimistic: false
       })
+      
+      // Method 2: Also evict posts cache entries to be extra sure
+      client.cache.evict({ fieldName: 'posts' })
+      client.cache.gc()
+      
     } catch (error) {
-      console.warn('Cache refresh failed:', error.message)
+      console.error('Cache refresh failed:', error.message)
+      throw error
     }
   }
 
   /**
-   * Update cache for create/update operations
-   * @param {Object} newPost - The new post data to add to cache
-   * @param {Object} variables - Query variables to target
+   * Nuclear option - reset entire cache (use if regular refresh fails)
    */
-  const updatePostsCache = (newPost, variables = DEFAULT_POSTS_VARIABLES) => {
+  const resetCache = async () => {
     try {
-      const existingPosts = client.readQuery({
-        query: GET_ALL_POSTS,
-        variables,
-      })
-
-      if (existingPosts) {
-        client.writeQuery({
-          query: GET_ALL_POSTS,
-          variables,
-          data: {
-            posts: [newPost, ...existingPosts.posts],
-          },
-        })
-      }
+      console.log('💥 Resetting entire Apollo cache...')
+      await client.resetStore()
+      console.log('✅ Cache reset complete')
     } catch (error) {
-      console.warn('Cache update failed, will refetch instead:', error.message)
-      // Fallback to refresh if cache update fails
-      refreshPosts(variables)
+      console.error('❌ Cache reset failed:', error.message)
     }
   }
 
   /**
-   * Remove post from cache
-   * @param {string} postId - ID of post to remove
-   * @param {Object} variables - Query variables to target
+   * Simple cache invalidation - just refresh everything
    */
-  const removePostFromCache = (postId, variables = DEFAULT_POSTS_VARIABLES) => {
-    try {
-      client.cache.modify({
-        fields: {
-          posts(existingPosts = [], { readField }) {
-            return existingPosts.filter(
-              (postRef) => postId !== readField('id', postRef)
-            )
-          },
-        },
-      })
-    } catch (error) {
-      console.warn('Cache removal failed, will refetch instead:', error.message)
-      refreshPosts(variables)
-    }
+  const invalidateCache = () => {
+    refreshPosts()
   }
 
   return {
     refreshPosts,
-    updatePostsCache,
-    removePostFromCache,
+    resetCache,
+    invalidateCache,
   }
 }

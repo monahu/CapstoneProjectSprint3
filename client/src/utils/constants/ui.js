@@ -105,6 +105,14 @@ export const UI_TEXT = {
       'Your contributions help us maintain and improve our platform. Every donation counts!',
     button: 'Donate Now',
   },
+  loading: {
+    posts: 'Loading delicious reviews...',
+    search: 'Searching for amazing places...',
+    profile: 'Loading your profile...',
+    creating: 'Creating your review...',
+    updating: 'Updating your review...',
+    tip: "💡 Pro tip: Use our filters to find exactly what you're craving!",
+  },
   defaults: {
     userAvatar: 'https://img.daisyui.com/images/profile/demo/2@94.webp',
     userName: 'Anonymous User',

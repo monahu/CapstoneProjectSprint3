@@ -105,4 +105,10 @@ export const UI_TEXT = {
       'Your contributions help us maintain and improve our platform. Every donation counts!',
     button: 'Donate Now',
   },
+  defaults: {
+    userAvatar: 'https://img.daisyui.com/images/profile/demo/2@94.webp',
+    userName: 'Anonymous User',
+    authDelay: 100,
+    emptyStateActionText: 'Share Your Experience',
+  },
 }

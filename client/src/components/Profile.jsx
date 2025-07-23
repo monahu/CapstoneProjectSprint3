@@ -93,14 +93,6 @@ const Profile = () => {
 
                         {/* Links */}
                         <div className="mt-6 flex flex-col items-center space-y-2">
-                            <a
-                                href="/profile"
-                                className="text-purple-600 font-medium underline flex items-center space-x-1"
-                            >
-                                <span>💜</span>
-                                <span>Check your profile</span>
-                                <span>💜</span>
-                            </a>
                             <button
                                 onClick={handleSignOut}
                                 className="text-purple-600 cursor-pointer font-medium underline flex items-center space-x-1"

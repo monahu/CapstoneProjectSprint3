@@ -14,7 +14,13 @@ const Detail = () => {
 
   // Loading state
   if (loading) {
-    return <LoadingState skeletonCount={1} />
+    return (
+      <LoadingState
+        type={UI_TEXT.loadingTypes.DATA}
+        skeletonCount={1}
+        message={UI_TEXT.loading.detail}
+      />
+    )
   }
 
   // Error state

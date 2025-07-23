@@ -1,18 +1,53 @@
-import { PostCardSkeleton, ImageSkeleton } from './Skeleton'
+import { UI_TEXT } from '../utils/constants/ui'
+import { getLoadingConfig } from '../utils/loadingConfig'
+import { LoadingHeader, SkeletonCards, LoadingTips } from './LoadingComponents'
 
 /*
  * LoadingState.jsx
- * This component displays a loading state with a specified number of skeleton cards.
- * It's used to show a loading state while the posts are being fetched.
+ * Clean, configurable loading component with different types:
+ * COMPONENT | DATA | SEARCH | MINIMAL | FULL
  */
-const LoadingState = ({ skeletonCount = 4 }) => {
+const LoadingState = ({
+  type = UI_TEXT.loadingTypes.DATA,
+  skeletonCount,
+  message,
+  showProgress,
+  className = '',
+}) => {
+  const config = getLoadingConfig(type, {
+    skeletonCount,
+    message,
+    showProgress,
+  })
+
+
+  // Minimal type - just skeleton cards
+  if (type === UI_TEXT.loadingTypes.MINIMAL) {
+    return (
+      <SkeletonCards
+        count={config.skeletonCount}
+        className={className}
+      />
+    )
+  }
+
   return (
-    <div className='min-h-screen'>
-      <ImageSkeleton />
-      <div className='container mx-auto px-4 py-8 space-y-6'>
-        {Array.from({ length: skeletonCount }).map((_, index) => (
-          <PostCardSkeleton key={index} />
-        ))}
+    <div className={config.containerClass}>
+      <div className='container mx-auto px-4'>
+        {config.showHeader && config.message && (
+          <LoadingHeader
+            message={config.message}
+            showProgress={config.showProgress}
+            showFullMessage={type === UI_TEXT.loadingTypes.FULL}
+          />
+        )}
+
+        <SkeletonCards
+          count={config.skeletonCount}
+          className={className}
+        />
+
+        {config.showTips && <LoadingTips />}
       </div>
     </div>
   )

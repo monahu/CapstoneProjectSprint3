@@ -38,7 +38,10 @@ const ExploreResults = ({
             {UI_TEXT.explore.searchingText} "
             {searchTerm || tags.join(', ') || location}"...
           </div>
-          <LoadingState skeletonCount={4} />
+          <LoadingState
+            type={UI_TEXT.loadingTypes.SEARCH}
+            skeletonCount={4}
+          />
         </>
       )}
 

@@ -1,17 +1,12 @@
 import React from 'react'
 import EditForm from './EditForm'
-import { useParams, useNavigate } from 'react-router-dom'
-import { useCacheRefresh } from '../../hooks/useCacheRefresh'
+import { useParams } from 'react-router-dom'
 
 const Edit = () => {
   const { id: postId } = useParams()
-  const navigate = useNavigate()
-  const { refreshPosts } = useCacheRefresh()
 
   const handleSuccess = async () => {
-    // Refetch posts to update cache after REST API edit
-    await refreshPosts()
-    navigate('/')
+    window.location.href = '/'
   }
 
   return (

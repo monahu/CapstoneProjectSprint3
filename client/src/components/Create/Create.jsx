@@ -5,13 +5,11 @@ import Hero from '../Hero'
 import { PostCardSkeleton, ImageSkeleton } from '../Skeleton'
 import { UI_TEXT } from '../../utils/constants/ui'
 import CreateForm from './CreateForm'
-import { useCacheRefresh } from '../../hooks/useCacheRefresh'
 import { getApiUrl } from '../../utils/config'
 
 const Create = () => {
   const { id } = useParams()
   const navigate = useNavigate()
-  const { refreshPosts } = useCacheRefresh()
 
   const { post, loading, error } = usePost(id)
   const { createPost, loading: creating, error: createError } = useCreatePost()
@@ -135,12 +133,9 @@ const Create = () => {
                 })
                 const data = await res.json()
                 if (data.success) {
-                  // Refresh posts cache to show new post on home page
-                  await refreshPosts()
-
                   if (formikHelpers && formikHelpers.resetForm)
                     formikHelpers.resetForm()
-                  navigate('/')
+                  window.location.href = '/'
                 } else {
                   throw new Error(data.error || 'Failed to create post')
                 }

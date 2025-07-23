@@ -30,6 +30,7 @@ const Profile = () => {
       await deletePost(postId)
       alert('Post deleted successfully!')
       refetch({ fetchPolicy: 'network-only' })
+      window.location.href = '/profile'
     } catch (error) {
       console.error('Delete failed:', error)
       alert('Failed to delete the post.')

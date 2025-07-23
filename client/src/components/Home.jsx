@@ -7,11 +7,10 @@ import LoadingState from './LoadingState'
 import ErrorMessage from './ErrorMessage'
 import EmptyState from './EmptyState'
 import RestaurantCard from './Post/RestaurantCard'
-import { PostCardSkeleton } from './Skeleton'
 import { UI_TEXT } from '../utils/constants/ui'
-import { useProgressivePosts } from '../hooks/usePost'
-import heroImage from '../assets/img/restJam_hero1.webp'
+import { usePosts } from '../hooks/usePost'
 import { POST_QUERY_CONFIG } from '../utils/constants/posts'
+import heroImage from '../assets/img/restJam_hero1.webp'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -21,45 +20,19 @@ const Home = () => {
 
   const {
     posts,
-    firstPost,
-    remainingPosts,
     loading,
-    remainingLoading,
     error,
-    hasFirstPost,
+    loadMore,
     refetch,
-  } = useProgressivePosts(
+    isLoadingMore,
+    hasMorePosts,
+    showLoadMoreButton,
+    totalCount,
+  } = usePosts(
     POST_QUERY_CONFIG.DEFAULT_LIMIT,
+    POST_QUERY_CONFIG.DEFAULT_OFFSET,
     POST_QUERY_CONFIG.DEFAULT_FILTER
   )
-
-  const handleNavigateToLogin = () => {
-    navigate(user ? UI_TEXT.hero.buttonLinkLoggedIn : UI_TEXT.hero.buttonLink)
-  }
-
-  const getPostProps = (post, isPriority = false) => ({
-    key: post.id,
-    id: post.id,
-    image: post.imageUrls?.desktop || post.imageUrl,
-    user: {
-      name: post.author?.displayName || UI_TEXT.defaults.userName,
-      avatar: post.author?.photoURL || UI_TEXT.defaults.userAvatar
-    },
-    location: post.location,
-    title: post.title,
-    placeName: post.placeName,
-    description: post.content,
-    date: new Date(post.createdAt).toLocaleDateString(),
-    tags: post.tags?.map((tag) => tag.name) || [],
-    rating: post.rating?.type,
-    likeCount: post.likeCount,
-    shareCount: post.shareCount || 0,
-    wantToGoCount: post.attendeeCount,
-    isWantToGo: post.isWantToGo,
-    isLiked: post.isLiked,
-    className: 'mt-10 max-w-full md:max-w-5xl lg:max-w-4xl',
-    priority: isPriority
-  })
 
   useEffect(() => {
     if (authInitialized && previousUserRef.current !== user && refetch) {
@@ -70,19 +43,46 @@ const Home = () => {
     }
   }, [user, authInitialized, refetch])
 
-  const renderPostsContent = () => {
+  const heroButtonText = user
+    ? UI_TEXT.hero.buttonLoggedIn
+    : UI_TEXT.hero.button
+  const heroButtonLink = user
+    ? UI_TEXT.hero.buttonLinkLoggedIn
+    : UI_TEXT.hero.buttonLink
+  const handleHeroClick = () => navigate(heroButtonLink)
+  const handleEmptyStateAction = () => navigate(heroButtonLink)
+
+  const loadMoreButtonText = isLoadingMore
+    ? UI_TEXT.buttons.loading
+    : hasMorePosts
+      ? UI_TEXT.buttons.loadMore
+      : UI_TEXT.buttons.allLoaded
+  const isLoadMoreDisabled = isLoadingMore || !hasMorePosts
+
+  const heroProps = {
+    heroImage,
+    buttonText: heroButtonText,
+    onButtonClick: handleHeroClick,
+  }
+
+  const renderContent = () => {
     if (loading) {
       return <LoadingState type={UI_TEXT.loadingTypes.FULL} />
     }
 
     if (error) {
-      return <ErrorMessage error={error} onRetry={() => refetch()} />
+      return (
+        <ErrorMessage
+          error={error}
+          onRetry={refetch}
+        />
+      )
     }
-    
-    if (!posts || posts.length === 0) {
+
+    if (!posts?.length) {
       return (
         <EmptyState
-          onAction={handleNavigateToLogin}
+          onAction={handleEmptyStateAction}
           actionText={UI_TEXT.defaults.emptyStateActionText}
         />
       )
@@ -90,35 +90,55 @@ const Home = () => {
 
     return (
       <>
-        {firstPost && (() => {
-          const { key, ...restProps } = getPostProps(firstPost, true)
-          return <RestaurantCard key={key} {...restProps} />
-        })()}
-        
-        {hasFirstPost && remainingLoading && (
-          <div className='mt-10 max-w-full md:max-w-5xl lg:max-w-4xl mx-auto'>
-            <PostCardSkeleton />
-            <PostCardSkeleton />
-            <PostCardSkeleton />
+        {posts.map((post, index) => (
+          <RestaurantCard
+            key={post.id}
+            id={post.id}
+            image={post.imageUrls?.desktop || post.imageUrl}
+            user={{
+              name: post.author?.displayName || UI_TEXT.defaults.userName,
+              avatar: post.author?.photoURL || UI_TEXT.defaults.userAvatar,
+            }}
+            location={post.location}
+            title={post.title}
+            placeName={post.placeName}
+            description={post.content}
+            date={new Date(post.createdAt).toLocaleDateString()}
+            tags={post.tags?.map((tag) => tag.name) || []}
+            rating={post.rating?.type}
+            likeCount={post.likeCount}
+            shareCount={post.shareCount || 0}
+            wantToGoCount={post.attendeeCount}
+            isWantToGo={post.isWantToGo}
+            isLiked={post.isLiked}
+            className='mt-10 max-w-full md:max-w-5xl lg:max-w-4xl'
+            priority={index === 0}
+          />
+        ))}
+
+        <div className='mt-10 flex flex-col items-center space-y-4'>
+          <div className='text-gray-600 text-sm'>
+            Showing {posts.length}/{totalCount}{' '}
+            {totalCount === 1 ? 'post' : 'posts'}
           </div>
-        )}
-        
-        {remainingPosts.map((post) => {
-          const { key, ...restProps } = getPostProps(post)
-          return <RestaurantCard key={key} {...restProps} />
-        })}
+          {showLoadMoreButton && (
+            <button
+              onClick={loadMore}
+              disabled={isLoadMoreDisabled}
+              className='px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {loadMoreButtonText}
+            </button>
+          )}
+        </div>
       </>
     )
   }
 
   return (
     <div className='min-h-screen'>
-      <Hero
-        heroImage={heroImage}
-        buttonText={user ? UI_TEXT.hero.buttonLoggedIn : UI_TEXT.hero.button}
-        onButtonClick={handleNavigateToLogin}
-      />
-      {renderPostsContent()}
+      <Hero {...heroProps} />
+      {renderContent()}
     </div>
   )
 }

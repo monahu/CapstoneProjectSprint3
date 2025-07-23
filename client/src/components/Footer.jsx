@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { SOCIAL_LINKS, NAVIGATION } from "../utils/constants/navigation";
 import { APP_CONFIG } from "../utils/constants/app";
+import { UI_TEXT } from "../utils/constants/ui";
 
 const navigation = {
     social: [
@@ -72,6 +73,13 @@ const donateItem = NAVIGATION.footer.find(
 );
 
 export default function Footer() {
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    };
+
     return (
         <footer className="bg-white">
             <div className="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">
@@ -93,7 +101,36 @@ export default function Footer() {
                 </nav>
                 <div className="mt-8 grid w-full grid-cols-1 gap-4 md:grid-cols-3 items-center">
 
-                    <div className="hidden md:block" />
+                    <div className="flex justify-center md:justify-start">
+                        <button
+                            onClick={scrollToTop}
+                            className="group relative inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:bg-gray-50 hover:text-orange-600 hover:border-orange-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-all duration-300 ease-in-out transform hover:-translate-y-1"
+                            aria-label={UI_TEXT.buttons.goToTop}
+                        >
+                            <div className="relative">
+                                <svg 
+                                    className="w-4 h-4 transition-transform duration-300 ease-in-out group-hover:-translate-y-0.5" 
+                                    fill="none" 
+                                    stroke="currentColor" 
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path 
+                                        strokeLinecap="round" 
+                                        strokeLinejoin="round" 
+                                        strokeWidth={2} 
+                                        d="M5 15l7-7 7 7" 
+                                    />
+                                </svg>
+                                <div className="absolute inset-0 bg-orange-400/20 rounded-full scale-0 group-hover:scale-110 transition-transform duration-300 ease-in-out" />
+                            </div>
+                            <span className="relative">
+                                {UI_TEXT.buttons.goToTop}
+                            </span>
+                            
+                            {/* Subtle shine effect */}
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 -translate-x-full group-hover:translate-x-full transition-all duration-700 ease-in-out rounded-lg" />
+                        </button>
+                    </div>
 
                     <div className="flex justify-center gap-x-6">
                         {navigation.social.map((item) => (

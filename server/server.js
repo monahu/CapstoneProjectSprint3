@@ -51,10 +51,11 @@ app.use(cookieParser())
 // CORS configuration
 const corsOptions = {
   origin: [
-    'http://localhost:5173',  // Vite dev server
-    'http://localhost:3000',  // Alternative dev port
-    'http://127.0.0.1:5173',  // Alternative localhost
-    process.env.CLIENT_URL || 'https://your-deployed-client-domain.com'
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:3000', // Alternative dev port
+    'http://127.0.0.1:5173', // Alternative localhost
+    process.env.CLIENT_URL || 'https://your-deployed-client-domain.com',
+    'https://studio.apollographql.com',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

@@ -10,7 +10,7 @@ export const postImage = {
 }
 
 export const POST_QUERY_CONFIG = {
-  DEFAULT_LIMIT: 10,
+  DEFAULT_LIMIT: 6,
   DEFAULT_OFFSET: 0,
   DEFAULT_FILTER: {},
 }

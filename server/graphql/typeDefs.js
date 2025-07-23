@@ -37,6 +37,11 @@ const typeDefs = `#graphql
     isOwner: Boolean
   }
 
+  type PostsResult {
+    posts: [Post]
+    totalCount: Int
+  }
+
     type ImageUrls {
     desktop: String
     mobile: String
@@ -135,7 +140,7 @@ const typeDefs = `#graphql
     me: User
     
     # Post queries
-    posts(limit: Int, offset: Int, filter: PostFilter): [Post]
+    posts(limit: Int, offset: Int, filter: PostFilter): PostsResult
     post(id: ID!): Post
     myPosts: [Post]
     searchPostsByTags(tags: [String!]!, limit: Int, offset: Int): [Post]

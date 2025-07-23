@@ -20,40 +20,43 @@ export const GET_ALL_TAGS = gql`
 export const GET_ALL_POSTS = gql`
   query GetAllPosts($limit: Int, $offset: Int, $filter: PostFilter) {
     posts(limit: $limit, offset: $offset, filter: $filter) {
-      id
-      title
-      placeName
-      content
-      location
-      imageUrls {
-        desktop
-        mobile
-        mobile2x
-        tablet
-      }
-      createdAt
-      shareCount
-      author {
+      posts {
         id
-        displayName
-        photoURL
+        title
+        placeName
+        content
+        location
+        imageUrls {
+          desktop
+          mobile
+          mobile2x
+          tablet
+        }
+        createdAt
+        shareCount
+        author {
+          id
+          displayName
+          photoURL
+        }
+        rating {
+          type
+        }
+        attendees {
+          id
+          displayName
+        }
+        attendeeCount
+        isWantToGo
+        likeCount
+        isLiked
+        tags {
+          id
+          name
+        }
+        isOwner
       }
-      rating {
-        type
-      }
-      attendees {
-        id
-        displayName
-      }
-      attendeeCount
-      isWantToGo
-      likeCount
-      isLiked
-      tags {
-        id
-        name
-      }
-      isOwner
+      totalCount
     }
   }
 `

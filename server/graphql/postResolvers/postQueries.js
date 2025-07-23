@@ -15,7 +15,12 @@ const postQueries = {
    * Get all posts with pagination and filtering
    */
   posts: async (_, { limit = 10, offset = 0, filter = {} }) => {
-    return await getPosts(limit, offset, filter)
+    const posts = await getPosts(limit, offset, filter)
+    const totalCount = await getPosts(null, null, filter, true) // Get total count
+    return {
+      posts,
+      totalCount
+    }
   },
 
   /**

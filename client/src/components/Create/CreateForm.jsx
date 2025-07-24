@@ -1,27 +1,15 @@
 import { Formik, Form } from 'formik'
-import { getValidationSchema } from '../../utils/validationSchema'
+import { createValidationSchema } from '../../utils/postValidationSchema'
 import {
   ImageUploadField,
   RichTextField,
 } from './FormFields'
 import { useEffect, useState } from 'react'
-import { UI_TEXT } from '../../utils/constants/ui'
-import { FORM_CONFIG } from '../../utils/constants/form'
 import { getApiUrl } from '../../utils/config'
 import FieldWithMic from '../Speech/FieldWithMic'
 import SpeechButton from '../Speech/SpeechButton'
 
-const CreateForm = ({ onSubmit, isLoading }) => {
-  const handleSubmit = async (values, { setSubmitting }) => {
-    try {
-      if (onSubmit) {
-        await onSubmit(values)
-      }
-    } finally {
-      setSubmitting(false)
-    }
-  }
-
+const CreateForm = ({ onSubmit, isLoading, serverError }) => {
   const [ratings, setRatings] = useState([])
   const [ratingsLoading, setRatingsLoading] = useState(true)
 
@@ -35,6 +23,20 @@ const CreateForm = ({ onSubmit, isLoading }) => {
       .catch(() => setRatingsLoading(false))
   }, [])
 
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+    try {
+      if (onSubmit) {
+        await onSubmit(values)
+      }
+    } catch (error) {
+      if (error.response?.data?.errors) {
+        setErrors(error.response.data.errors)
+      }
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
     <Formik
       initialValues={{
@@ -46,40 +48,53 @@ const CreateForm = ({ onSubmit, isLoading }) => {
         location: '',
         tags: '',
       }}
+      validationSchema={createValidationSchema}
       onSubmit={handleSubmit}
     >
-      {({ isSubmitting, values, setFieldValue }) => (
-        <Form className='space-y-6'>
+      {({ isSubmitting, values, setFieldValue, errors, touched }) => (
+        <Form className="space-y-6">
+          {/* Server-side error */}
+          {serverError && (
+            <div className="text-sm text-red-600 bg-red-100 border border-red-300 p-2 rounded">
+              {serverError}
+            </div>
+          )}
 
-          <FieldWithMic name="title" label="Review Title">
+          <FieldWithMic name="title" label="Review Title" required>
             <SpeechButton fieldName="title" setFieldValue={setFieldValue} />
           </FieldWithMic>
 
-          <FieldWithMic name="placeName" label="Place Name">
+          <FieldWithMic name="placeName" label="Place Name" required>
             <SpeechButton fieldName="placeName" setFieldValue={setFieldValue} />
           </FieldWithMic>
 
           <div>
-            <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">Rating</label>
+            <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">
+              Rating <span className="text-red-500">*</span>
+            </label>
             <select
               id="ratingId"
               name="ratingId"
-              className="block w-full rounded-md border-gray-300 px-3 py-2 mt-1"
+              className={`block w-full rounded-md border ${
+                touched.ratingId && errors.ratingId ? 'border-red-500' : 'border-gray-300'
+              } px-3 py-2 mt-1`}
               value={values.ratingId}
               onChange={e => setFieldValue('ratingId', e.target.value)}
-              required
               disabled={ratingsLoading}
             >
               <option value="">{ratingsLoading ? 'Loading...' : 'Select rating'}</option>
-              {Array.isArray(ratings) && ratings.map(rating => (
+              {ratings.map(rating => (
                 <option key={rating._id || rating.id} value={rating._id || rating.id}>
                   {rating.type}{rating.description ? ` - ${rating.description}` : ''}
                 </option>
               ))}
             </select>
+            {touched.ratingId && errors.ratingId && (
+              <div className="text-sm text-red-600 mt-1">{errors.ratingId}</div>
+            )}
           </div>
 
-          <FieldWithMic name="location" label="Location">
+          <FieldWithMic name="location" label="Location" required>
             <SpeechButton fieldName="location" setFieldValue={setFieldValue} />
           </FieldWithMic>
 

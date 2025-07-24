@@ -143,6 +143,7 @@ const typeDefs = `#graphql
     posts(limit: Int, offset: Int, filter: PostFilter): PostsResult
     post(id: ID!): Post
     myPosts: [Post]
+    myWantToGoPosts: [Post]
     searchPostsByTags(tags: [String!]!, limit: Int, offset: Int): [Post]
     searchPosts(searchTerm: String, tags: [String], location: String, limit: Int, offset: Int): [Post]
         

@@ -60,6 +60,26 @@ export const GET_ALL_POSTS = gql`
     }
   }
 `
+export const GET_MY_WANT_TO_GO_POSTS = gql`
+  query GetMyWantToGoPosts {
+    myWantToGoPosts {
+      id
+      title
+      location
+      imageUrls {
+        desktop
+        mobile
+      }
+      createdAt
+      author {
+        id
+        displayName
+        photoURL
+      }
+      isWantToGo
+    }
+  }
+`;
 
 export const GET_POST_BY_ID = gql`
   query GetPostById($id: ID!) {
@@ -119,6 +139,7 @@ export const GET_MY_POSTS = gql`
       placeName
       content
       location
+      isWantToGo
       imageUrls {
         desktop
         mobile

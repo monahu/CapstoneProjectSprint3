@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { useMyPosts } from "../hooks/useMyPosts";
 import Hero from "./Hero";
-import heroImage from "../assets/img/resJam_post_1.webp";
+import heroImage from "../assets/img/profile_hero1.webp";
 import { useNavbar } from "../hooks/useNavbar";
 import ErrorMessage from "./ErrorMessage";
 import { useNavigate } from "react-router-dom";

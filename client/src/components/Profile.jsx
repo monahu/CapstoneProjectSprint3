@@ -4,7 +4,6 @@ import Hero from "./Hero";
 import heroImage from "../assets/img/resJam_post_1.webp";
 import { useNavbar } from "../hooks/useNavbar";
 import ErrorMessage from "./ErrorMessage";
-import EmptyState from "./EmptyState";
 import { useNavigate } from "react-router-dom";
 import { useDeletePost } from "../hooks/useDeletePost";
 
@@ -41,9 +40,9 @@ const Profile = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
-            <div className="flex">
-                <main className="flex-1 px-4 sm:px-8 md:px-12">
+        <div className="min-h-screen bg-gray-50 p-4 sm:p-6 md:p-8">
+            <div className="flex flex-col">
+                <main className="flex-1">
                     {/* Header */}
                     <Hero
                         heroImage={heroImage}
@@ -55,17 +54,17 @@ const Profile = () => {
 
                     {/* Profile Stats */}
                     <div className="mt-6 mb-10 bg-white shadow-md rounded-xl p-6 text-center">
-                        <h2 className="text-2xl font-bold mb-6">
+                        <h2 className="text-xl md:text-2xl font-bold mb-6">
                             Hello, {user?.displayName || "Guest"}!
                         </h2>
 
-                        <div className="flex flex-col md:flex-row justify-center items-center gap-x-10 gap-y-4">
+                        <div className="flex flex-col md:flex-row justify-center items-center w-full text-center gap-6">
                             {/* Total Posts */}
-                            <div className="min-w-[100px] text-center">
+                            <div className="min-w-[100px]">
                                 <div className="text-gray-500 text-sm">
                                     Total posts
                                 </div>
-                                <div className="text-4xl font-bold">
+                                <div className="text-3xl md:text-4xl font-bold">
                                     {posts.length}
                                 </div>
                             </div>
@@ -83,11 +82,13 @@ const Profile = () => {
                             </div>
 
                             {/* Total Want to Go */}
-                            <div className="min-w-[100px] text-center">
+                            <div className="min-w-[100px]">
                                 <div className="text-gray-500 text-sm">
                                     Total want to go
                                 </div>
-                                <div className="text-4xl font-bold">6</div>
+                                <div className="text-3xl md:text-4xl font-bold">
+                                    6
+                                </div>
                             </div>
                         </div>
 
@@ -123,24 +124,20 @@ const Profile = () => {
                             />
                         )}
                         {!loading && !error && (
-                            <div className="overflow-x-auto">
-                                <table className="min-w-full text-sm text-left bg-white shadow-md rounded-xl overflow-hidden">
+                            <div className="overflow-x-auto w-full">
+                                <table className="min-w-full text-xs sm:text-sm text-left bg-white shadow-md rounded-xl">
                                     <thead className="text-gray-700 uppercase bg-gray-100">
                                         <tr>
-                                            {/*                                             <th className="px-4 py-3 w-10">
-                                                <input
-                                                    type="checkbox"
-                                                    className="form-checkbox bg-white appearance-none border rounded w-5 h-5 border-gray-300 checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition"
-                                                />
-                                            </th> */}
-                                            <th className="px-4 py-3">ID</th>
+                                            <th className="px-4 py-3">#</th>
                                             <th className="px-4 py-3">
-                                                Restaurant Recommendations
+                                                Restaurant
                                             </th>
-                                            <th className="px-4 py-3">
+                                            <th className="px-4 py-3 hidden md:table-cell">
                                                 Address
                                             </th>
-                                            <th className="px-4 py-3">Date</th>
+                                            <th className="px-4 py-3 hidden lg:table-cell">
+                                                Date
+                                            </th>
                                             <th className="px-4 py-3 text-right">
                                                 Actions
                                             </th>
@@ -152,24 +149,23 @@ const Profile = () => {
                                             posts.map((post, index) => (
                                                 <tr
                                                     key={post.id}
-                                                    className="hover:bg-gray-50 border-b last:border-b-0"
+                                                    onClick={() =>
+                                                        navigate(
+                                                            `/post/${post.id}`
+                                                        )
+                                                    }
+                                                    className="hover:bg-gray-50 border-b last:border-b-0 cursor-pointer transition"
                                                 >
-                                                    {/*                                                     <td className="px-4 py-3">
-                                                        <input
-                                                            type="checkbox"
-                                                            className="form-checkbox bg-white appearance-none border rounded w-5 h-5 border-gray-300 checked:bg-purple-600 checked:border-purple-600 focus:outline-none transition"
-                                                        />
-                                                    </td> */}
                                                     <td className="px-4 py-3 font-bold">
                                                         {index + 1}
                                                     </td>
                                                     <td className="px-4 py-3 font-bold">
                                                         {post.title}
                                                     </td>
-                                                    <td className="px-4 py-3 font-bold">
+                                                    <td className="px-4 py-3 font-bold hidden md:table-cell">
                                                         {post.location}
                                                     </td>
-                                                    <td className="px-4 py-3 text-gray-400">
+                                                    <td className="px-4 py-3 text-gray-400 hidden lg:table-cell">
                                                         {
                                                             new Date(
                                                                 post.createdAt
@@ -178,37 +174,35 @@ const Profile = () => {
                                                                 .split("T")[0]
                                                         }
                                                     </td>
-                                                    <td className="px-4 py-3 text-right space-x-2">
-                                                        <button
-                                                            className="bg-gray-700 cursor-pointer hover:bg-gray-800 text-white text-xs px-3 py-1 rounded-2xl"
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/edit/${post.id}`
-                                                                )
-                                                            }
-                                                        >
-                                                            Edit
-                                                        </button>
-                                                        <button
-                                                            className="bg-purple-800 cursor-pointer text-white hover:bg-purple-900 text-xs px-3 py-1 rounded-2xl"
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/post/${post.id}`
-                                                                )
-                                                            }
-                                                        >
-                                                            Detail
-                                                        </button>
-                                                        <button
-                                                            className="bg-red-600 cursor-pointer hover:bg-red-700 text-white text-xs px-3 py-1 rounded-2xl"
-                                                            onClick={() =>
-                                                                handleDelete(
-                                                                    post.id
-                                                                )
-                                                            }
-                                                        >
-                                                            Delete
-                                                        </button>
+                                                    <td className="px-4 py-3 text-right">
+                                                        <div className="flex flex-wrap gap-2 justify-end">
+                                                            <button
+                                                                className="cursor-pointer bg-gray-700 hover:bg-gray-800 text-white text-xs px-3 py-1 rounded-2xl"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    navigate(
+                                                                        `/edit/${post.id}`
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                className="cursor-pointer bg-red-700 btn-error hover:bg-red-800 text-white text-xs px-3 py-1 rounded-2xl hidden md:inline-block"
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    handleDelete(
+                                                                        post.id
+                                                                    );
+                                                                }}
+                                                            >
+                                                                Delete
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             ))
@@ -227,7 +221,7 @@ const Profile = () => {
                                                             onClick={
                                                                 handlePostCreated
                                                             }
-                                                            className="bg-purple-700 hover:bg-purple-800 text-white text-sm px-4 py-2 rounded-xl"
+                                                            className="cursor-pointer bg-purple-700 hover:bg-purple-800 text-white text-sm px-4 py-2 rounded-xl"
                                                         >
                                                             Share Your
                                                             Experience
@@ -240,7 +234,7 @@ const Profile = () => {
                                 </table>
 
                                 {posts.length > 0 && (
-                                    <div className="mt-4 flex justify-center space-x-1">
+                                    <div className="mt-4 flex justify-center flex-wrap gap-1">
                                         <button className="px-3 cursor-pointer py-1 rounded border border-gray-300 text-sm">
                                             1
                                         </button>
@@ -258,8 +252,8 @@ const Profile = () => {
                             </div>
                         )}
                     </section>
-                     {/* // ! TODO: Implement Going List Section */}
-                    {/* Going List Section (placeholder) */}
+
+                    {/* Going List Section */}
                     <section className="mt-10">
                         <h3 className="text-lg font-semibold mb-4">
                             Going List

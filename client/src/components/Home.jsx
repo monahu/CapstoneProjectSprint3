@@ -7,6 +7,7 @@ import LoadingState from './LoadingState'
 import ErrorMessage from './ErrorMessage'
 import EmptyState from './EmptyState'
 import RestaurantCard from './Post/RestaurantCard'
+import LoadMoreSection from './LoadMoreSection'
 import { UI_TEXT } from '../utils/constants/ui'
 import { usePosts } from '../hooks/usePost'
 import { POST_QUERY_CONFIG } from '../utils/constants/posts'
@@ -51,13 +52,6 @@ const Home = () => {
     : UI_TEXT.hero.buttonLink
   const handleHeroClick = () => navigate(heroButtonLink)
   const handleEmptyStateAction = () => navigate(heroButtonLink)
-
-  const loadMoreButtonText = isLoadingMore
-    ? UI_TEXT.buttons.loading
-    : hasMorePosts
-      ? UI_TEXT.buttons.loadMore
-      : UI_TEXT.buttons.allLoaded
-  const isLoadMoreDisabled = isLoadingMore || !hasMorePosts
 
   const heroProps = {
     heroImage,
@@ -116,21 +110,15 @@ const Home = () => {
           />
         ))}
 
-        <div className='mt-10 flex flex-col items-center space-y-4'>
-          <div className='text-gray-600 text-sm'>
-            Showing {posts.length}/{totalCount}{' '}
-            {totalCount === 1 ? 'post' : 'posts'}
-          </div>
-          {showLoadMoreButton && (
-            <button
-              onClick={loadMore}
-              disabled={isLoadMoreDisabled}
-              className='px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed'
-            >
-              {loadMoreButtonText}
-            </button>
-          )}
-        </div>
+        <LoadMoreSection
+          currentCount={posts.length}
+          totalCount={totalCount}
+          onLoadMore={loadMore}
+          isLoading={isLoadingMore}
+          hasMore={hasMorePosts}
+          showButton={showLoadMoreButton}
+          countText={totalCount === 1 ? 'post' : 'posts'}
+        />
       </>
     )
   }

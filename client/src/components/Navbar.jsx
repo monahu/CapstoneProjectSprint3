@@ -21,7 +21,7 @@ const Navbar = ({ setSidebarOpen }) => {
             <img
               alt={APP_CONFIG.name}
               src={APP_CONFIG.logo}
-              className='h-12 w-auto'
+              className='h-12 w-auto my-logo'
             />
           </Link>
         </div>
@@ -50,7 +50,10 @@ const Navbar = ({ setSidebarOpen }) => {
             </Link>
           </div>
 
-          <SearchForm className='hidden md:grid' id='navbar-search-input' />
+          <SearchForm
+            className='hidden md:grid'
+            id='navbar-search-input'
+          />
         </>
       )}
 

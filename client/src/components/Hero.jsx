@@ -45,7 +45,7 @@ const Hero = ({
           <p className='mb-5 text-[1.2rem]'>{description}</p>
           {showButton && (
             <button
-              className='btn btn-primary text-lg md:btn-lg md:text-[1.2rem]'
+              className='px-6 py-3 btn border-0 shadow-none bg-primary primary-hover rounded-md text-base-100 hover:text-base-300 text-lg md:btn-lg md:text-[1.2rem]  transition-all duration-300'
               onClick={onButtonClick}
               aria-label={`${buttonText} - Get started with your account`}
             >

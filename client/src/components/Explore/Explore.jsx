@@ -18,6 +18,11 @@ const Explore = () => {
     hasSearched,
     hasActiveSearch,
 
+    // Pagination state
+    isLoadingMore,
+    hasMoreResults,
+    showLoadMoreButton,
+
     // Tag management
     tagsToDisplay,
     hasMoreTags,
@@ -29,6 +34,7 @@ const Explore = () => {
     clearAllFilters,
     handleTagClick,
     searchPosts,
+    handleLoadMore,
     classNames,
   } = useExplore()
 
@@ -78,6 +84,10 @@ const Explore = () => {
         tags={tags}
         location={location}
         onRetry={handleRetry}
+        isLoadingMore={isLoadingMore}
+        hasMoreResults={hasMoreResults}
+        showLoadMoreButton={showLoadMoreButton}
+        onLoadMore={handleLoadMore}
       />
     </div>
   )

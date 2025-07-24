@@ -7,7 +7,17 @@ import { useTagSelection } from './useTagSelection'
 export const useExplore = () => {
   const [searchParams] = useSearchParams()
   const navigate = useNavigate()
-  const { searchPosts, posts, loading, error, hasSearched } = useSearchPosts()
+  const {
+    searchPosts,
+    loadMoreResults,
+    posts,
+    loading,
+    error,
+    hasSearched,
+    isLoadingMore,
+    hasMoreResults,
+    showLoadMoreButton,
+  } = useSearchPosts()
   const { tags: dbTags } = useTags()
   const { classNames } = useClassNames()
   const [showAllTags, setShowAllTags] = useState(false)
@@ -53,6 +63,11 @@ export const useExplore = () => {
     navigate('/explore', { replace: true })
   }
 
+  // Handle load more results
+  const handleLoadMore = () => {
+    loadMoreResults(searchTerm, { tags, location })
+  }
+
   // Get tags for display (limit to 10 unless showing all)
   const tagsToDisplay = showAllTags ? dbTags : dbTags.slice(0, 10)
   const hasMoreTags = dbTags.length > 10
@@ -68,6 +83,11 @@ export const useExplore = () => {
     hasSearched,
     hasActiveSearch,
 
+    // Pagination state
+    isLoadingMore,
+    hasMoreResults,
+    showLoadMoreButton,
+
     // Tag management
     dbTags,
     tagsToDisplay,
@@ -80,6 +100,7 @@ export const useExplore = () => {
     clearAllFilters,
     handleTagClick,
     searchPosts,
+    handleLoadMore,
     classNames,
   }
 }

@@ -83,7 +83,7 @@ export default function SearchForm({
           <button
             type='submit'
             disabled={!hasActiveFilters}
-            className='px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors'
+            className='px-6 py-3 bg-indigo-700 text-white rounded-lg font-medium hover:bg-indigo-900 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors'
           >
             Search
           </button>

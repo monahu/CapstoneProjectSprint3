@@ -104,7 +104,7 @@ const SidebarContent = ({ user }) => {
             <img
               alt={APP_CONFIG.name}
               src={APP_CONFIG.logo}
-              className='h-12 w-auto mt-2'
+              className='h-12 w-auto mt-2 my-logo'
             />
           </Link>
         </div>

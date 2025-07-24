@@ -54,7 +54,7 @@ const Login = () => {
             <img
               alt={APP_CONFIG.name}
               src={APP_CONFIG.logo}
-              className='mx-auto w-auto'
+              className='mx-auto w-auto my-logo'
             />
           </Link>
           <h2 className='mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900'>

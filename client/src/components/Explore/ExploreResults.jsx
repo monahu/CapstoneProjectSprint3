@@ -3,6 +3,7 @@ import RestaurantCard from '../Post/RestaurantCard'
 import LoadingState from '../LoadingState'
 import ErrorMessage from '../ErrorMessage'
 import EmptyState from '../EmptyState'
+import LoadMoreSection from '../LoadMoreSection'
 import { UI_TEXT } from '../../utils/constants/ui'
 
 const ExploreResults = ({
@@ -15,6 +16,10 @@ const ExploreResults = ({
   tags,
   location,
   onRetry,
+  isLoadingMore,
+  hasMoreResults,
+  showLoadMoreButton,
+  onLoadMore,
 }) => {
   return (
     <div className='container mx-auto px-4 py-8'>
@@ -98,35 +103,49 @@ const ExploreResults = ({
               </p>
             </div>
           ) : (
-            /* Results list */
-            <div className='space-y-6'>
-              {posts.map((post) => (
-                <RestaurantCard
-                  key={post.id}
-                  id={post.id}
-                  image={post.imageUrls?.desktop || post.imageUrls}
-                  user={{
-                    name: post.author?.displayName,
-                    avatar:
-                      post.author?.photoURL ||
-                      'https://img.daisyui.com/images/profile/demo/2@94.webp',
-                  }}
-                  location={post.location}
-                  title={post.title}
-                  placeName={post.placeName}
-                  description={post.content}
-                  date={new Date(post.createdAt).toLocaleDateString()}
-                  tags={post.tags?.map((tag) => tag.name) || []}
-                  rating={post.rating?.type}
-                  likeCount={post.likeCount}
-                  shareCount={post.shareCount || 0}
-                  wantToGoCount={post.attendeeCount}
-                  isWantToGo={post.isWantToGo}
-                  isLiked={post.isLiked}
-                  className='max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto'
-                />
-              ))}
-            </div>
+            <>
+              {/* Results list */}
+              <div className='space-y-6'>
+                {posts.map((post) => (
+                  <RestaurantCard
+                    key={post.id}
+                    id={post.id}
+                    image={post.imageUrls?.desktop || post.imageUrls}
+                    user={{
+                      name: post.author?.displayName,
+                      avatar:
+                        post.author?.photoURL ||
+                        'https://img.daisyui.com/images/profile/demo/2@94.webp',
+                    }}
+                    location={post.location}
+                    title={post.title}
+                    placeName={post.placeName}
+                    description={post.content}
+                    date={new Date(post.createdAt).toLocaleDateString()}
+                    tags={post.tags?.map((tag) => tag.name) || []}
+                    rating={post.rating?.type}
+                    likeCount={post.likeCount}
+                    shareCount={post.shareCount || 0}
+                    wantToGoCount={post.attendeeCount}
+                    isWantToGo={post.isWantToGo}
+                    isLiked={post.isLiked}
+                    className='max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto'
+                  />
+                ))}
+              </div>
+
+              {/* Pagination */}
+              <LoadMoreSection
+                currentCount={posts.length}
+                onLoadMore={onLoadMore}
+                isLoading={isLoadingMore}
+                hasMore={hasMoreResults}
+                showButton={showLoadMoreButton}
+                countText='results'
+                loadMoreText={UI_TEXT.buttons.loadMoreResults}
+                allLoadedText={UI_TEXT.buttons.allResultsLoaded}
+              />
+            </>
           )}
         </>
       )}

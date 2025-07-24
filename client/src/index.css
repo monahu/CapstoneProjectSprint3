@@ -77,6 +77,10 @@
   color: #000;
 }
 
+.my-logo {
+  shape-rendering: geometricPrecision !important;
+}
+
 .tiptap-editor :is(ul, ol) {
   list-style-type: revert !important;
   margin-left: 1.5rem;

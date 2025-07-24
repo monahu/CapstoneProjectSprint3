@@ -26,7 +26,9 @@ export const UI_TEXT = {
     google: 'Google',
     loading: 'Loading...',
     loadMore: 'Load More Posts',
+    loadMoreResults: 'Load More Results',
     allLoaded: 'All Posts Loaded',
+    allResultsLoaded: 'All Results Loaded',
     goToTop: 'Go to Top',
   },
   labels: {
@@ -117,26 +119,26 @@ export const UI_TEXT = {
     creating: 'Creating your review...',
     updating: 'Updating your review...',
     component: 'Loading page...',
-    tip: '💡 Pro tip: Use our filters to find exactly what you\'re craving!',
+    tip: "💡 Pro tip: Use our filters to find exactly what you're craving!",
     tips: [
-      '💡 Pro tip: Use our filters to find exactly what you\'re craving!',
+      "💡 Pro tip: Use our filters to find exactly what you're craving!",
       '🍴 Did you know? You can save posts to visit later!',
       '⭐ Rate restaurants to help others discover great places!',
       '📍 Add location tags to help others find nearby spots!',
-      '📱 Our app works great on mobile devices too!'
-    ]
+      '📱 Our app works great on mobile devices too!',
+    ],
   },
   loadingTypes: {
     COMPONENT: 'component',
-    DATA: 'data', 
+    DATA: 'data',
     SEARCH: 'search',
     MINIMAL: 'minimal',
-    FULL: 'full'
+    FULL: 'full',
   },
   defaults: {
     userAvatar: 'https://img.daisyui.com/images/profile/demo/2@94.webp',
     userName: 'Anonymous User',
     authDelay: 100,
-    emptyStateActionText: 'Share Your Experience'
+    emptyStateActionText: 'Share Your Experience',
   },
 }

@@ -14,21 +14,24 @@ import {
 import { DEFAULT_POSTS_VARIABLES } from '../utils/constants/posts'
 
 export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
-  const { data, loading, error, fetchMore, refetch, networkStatus } = useQuery(GET_ALL_POSTS, {
-    variables: { limit, offset, filter },
-    notifyOnNetworkStatusChange: true,
-    ...options,
-    onError: (error) => {
-      console.error('GET_ALL_POSTS error:', {
-        message: error.message,
-        graphQLErrors: error.graphQLErrors,
-        networkError: error.networkError,
-      })
-    },
-    onCompleted: (data) => {
-      console.log('GET_ALL_POSTS completed:', data)
-    },
-  })
+  const { data, loading, error, fetchMore, refetch, networkStatus } = useQuery(
+    GET_ALL_POSTS,
+    {
+      variables: { limit, offset, filter },
+      notifyOnNetworkStatusChange: true,
+      ...options,
+      onError: (error) => {
+        console.error('GET_ALL_POSTS error:', {
+          message: error.message,
+          graphQLErrors: error.graphQLErrors,
+          networkError: error.networkError,
+        })
+      },
+      onCompleted: (data) => {
+        console.log('GET_ALL_POSTS completed:', data)
+      },
+    }
+  )
 
   const loadMore = () => {
     fetchMore({
@@ -37,18 +40,18 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
       },
       updateQuery: (previousResult, { fetchMoreResult }) => {
         if (!fetchMoreResult) return previousResult
-        
+
         // Store the length of the new batch to determine if there are more posts
         const newPosts = fetchMoreResult.posts?.posts || []
         const updatedResult = {
           ...previousResult,
           posts: {
             posts: [...previousResult.posts.posts, ...newPosts],
-            totalCount: fetchMoreResult.posts.totalCount
+            totalCount: fetchMoreResult.posts.totalCount,
           },
           lastFetchCount: newPosts.length, // Track last fetch size
         }
-        
+
         return updatedResult
       },
     })
@@ -59,7 +62,7 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
     data?.posts?.posts?.filter((post) => {
       return !filter.authorId || post.author?.id === filter.authorId
     }) || []
-  
+
   const totalCount = data?.posts?.totalCount || 0
 
   const isLoadingMore = networkStatus === 3 // NetworkStatus.fetchMore
@@ -250,19 +253,19 @@ export const useDeletePost = () => {
 // ===========================
 
 export const useSearchPosts = () => {
-  const [executeSearch, { data, loading, error, called }] = useLazyQuery(
-    SEARCH_POSTS,
-    {
-      notifyOnNetworkStatusChange: true,
-      fetchPolicy: 'cache-and-network',
-      onError: (error) => {
-        console.error('SEARCH_POSTS error:', error)
-      },
-    }
-  )
+  const [
+    executeSearch,
+    { data, loading, error, called, fetchMore, networkStatus },
+  ] = useLazyQuery(SEARCH_POSTS, {
+    notifyOnNetworkStatusChange: true,
+    fetchPolicy: 'cache-and-network',
+    onError: (error) => {
+      console.error('SEARCH_POSTS error:', error)
+    },
+  })
 
   const searchPosts = (searchTerm, options = {}) => {
-    const { tags, location, limit = 20 } = options
+    const { tags, location, limit = 20, offset = 0 } = options
 
     const hasSearchTerm = searchTerm?.trim()
     const hasTags = tags?.length > 0
@@ -278,17 +281,53 @@ export const useSearchPosts = () => {
         tags: hasTags ? tags : null,
         location: hasLocation || null,
         limit,
+        offset,
       },
     })
   }
 
+  const loadMoreResults = (currentSearchTerm, currentOptions = {}) => {
+    if (!data?.searchPosts) return
+
+    const currentLength = data.searchPosts.length
+    const { tags, location, limit = 20 } = currentOptions
+
+    return fetchMore({
+      variables: {
+        searchTerm: currentSearchTerm?.trim() || null,
+        tags: tags?.length > 0 ? tags : null,
+        location: location?.trim() || null,
+        limit,
+        offset: currentLength,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return previousResult
+
+        return {
+          searchPosts: [
+            ...(previousResult.searchPosts || []),
+            ...(fetchMoreResult.searchPosts || []),
+          ],
+        }
+      },
+    })
+  }
+
+  const posts = data?.searchPosts || []
+  const isLoadingMore = networkStatus === 3
+  const hasMoreResults = posts.length > 0 && posts.length % 20 === 0 // Assuming limit of 20
+
   return {
     searchPosts,
-    posts: data?.searchPosts || [],
+    loadMoreResults,
+    posts,
     loading,
     error,
     called,
     hasSearched: called,
+    isLoadingMore,
+    hasMoreResults,
+    showLoadMoreButton: posts.length > 0 && hasMoreResults,
   }
 }
 

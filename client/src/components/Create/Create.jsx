@@ -136,8 +136,15 @@ const Create = () => {
                   if (formikHelpers && formikHelpers.resetForm)
                     formikHelpers.resetForm()
                   
-                  // Simplest approach: just go to home and let it refresh
-                  window.location.href = '/'
+                  // // Simplest approach: just go to home and let it refresh
+                  // window.location.href = '/'
+
+                    // Redirect to home with success message
+                  navigate('/', {
+                    state: {
+                      successMessage: 'Post created successfully!',
+                    },
+                  })
                 } else {
                   throw new Error(data.error || 'Failed to create post')
                 }

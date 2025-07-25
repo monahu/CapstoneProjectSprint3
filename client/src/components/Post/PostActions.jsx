@@ -18,13 +18,22 @@ const PostActions = ({
   handleLikeToggle,
   handleWantToGoToggle,
   handleShareClick,
+  isOwner = true,
 }) => {
   const navigate = useNavigate()
 
   return (
     <div className='text-center'>
       {/* Like it? text */}
-      <div className='text-gray-600 text-base mb-8 divider'>Like it?</div>
+      <div className='text-gray-600 text-base mb-8 divider'>
+        {isOwner ? (
+          <div className='badge badge-soft badge-primary'>
+            Your post is popular
+          </div>
+        ) : (
+          'Like it?'
+        )}
+      </div>
 
       <div
         className='flex flex-col sm:flex-row-reverse justify-evenly md:justify-between gap-4 px-2 lg:px-20'
@@ -44,7 +53,7 @@ const PostActions = ({
                 <button
                   onClick={handleShareClick}
                   className='btn btn-circle btn-outline btn-success shadow-lg hover:shadow-xl transition-shadow md:my-auto'
-                  aria-label="Share this post"
+                  aria-label='Share this post'
                 >
                   <Share className='w-5 h-5' />
                 </button>
@@ -67,7 +76,7 @@ const PostActions = ({
                   className={`btn btn-circle shadow-lg hover:shadow-xl transition-shadow ${
                     isLiked ? 'btn-secondary' : 'btn-outline btn-secondary'
                   }`}
-                  aria-label={isLiked ? "Unlike this post" : "Like this post"}
+                  aria-label={isLiked ? 'Unlike this post' : 'Like this post'}
                 >
                   <Heart
                     className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`}

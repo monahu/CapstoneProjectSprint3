@@ -10,6 +10,7 @@ import PostDate from './PostDate'
 import AttendeesList from './AttendeesList'
 import MapView from './MapView'
 import RichTextDisplay from '../Post/RichTextDisplay'
+import PostManipulation from './PostManipulation'
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
@@ -23,6 +24,7 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
     initialWantToGoCount: post?.attendeeCount || 0,
     initialIsLiked: post?.isLiked || false,
     initialIsWantToGo: post?.isWantToGo || false,
+    isOwner: post?.isOwner || false,
   })
 
   // Loading state - use shared component
@@ -69,15 +71,6 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
 
       {/* Content */}
       <div className='p-4 sm:p-6'>
-        {/* Edit Button for post owner - relocated for visibility */}
-        {post.isOwner && (
-          <button
-            className='btn btn-sm mb-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded shadow hover:from-blue-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-blue-400'
-            onClick={() => navigate(`/edit/${post._id || post.id}`)}
-          >
-            Edit
-          </button>
-        )}
         <PostHeader
           title={post.title}
           location={post.location}
@@ -95,7 +88,11 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
         </div>
 
         <PostDate createdAt={post.createdAt} />
-
+        <PostManipulation
+          isOwner={post.isOwner}
+          postId={post._id || post.id}
+          navigate={navigate}
+        />
         <PostActions {...postActions} />
 
         {/* More Info Section */}

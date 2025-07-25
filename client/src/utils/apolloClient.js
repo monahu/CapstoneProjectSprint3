@@ -168,7 +168,77 @@ const client = new ApolloClient({
   link: from([errorLink, retryLink, authLink, httpLink]),
 
   // Cache configuration
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Query: {
+        fields: {
+          posts: {
+            // Define how posts pagination should be merged
+            keyArgs: ["filter"], // Cache different filters separately
+            merge(existing = { posts: [], totalCount: 0 }, incoming, { args }) {
+              // Handle pagination merge
+              if (args?.offset > 0) {
+                // This is a fetchMore call - append new posts
+                return {
+                  ...incoming,
+                  posts: [...existing.posts, ...incoming.posts]
+                }
+              }
+              // This is a fresh query - replace existing
+              return incoming
+            }
+          },
+          searchPosts: {
+            // Merge search results for pagination
+            keyArgs: ["searchTerm", "tags", "location"],
+            merge(existing = [], incoming, { args }) {
+              if (args?.offset > 0) {
+                return [...existing, ...incoming]
+              }
+              return incoming
+            }
+          }
+        }
+      },
+      Post: {
+        fields: {
+          // Ensure these fields are replaced, not merged
+          likeCount: {
+            merge: false // Always replace with new value
+          },
+          shareCount: {
+            merge: false
+          },
+          attendeeCount: {
+            merge: false
+          },
+          isLiked: {
+            merge: false
+          },
+          isWantToGo: {
+            merge: false
+          },
+          isOwner: {
+            merge: false
+          },
+          // Handle array fields properly
+          likes: {
+            merge: false // Replace entire array
+          },
+          attendees: {
+            merge: false // Replace entire array
+          },
+          tags: {
+            merge: false // Replace entire array
+          }
+        }
+      }
+    },
+    // Additional cache configuration
+    addTypename: true, // Add __typename to all objects
+    resultCaching: true, // Cache query results
+    canonizeResults: true, // Normalize identical objects
+  }),
 
   // Default options for all queries/mutations
   defaultOptions: {

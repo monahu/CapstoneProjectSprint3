@@ -105,6 +105,7 @@ const Home = () => {
             wantToGoCount={post.attendeeCount}
             isWantToGo={post.isWantToGo}
             isLiked={post.isLiked}
+            isOwner={post.isOwner || false}
             className='mt-10 max-w-full md:max-w-5xl lg:max-w-4xl'
             priority={index === 0}
           />

@@ -13,11 +13,35 @@ import { usePosts } from '../hooks/usePost'
 import { POST_QUERY_CONFIG } from '../utils/constants/posts'
 import heroImage from '../assets/img/restJam_hero1.webp'
 
+import { useLocation } from 'react-router-dom'
+import { useState } from 'react'
+
+
 const Home = () => {
   const navigate = useNavigate()
   const user = useSelector((state) => state.user.data)
   const authInitialized = useSelector((state) => state.user.authInitialized)
   const previousUserRef = useRef(user)
+
+  const location = useLocation()
+  const [successMessage, setSuccessMessage] = useState(location.state?.successMessage || '')
+
+  useEffect(() => {
+    if (location.state?.successMessage) {
+      setSuccessMessage(location.state.successMessage)
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+  }, [location, navigate])
+
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => {
+        setSuccessMessage('')
+      }, 3000)
+      return () => clearTimeout(timer)
+    }
+  }, [successMessage])
+
 
   const {
     posts,
@@ -126,6 +150,12 @@ const Home = () => {
   return (
     <div className='min-h-screen'>
       <Hero {...heroProps} />
+   
+      {successMessage && (
+        <div className='mx-auto max-w-xl mt-4 px-4 py-2 rounded-md bg-green-100 text-green-800 font-medium text-center shadow-md border border-green-300'>
+          {successMessage}
+        </div>
+      )}
       {renderContent()}
     </div>
   )

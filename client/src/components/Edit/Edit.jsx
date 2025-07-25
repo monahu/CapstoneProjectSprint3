@@ -1,13 +1,20 @@
 import React from 'react'
 import EditForm from './EditForm'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 
 const Edit = () => {
-  const { id: postId } = useParams()
+  const { id: postId } = useParams()  
+  const navigate = useNavigate()
 
   const handleSuccess = () => {
-    // Simple approach: go to home and refresh
-    window.location.href = '/'
+    // // Simple approach: go to home and refresh
+    // window.location.href = '/'
+     // Redirect to home with success message
+      navigate('/', {
+        state: {
+          successMessage: 'Post updated successfully!',
+        },
+      })
   }
 
   return (

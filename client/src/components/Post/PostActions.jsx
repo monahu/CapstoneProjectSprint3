@@ -18,7 +18,7 @@ const PostActions = ({
   handleLikeToggle,
   handleWantToGoToggle,
   handleShareClick,
-  isOwner = true,
+  isOwner,
 }) => {
   const navigate = useNavigate()
 

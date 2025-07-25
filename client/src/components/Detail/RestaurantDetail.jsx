@@ -26,7 +26,7 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
     initialIsWantToGo: post?.isWantToGo || false,
     isOwner: post?.isOwner || false,
   })
-
+  console.log('post.isOwner:', post.isOwner)
   // Loading state - use shared component
   if (loading) {
     return (
@@ -89,7 +89,7 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
 
         <PostDate createdAt={post.createdAt} />
         <PostManipulation
-          isOwner={post.isOwner}
+          isOwner={post.isOwner || false}
           postId={post._id || post.id}
           navigate={navigate}
         />

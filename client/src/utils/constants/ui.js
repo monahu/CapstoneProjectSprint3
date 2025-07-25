@@ -141,4 +141,20 @@ export const UI_TEXT = {
     authDelay: 100,
     emptyStateActionText: 'Share Your Experience',
   },
+  dialogs: {
+    deletePost: {
+      type: 'delete',
+      title: 'Delete Post',
+      message: 'Are you sure you want to delete this restaurant post? This action cannot be undone and all associated data will be permanently removed.',
+      confirmText: 'Delete Post',
+      cancelText: 'Keep Post',
+    },
+    deletePostFromProfile: {
+      type: 'delete',
+      title: 'Delete Post',
+      message: 'Are you sure you want to delete this post? This action cannot be undone.',
+      confirmText: 'Delete Post',
+      cancelText: 'Cancel',
+    },
+  },
 }

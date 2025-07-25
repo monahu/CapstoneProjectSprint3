@@ -129,6 +129,7 @@ const ExploreResults = ({
                     wantToGoCount={post.attendeeCount}
                     isWantToGo={post.isWantToGo}
                     isLiked={post.isLiked}
+                    isOwner={post.isOwner || false}
                     className='max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto'
                   />
                 ))}

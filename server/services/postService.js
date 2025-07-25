@@ -3,6 +3,7 @@ const PostsTags = require('../models/PostsTags')
 const WantToGo = require('../models/WantToGo')
 const Like = require('../models/Likes')
 const Tag = require('../models/Tags')
+const mongoose = require('mongoose')
 
 /**
  * Post Service - Core business logic for post operations
@@ -13,20 +14,29 @@ const Tag = require('../models/Tags')
  * Create a new post with tags
  */
 const createPost = async (input, userId) => {
-  const newPost = new Post({
-    ...input,
-    userId: userId,
-    createdAt: new Date(),
-  })
+  const session = await mongoose.startSession()
+  
+  try {
+    let savedPost
+    await session.withTransaction(async () => {
+      const newPost = new Post({
+        ...input,
+        userId: userId,
+        createdAt: new Date(),
+      })
 
-  const savedPost = await newPost.save()
+      savedPost = await newPost.save({ session })
 
-  // Process tags if provided
-  if (input.tags && input.tags.length > 0) {
-    await addTagsToPost(savedPost._id, input.tags)
+      // Process tags if provided
+      if (input.tags && input.tags.length > 0) {
+        await addTagsToPost(savedPost._id, input.tags, session)
+      }
+    })
+
+    return savedPost
+  } finally {
+    await session.endSession()
   }
-
-  return savedPost
 }
 
 /**
@@ -40,48 +50,64 @@ const updatePost = async (postId, input) => {
  * Delete a post and all associated data
  */
 const deletePost = async (postId) => {
-  // Get tag IDs associated with this post before deletion
-  const postTagRecords = await PostsTags.find({ postId: postId })
-  const tagIds = postTagRecords.map((record) => record.tagId)
+  const session = await mongoose.startSession()
+  
+  try {
+    await session.withTransaction(async () => {
+      // Get tag IDs associated with this post before deletion
+      const postTagRecords = await PostsTags.find({ postId: postId }).session(session)
+      const tagIds = postTagRecords.map((record) => record.tagId)
 
-  // Delete post and all associated records in parallel
-  await Promise.all([
-    Post.findByIdAndDelete(postId),
-    WantToGo.deleteMany({ postId: postId }),
-    Like.deleteMany({ postId: postId }),
-    PostsTags.deleteMany({ postId: postId }),
-  ])
+      // Delete post and all associated records
+      await Promise.all([
+        Post.findByIdAndDelete(postId).session(session),
+        WantToGo.deleteMany({ postId: postId }).session(session),
+        Like.deleteMany({ postId: postId }).session(session),
+        PostsTags.deleteMany({ postId: postId }).session(session),
+      ])
 
-  // Clean up orphaned tags (tags no longer referenced by any posts)
-  if (tagIds.length > 0) {
-    for (const tagId of tagIds) {
-      const remainingReferences = await PostsTags.countDocuments({
-        tagId: tagId,
-      })
-      if (remainingReferences === 0) {
-        await Tag.findByIdAndDelete(tagId)
+      // Clean up orphaned tags
+      if (tagIds.length > 0) {
+        for (const tagId of tagIds) {
+          const remainingReferences = await PostsTags.countDocuments({
+            tagId: tagId,
+          }).session(session)
+          if (remainingReferences === 0) {
+            await Tag.findByIdAndDelete(tagId).session(session)
+          }
+        }
       }
-    }
-  }
+    })
 
-  return postId
+    return postId
+  } finally {
+    await session.endSession()
+  }
 }
 
 /**
  * Get all posts with pagination and filtering
  */
-const getPosts = async (limit = 10, offset = 0, filter = {}, countOnly = false) => {
+const getPosts = async (limit = 10, offset = 0, filter = {}, options = {}) => {
+  const { countOnly = false, withCount = false } = options;
+  
   if (countOnly) {
-    return await Post.countDocuments(filter)
+    return await Post.countDocuments(filter);
   }
 
-  const safeLimit = Math.min(limit, 50) // Max 50 posts per request
-
-  return await Post.find(filter)
+  const safeLimit = Math.min(limit, 50); // Max 50 posts per request
+  const posts = await Post.find(filter)
     .sort({ createdAt: -1 })
     .limit(safeLimit)
     .skip(offset)
-    .populate('userId', 'displayName photoURL')
+    .populate('userId', 'displayName photoURL');
+
+  if (withCount) {
+    const totalCount = await Post.countDocuments(filter);
+    return { posts, totalCount };
+  }
+
+  return posts;
 }
 
 /**
@@ -164,24 +190,24 @@ const incrementShareCount = async (postId) => {
 /**
  * Add tags to a post (helper for createPost)
  */
-const addTagsToPost = async (postId, tagNames) => {
+const addTagsToPost = async (postId, tagNames, session = null) => {
   for (const tagName of tagNames) {
     // Find existing tag or create new one
-    let tag = await Tag.findOne({ name: tagName.trim() })
+    let tag = await Tag.findOne({ name: tagName.trim() }).session(session)
     if (!tag) {
-      tag = await new Tag({ name: tagName.trim() }).save()
+      tag = await new Tag({ name: tagName.trim() }).save({ session })
     }
 
     // Create association between post and tag if it doesn't exist
     const existing = await PostsTags.findOne({
       postId: postId,
       tagId: tag._id,
-    })
+    }).session(session)
     if (!existing) {
       await new PostsTags({
         postId: postId,
         tagId: tag._id,
-      }).save()
+      }).save({ session })
     }
   }
 }

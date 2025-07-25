@@ -23,6 +23,7 @@ const RestaurantCard = ({
   wantToGoCount = 0,
   isWantToGo = false,
   isLiked = false,
+  isOwner = false,
   className = '',
   priority = false,
 }) => {
@@ -36,6 +37,7 @@ const RestaurantCard = ({
     initialWantToGoCount: wantToGoCount,
     initialIsLiked: isLiked,
     initialIsWantToGo: isWantToGo,
+    isOwner: isOwner || false,
   })
 
   const handleViewDetail = () => {

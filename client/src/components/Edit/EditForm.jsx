@@ -5,17 +5,20 @@ import axios from 'axios'
 import { auth } from '../../utils/firebase'
 import { ImageUploadField, RichTextField } from '../Create/FormFields'
 import { getApiUrl } from '../../utils/config'
+import { createValidationSchema } from '../../utils/postValidationSchema'
+import FieldWithMic from '../Speech/FieldWithMic'
+import SpeechButton from '../Speech/SpeechButton'
 
 const EditForm = ({ postId, onSuccess }) => {
   const [initialValues, setInitialValues] = useState(null)
   const [loading, setLoading] = useState(true)
-  const user = useSelector((state) => state.user.data)
-  const [error, setError] = useState(null)
   const [ratings, setRatings] = useState([])
   const [ratingsLoading, setRatingsLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [postData, setPostData] = useState(null)
+  const user = useSelector((state) => state.user.data)
 
-  // Fetch post data
+  // Fetch post
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -31,7 +34,7 @@ const EditForm = ({ postId, onSuccess }) => {
     fetchPost()
   }, [postId])
 
-  // Fetch ratings list
+  // Fetch ratings
   useEffect(() => {
     fetch(getApiUrl('/api/ratings'))
       .then((res) => res.json())
@@ -42,21 +45,15 @@ const EditForm = ({ postId, onSuccess }) => {
       .catch(() => setRatingsLoading(false))
   }, [])
 
-  // Prepare initial form values after loading post and ratings
+  // Prepare initial form values
   useEffect(() => {
     if (ratingsLoading || !postData || ratings.length === 0) return
 
     let ratingId = ''
-
-    if (postData.ratingId) {
-      ratingId = String(postData.ratingId)
-    } else if (postData.rating && postData.rating._id) {
-      ratingId = String(postData.rating._id)
-    } else if (typeof postData.rating === 'string') {
+    if (postData.ratingId) ratingId = String(postData.ratingId)
+    else if (postData.rating?._id) ratingId = String(postData.rating._id)
+    else if (typeof postData.rating === 'string') {
       const found = ratings.find((r) => r.type === postData.rating)
-      if (found) ratingId = String(found._id)
-    } else if (postData.rating?.type) {
-      const found = ratings.find((r) => r.type === postData.rating.type)
       if (found) ratingId = String(found._id)
     }
 
@@ -70,47 +67,35 @@ const EditForm = ({ postId, onSuccess }) => {
         : '',
       image: postData.imageUrls?.desktop || '',
       content: postData.content || '',
-      // Store entire imageUrls in state (for image upload)
       imageUrls: postData.imageUrls || {},
     })
   }, [ratingsLoading, ratings, postData])
 
-  const handleSubmit = async (values, { setSubmitting }) => {
+  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
     setError(null)
 
-    if (!user || !auth.currentUser) {
-      setError('You must be logged in to update a post.')
-      setSubmitting(false)
-      return
-    }
-
     try {
-      const idToken = await auth.currentUser.getIdToken()
-
-      if (!idToken || typeof idToken !== 'string' || idToken.length < 10) {
-        setError('No valid authentication token found. Please log in again.')
+      const idToken = await auth.currentUser?.getIdToken()
+      if (!idToken) {
+        setError('Authentication required.')
         setSubmitting(false)
         return
       }
 
-      // Handle image upload if user changed the image file (ImageUploadField passes File object)
       let imageUrls = values.imageUrls || {}
-      if (values.image && values.image instanceof File) {
+      if (values.image instanceof File) {
         const formData = new FormData()
         formData.append('image', values.image)
-
         const res = await fetch(getApiUrl('/api/upload-image'), {
           method: 'POST',
           body: formData,
         })
-
         const data = await res.json()
-
         if (data.success && data.urls) {
           imageUrls = {
             desktop: data.urls.desktop || '',
             mobile: data.urls.mobile || '',
-            mobile2x: data.urls['mobile@2x'] || data.urls.mobile2x || '',
+            mobile2x: data.urls['mobile@2x'] || '',
             tablet: data.urls.tablet || '',
           }
         } else {
@@ -134,146 +119,80 @@ const EditForm = ({ postId, onSuccess }) => {
       await axios.put(getApiUrl(`/api/posts/${postId}`), payload, {
         headers: {
           Authorization: `Bearer ${idToken}`,
-          'Content-Type': 'application/json',
         },
       })
 
       if (onSuccess) onSuccess()
     } catch (err) {
-      console.error('Failed to update post:', err)
-      setError('Failed to update post. ' + (err.message || ''))
+      console.error(err)
+      setError('Failed to update post.')
     } finally {
       setSubmitting(false)
     }
   }
 
-  if (!user) {
-    return <div className='text-red-600'>Please log in to edit this post.</div>
-  }
-
+  if (!user) return <div className="text-red-600">Please log in to edit this post.</div>
   if (loading || !initialValues) return <div>Loading...</div>
-  if (error) return <div className='text-red-500'>{error}</div>
+  if (error) return <div className="text-red-600">{error}</div>
 
   return (
     <Formik
       initialValues={initialValues}
       enableReinitialize
+      validationSchema={createValidationSchema}
       onSubmit={handleSubmit}
     >
-      {({ values, setFieldValue, isSubmitting }) => (
-        <Form className='space-y-6'>
-          <div>
-            <label
-              htmlFor='title'
-              className='block text-sm font-medium text-gray-900'
-            >
-              Review Title
-            </label>
-            <input
-              id='title'
-              name='title'
-              type='text'
-              className='block w-full rounded-md border-gray-300 px-3 py-2 mt-1'
-              placeholder='Enter review title'
-              value={values.title}
-              onChange={(e) => setFieldValue('title', e.target.value)}
-            />
-          </div>
+      {({ values, setFieldValue, isSubmitting, touched, errors }) => (
+        <Form className="space-y-6">
+          <FieldWithMic name="title" label="Review Title" required>
+            <SpeechButton fieldName="title" setFieldValue={setFieldValue} />
+          </FieldWithMic>
+
+          <FieldWithMic name="placeName" label="Place Name" required>
+            <SpeechButton fieldName="placeName" setFieldValue={setFieldValue} />
+          </FieldWithMic>
 
           <div>
-            <label
-              htmlFor='placeName'
-              className='block text-sm font-medium text-gray-900'
-            >
-              Place Name
-            </label>
-            <input
-              id='placeName'
-              name='placeName'
-              type='text'
-              className='block w-full rounded-md border-gray-300 px-3 py-2 mt-1'
-              placeholder='Enter place name'
-              value={values.placeName}
-              onChange={(e) => setFieldValue('placeName', e.target.value)}
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor='ratingId'
-              className='block text-sm font-medium text-gray-900'
-            >
-              Rating
+            <label htmlFor="ratingId" className="block text-sm font-medium text-gray-900">
+              Rating <span className="text-red-500">*</span>
             </label>
             <select
-              id='ratingId'
-              name='ratingId'
-              className='block w-full rounded-md border-gray-300 px-3 py-2 mt-1'
+              id="ratingId"
+              name="ratingId"
+              className={`block w-full rounded-md border ${
+                touched.ratingId && errors.ratingId ? 'border-red-500' : 'border-gray-300'
+              } px-3 py-2 mt-1`}
               value={values.ratingId}
               onChange={(e) => setFieldValue('ratingId', e.target.value)}
-              required
               disabled={ratingsLoading}
             >
-              <option value=''>
-                {ratingsLoading ? 'Loading...' : 'Select rating'}
-              </option>
+              <option value="">{ratingsLoading ? 'Loading...' : 'Select rating'}</option>
               {ratings.map((rating) => (
-                <option
-                  key={rating._id}
-                  value={String(rating._id)}
-                >
-                  {rating.type}
-                  {rating.description ? ` - ${rating.description}` : ''}
+                <option key={rating._id} value={rating._id}>
+                  {rating.type}{rating.description ? ` - ${rating.description}` : ''}
                 </option>
               ))}
             </select>
+            {touched.ratingId && errors.ratingId && (
+              <div className="text-sm text-red-600 mt-1">{errors.ratingId}</div>
+            )}
           </div>
 
-          <div>
-            <label
-              htmlFor='location'
-              className='block text-sm font-medium text-gray-900'
-            >
-              Location
-            </label>
-            <input
-              id='location'
-              name='location'
-              type='text'
-              className='block w-full rounded-md border-gray-300 px-3 py-2 mt-1'
-              placeholder='Enter location'
-              value={values.location}
-              onChange={(e) => setFieldValue('location', e.target.value)}
-            />
-          </div>
+          <FieldWithMic name="location" label="Location" required>
+            <SpeechButton fieldName="location" setFieldValue={setFieldValue} />
+          </FieldWithMic>
 
-          <div>
-            <label
-              htmlFor='tags'
-              className='block text-sm font-medium text-gray-900'
-            >
-              Tags
-            </label>
-            <input
-              id='tags'
-              name='tags'
-              type='text'
-              className='block w-full rounded-md border-gray-300 px-3 py-2 mt-1'
-              placeholder='Comma separated tags (e.g. Food,Review,Low Calorie)'
-              value={values.tags}
-              onChange={(e) => setFieldValue('tags', e.target.value)}
-            />
-          </div>
+          <FieldWithMic name="tags" label="Tags (comma-separated)">
+            <SpeechButton fieldName="tags" setFieldValue={setFieldValue} />
+          </FieldWithMic>
 
           {values.image && typeof values.image === 'string' && (
-            <div className='mb-4'>
-              <label className='block text-sm font-medium text-gray-900'>
-                Current Image
-              </label>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-900">Current Image</label>
               <img
                 src={values.image}
-                alt='Current post image'
-                className='max-w-xs rounded-md border border-gray-300 mt-2'
+                alt="Current post image"
+                className="max-w-xs rounded-md border border-gray-300 mt-2"
               />
             </div>
           )}
@@ -290,10 +209,10 @@ const EditForm = ({ postId, onSuccess }) => {
             initialContent={values.content}
           />
 
-          <div className='flex justify-end'>
+          <div className="flex justify-end">
             <button
-              type='submit'
-              className='btn btn-primary px-6 py-2 rounded-md text-white font-semibold disabled:opacity-60'
+              type="submit"
+              className="btn btn-primary px-6 py-2 rounded-md text-white font-semibold disabled:opacity-60"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Updating...' : 'Update Post'}

@@ -81,7 +81,7 @@ export const ImageUploadField = () => {
     <div className="mb-4">
       <label htmlFor="image" className={FIELD_STYLES.label}>
         {UI_TEXT.labels.image}
-        <RequiredIndicator />
+        {/* <RequiredIndicator /> */}
       </label>
       <div className="mt-2">
         <input
@@ -146,7 +146,7 @@ export const RichTextField = () => {
     <div className="mb-4">
       <label htmlFor="content" className={FIELD_STYLES.label}>
         {UI_TEXT.labels.content || 'Content'}
-        <RequiredIndicator />
+        {/* <RequiredIndicator /> */}
       </label>
       <div className="mt-2 min-h-[150px] rounded-md border border-gray-300 p-2 focus-within:border-indigo-600 prose max-w-full">
         {editor && <Toolbar />}

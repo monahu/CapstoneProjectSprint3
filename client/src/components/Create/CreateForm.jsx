@@ -12,6 +12,7 @@ import SpeechButton from '../Speech/SpeechButton'
 const CreateForm = ({ onSubmit, isLoading, serverError }) => {
   const [ratings, setRatings] = useState([])
   const [ratingsLoading, setRatingsLoading] = useState(true)
+  const [successMessage, setSuccessMessage] = useState('')
 
   useEffect(() => {
     fetch(getApiUrl('/api/ratings'))
@@ -23,10 +24,13 @@ const CreateForm = ({ onSubmit, isLoading, serverError }) => {
       .catch(() => setRatingsLoading(false))
   }, [])
 
-  const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+  const handleSubmit = async (values, { setSubmitting, setErrors, resetForm }) => {
     try {
       if (onSubmit) {
         await onSubmit(values)
+        setSuccessMessage('Post created successfully!')
+        resetForm()
+        setTimeout(() => setSuccessMessage(''), 5000) // clear message after 5 sec
       }
     } catch (error) {
       if (error.response?.data?.errors) {
@@ -53,6 +57,13 @@ const CreateForm = ({ onSubmit, isLoading, serverError }) => {
     >
       {({ isSubmitting, values, setFieldValue, errors, touched }) => (
         <Form className="space-y-6">
+          {/* Success message */}
+          {successMessage && (
+            <div className="text-sm text-green-700 bg-green-100 border border-green-300 p-2 rounded">
+              {successMessage}
+            </div>
+          )}
+
           {/* Server-side error */}
           {serverError && (
             <div className="text-sm text-red-600 bg-red-100 border border-red-300 p-2 rounded">

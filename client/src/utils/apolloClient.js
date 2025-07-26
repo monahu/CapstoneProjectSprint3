@@ -174,7 +174,7 @@ const client = new ApolloClient({
         fields: {
           posts: {
             // Define how posts pagination should be merged
-            keyArgs: ["filter"], // Cache different filters separately
+            keyArgs: [], // No keyArgs needed since filters are not used
             merge(existing = { posts: [], totalCount: 0 }, incoming, { args }) {
               // Handle pagination merge
               if (args?.offset > 0) {

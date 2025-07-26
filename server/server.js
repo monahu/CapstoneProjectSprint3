@@ -54,6 +54,7 @@ const corsOptions = {
     'http://localhost:5173', // Vite dev server
     'http://localhost:3000', // Alternative dev port
     'http://127.0.0.1:5173', // Alternative localhost
+    'https://localhost:4173',
     process.env.CLIENT_URL || 'https://your-deployed-client-domain.com',
     'https://studio.apollographql.com',
   ],

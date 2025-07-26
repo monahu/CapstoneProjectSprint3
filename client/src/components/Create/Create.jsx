@@ -6,6 +6,7 @@ import { PostCardSkeleton, ImageSkeleton } from '../Skeleton'
 import { UI_TEXT } from '../../utils/constants/ui'
 import CreateForm from './CreateForm'
 import { getApiUrl } from '../../utils/config'
+import { showSuccessToast } from '../../utils/toast'
 
 const Create = () => {
   const { id } = useParams()
@@ -136,15 +137,11 @@ const Create = () => {
                   if (formikHelpers && formikHelpers.resetForm)
                     formikHelpers.resetForm()
                   
-                  // // Simplest approach: just go to home and let it refresh
-                  // window.location.href = '/'
-
-                    // Redirect to home with success message
-                  navigate('/', {
-                    state: {
-                      successMessage: 'Post created successfully!',
-                    },
-                  })
+                  showSuccessToast('Post created successfully!')
+                  // Force page refresh to update cache after toast shows
+                  setTimeout(() => {
+                    window.location.href = '/'
+                  }, 1000)
                 } else {
                   throw new Error(data.error || 'Failed to create post')
                 }

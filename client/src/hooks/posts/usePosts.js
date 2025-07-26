@@ -6,8 +6,8 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
     GET_ALL_POSTS,
     {
       variables: { limit, offset, filter },
-      fetchPolicy: "cache-first", // Try cache first for faster initial render
-      nextFetchPolicy: "cache-and-network", // Background refresh after initial load
+      fetchPolicy: 'cache-first', // Try cache first for faster initial render
+      nextFetchPolicy: 'cache-and-network', // Background refresh after initial load
       notifyOnNetworkStatusChange: true,
       ...options,
       onError: (error) => {
@@ -17,11 +17,14 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
           networkError: error.networkError,
         })
       },
-      onCompleted: (data) => {
-        console.log('GET_ALL_POSTS completed:', data)
-      },
+      // onCompleted: (data) => {
+      //   // console.log('GET_ALL_POSTS completed:', data)
+      // },
     }
   )
+
+  // Only show loading for initial load or when there's no cached data
+  const isActuallyLoading = loading && (!data || !data.posts)
 
   const loadMore = () => {
     fetchMore({
@@ -62,7 +65,7 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
 
   return {
     posts, // Return filtered posts
-    loading,
+    loading: isActuallyLoading, // Use smart loading state
     error,
     loadMore,
     refetch,

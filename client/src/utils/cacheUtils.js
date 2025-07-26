@@ -1,4 +1,4 @@
-import { GET_ALL_POSTS, GET_POST_BY_ID } from './graphql/post'
+import { GET_ALL_POSTS, GET_POST_BY_ID, GET_ALL_TAGS } from './graphql/post'
 
 /**
  * Updates post cache with new field values
@@ -9,7 +9,7 @@ import { GET_ALL_POSTS, GET_POST_BY_ID } from './graphql/post'
 export const updatePostCache = (cache, postId, fields) => {
   cache.modify({
     id: cache.identify({ __typename: 'Post', id: postId }),
-    fields
+    fields,
   })
 }
 
@@ -22,7 +22,7 @@ export const updatePostCache = (cache, postId, fields) => {
 export const refreshPostQueries = (cache, postId, cacheVariables = {}) => {
   const queriesToUpdate = [
     { query: GET_ALL_POSTS, variables: cacheVariables },
-    { query: GET_POST_BY_ID, variables: { id: postId } }
+    { query: GET_POST_BY_ID, variables: { id: postId } },
   ]
 
   queriesToUpdate.forEach(({ query, variables }) => {
@@ -32,7 +32,7 @@ export const refreshPostQueries = (cache, postId, cacheVariables = {}) => {
         cache.writeQuery({
           query,
           variables,
-          data: existingData // Trigger cache update notification
+          data: existingData, // Trigger cache update notification
         })
       }
     } catch (e) {
@@ -48,7 +48,12 @@ export const refreshPostQueries = (cache, postId, cacheVariables = {}) => {
  * @param {Object} fields - Fields to update
  * @param {Object} cacheVariables - Variables for cache queries
  */
-export const updatePostCacheAndQueries = (cache, postId, fields, cacheVariables = {}) => {
+export const updatePostCacheAndQueries = (
+  cache,
+  postId,
+  fields,
+  cacheVariables = {}
+) => {
   updatePostCache(cache, postId, fields)
   refreshPostQueries(cache, postId, cacheVariables)
 }
@@ -60,10 +65,10 @@ export const updatePostCacheAndQueries = (cache, postId, fields, cacheVariables 
  */
 export const evictPostFromCache = (cache, postId) => {
   // Remove the individual post from cache
-  cache.evict({ 
-    id: cache.identify({ __typename: 'Post', id: postId })
+  cache.evict({
+    id: cache.identify({ __typename: 'Post', id: postId }),
   })
-  
+
   // Remove from all posts lists
   cache.modify({
     fields: {
@@ -74,17 +79,17 @@ export const evictPostFromCache = (cache, postId) => {
             ...existingPosts,
             posts: existingPosts.posts.filter(
               (postRef) => postId !== readField('id', postRef)
-            )
+            ),
           }
         }
-        
+
         // Handle direct array structure
         if (Array.isArray(existingPosts)) {
           return existingPosts.filter(
             (postRef) => postId !== readField('id', postRef)
           )
         }
-        
+
         // Return as-is if unexpected structure
         return existingPosts
       },
@@ -102,9 +107,9 @@ export const updatePostCount = (cache, countChange, cacheVariables = {}) => {
   try {
     const existingData = cache.readQuery({
       query: GET_ALL_POSTS,
-      variables: cacheVariables
+      variables: cacheVariables,
     })
-    
+
     if (existingData?.posts) {
       cache.writeQuery({
         query: GET_ALL_POSTS,
@@ -113,9 +118,12 @@ export const updatePostCount = (cache, countChange, cacheVariables = {}) => {
           ...existingData,
           posts: {
             ...existingData.posts,
-            totalCount: Math.max(0, (existingData.posts.totalCount || 0) + countChange)
-          }
-        }
+            totalCount: Math.max(
+              0,
+              (existingData.posts.totalCount || 0) + countChange
+            ),
+          },
+        },
       })
     }
   } catch (e) {
@@ -132,7 +140,14 @@ export const updatePostCount = (cache, countChange, cacheVariables = {}) => {
 export const deletePostFromCache = (cache, postId, cacheVariables = {}) => {
   evictPostFromCache(cache, postId)
   updatePostCount(cache, -1, cacheVariables)
-  
+
+  // Invalidate tags cache since deleting posts may affect available tags
+  try {
+    cache.evict({ fieldName: 'tags' })
+  } catch (e) {
+    // Ignore if tags field doesn't exist in cache
+  }
+
   // Garbage collect to remove orphaned references
   cache.gc()
 }
@@ -149,7 +164,7 @@ export const addPostToCache = (cache, newPost, cacheVariables = {}) => {
       query: GET_ALL_POSTS,
       variables: cacheVariables,
     })
-    
+
     if (existingData?.posts) {
       cache.writeQuery({
         query: GET_ALL_POSTS,
@@ -158,8 +173,8 @@ export const addPostToCache = (cache, newPost, cacheVariables = {}) => {
           posts: {
             ...existingData.posts,
             posts: [newPost, ...existingData.posts.posts],
-            totalCount: (existingData.posts.totalCount || 0) + 1
-          }
+            totalCount: (existingData.posts.totalCount || 0) + 1,
+          },
         },
       })
     }

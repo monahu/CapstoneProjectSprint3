@@ -4,11 +4,13 @@ const WantToGo = require('../models/WantToGo')
 const Like = require('../models/Likes')
 const Tag = require('../models/Tags')
 const mongoose = require('mongoose')
+const { buildPostAggregationPipeline } = require('../utils/aggregationPipelines')
 
 /**
  * Post Service - Core business logic for post operations
  * Handles CRUD operations, interactions, and search functionality
  */
+
 
 /**
  * Create a new post with tags
@@ -86,21 +88,26 @@ const deletePost = async (postId) => {
 }
 
 /**
- * Get all posts with pagination and filtering
+ * Get all posts with pagination and filtering using aggregation pipeline
+ * This fetches all related data in a single query to avoid N+1 problems
  */
 const getPosts = async (limit = 10, offset = 0, filter = {}, options = {}) => {
-  const { countOnly = false, withCount = false } = options;
+  const { countOnly = false, withCount = false, currentUserId = null } = options;
   
   if (countOnly) {
     return await Post.countDocuments(filter);
   }
 
   const safeLimit = Math.min(limit, 50); // Max 50 posts per request
-  const posts = await Post.find(filter)
-    .sort({ createdAt: -1 })
-    .limit(safeLimit)
-    .skip(offset)
-    .populate('userId', 'displayName photoURL');
+  
+  // Use shared aggregation pipeline builder
+  const pipeline = buildPostAggregationPipeline(
+    filter, 
+    currentUserId, 
+    { limit: safeLimit, offset }
+  );
+
+  const posts = await Post.aggregate(pipeline);
 
   if (withCount) {
     const totalCount = await Post.countDocuments(filter);
@@ -111,19 +118,30 @@ const getPosts = async (limit = 10, offset = 0, filter = {}, options = {}) => {
 }
 
 /**
- * Get a single post by ID
+ * Get a single post by ID using aggregation pipeline
  */
-const getPostById = async (postId) => {
-  return await Post.findById(postId).populate('userId', 'displayName photoURL')
+const getPostById = async (postId, currentUserId = null) => {
+  const pipeline = buildPostAggregationPipeline(
+    { _id: new mongoose.Types.ObjectId(postId) },
+    currentUserId,
+    { skipPagination: true }
+  );
+
+  const posts = await Post.aggregate(pipeline);
+  return posts.length > 0 ? posts[0] : null;
 }
 
 /**
- * Get posts by user ID
+ * Get posts by user ID using aggregation pipeline
  */
-const getPostsByUserId = async (userId) => {
-  return await Post.find({ userId: userId })
-    .sort({ createdAt: -1 })
-    .populate('userId', 'displayName photoURL')
+const getPostsByUserId = async (userId, currentUserId = null) => {
+  const pipeline = buildPostAggregationPipeline(
+    { userId: new mongoose.Types.ObjectId(userId) },
+    currentUserId,
+    { skipPagination: true }
+  );
+
+  return await Post.aggregate(pipeline);
 }
 
 /**
@@ -245,9 +263,9 @@ const removeTagFromPost = async (postId, tagName) => {
 }
 
 /**
- * Search posts by tag names
+ * Search posts by tag names using aggregation pipeline
  */
-const searchPostsByTags = async (tags, limit = 10, offset = 0) => {
+const searchPostsByTags = async (tags, limit = 10, offset = 0, currentUserId = null) => {
   if (!tags || tags.length === 0) return []
 
   // Find tags that match the search terms (case insensitive)
@@ -265,23 +283,28 @@ const searchPostsByTags = async (tags, limit = 10, offset = 0) => {
   // Get unique post IDs
   const postIds = [...new Set(postTagRecords.map((record) => record.postId))]
 
-  // Find and return posts
-  return await Post.find({ _id: { $in: postIds } })
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .skip(offset)
-    .populate('userId', 'displayName photoURL')
+  if (postIds.length === 0) return []
+
+  // Use aggregation pipeline with post IDs filter
+  const pipeline = buildPostAggregationPipeline(
+    { _id: { $in: postIds } },
+    currentUserId,
+    { limit, offset }
+  );
+
+  return await Post.aggregate(pipeline);
 }
 
 /**
- * Advanced search posts by search term, tags, and location
+ * Advanced search posts by search term, tags, and location using aggregation pipeline
  */
 const searchPosts = async (
   searchTerm,
   tags,
   location,
   limit = 10,
-  offset = 0
+  offset = 0,
+  currentUserId = null
 ) => {
   // If no search criteria provided, return empty array
   if (
@@ -360,11 +383,14 @@ const searchPosts = async (
       ? searchConditions[0]
       : { $and: searchConditions }
 
-  return await Post.find(searchFilter)
-    .sort({ createdAt: -1 })
-    .limit(limit)
-    .skip(offset)
-    .populate('userId', 'displayName photoURL')
+  // Use aggregation pipeline with search filter
+  const pipeline = buildPostAggregationPipeline(
+    searchFilter,
+    currentUserId,
+    { limit, offset }
+  );
+
+  return await Post.aggregate(pipeline);
 }
 
 module.exports = {

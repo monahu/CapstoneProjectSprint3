@@ -3,7 +3,8 @@ import { usePostActions } from '../../hooks/usePostActions'
 import LoadingState from '../LoadingState'
 import ErrorMessage from '../ErrorMessage'
 import { UI_TEXT } from '../../utils/constants/ui'
-import { PostImage, PostTags, PostActions } from '../Post'
+import { PostTags, PostActions } from '../Post'
+import ImageGallery from '../Post/ImageGallery'
 import PostMeta from './PostMeta'
 import PostHeader from './PostHeader'
 import PostDate from './PostDate'
@@ -64,8 +65,8 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
       className={`bg-white rounded-2xl shadow-lg overflow-hidden mx-auto cursor-pointer hover:shadow-xl transition-shadow ${className}`}
     >
       {/* Restaurant Image */}
-      <PostImage
-        imageUrl={post.imageUrls?.desktop || post.imageUrls}
+      <ImageGallery
+        imageUrls={post.imageUrls || post.imageUrl}
         alt={post.placeName}
       />
 

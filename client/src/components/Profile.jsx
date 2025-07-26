@@ -13,7 +13,7 @@ const Profile = () => {
     const user = useSelector((state) => state.user.data);
     const authInitialized = useSelector((state) => state.user.authInitialized);
 
-    // ✅ My posts
+    // My posts
     const {
         posts: myPosts,
         loading: myPostsLoading,
@@ -21,7 +21,7 @@ const Profile = () => {
         refetch: refetchMyPosts,
     } = useMyPosts();
 
-    // ✅ Going list
+    // Going list
     const {
         goingList,
         loading: goingLoading,
@@ -298,7 +298,6 @@ const Profile = () => {
                                 </table>
                             </div>
 
-                            {/* Mobile Cards */}
                             {/* Mobile Cards */}
                             <div className="md:hidden rounded-lg bg-white shadow-md">
                                 {/* Header for mobile */}

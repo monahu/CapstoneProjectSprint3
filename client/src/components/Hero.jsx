@@ -11,7 +11,7 @@ const Hero = ({
   buttonText = UI_TEXT.hero.button,
   onButtonClick,
   showButton = true,
-  className = 'min-h-[40vh]',
+  className = 'min-h-[40vh] max-h-[60vh]',
   contentClassName = '',
 }) => {
   const optimalImageUrl = !useColorBackground

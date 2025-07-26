@@ -101,6 +101,44 @@ A full-stack social media platform for sharing restaurant experiences and recomm
 
 > 📊 **For detailed architecture, security, and patterns**: See [TECH_STACK.md](./TECH_STACK.md)
 
+### 🗄️ Apollo Cache Architecture
+
+Our application uses a sophisticated Apollo Client caching strategy for optimal performance and data consistency:
+
+#### **Core Configuration** (`client/src/utils/apolloClient.js`)
+- **InMemoryCache** with custom type policies for posts and search queries
+- **Pagination Support**: Smart merge strategies for `fetchMore` operations
+- **Field-Level Control**: Specific handling for counts (`likeCount`, `shareCount`) with `merge: false`
+- **Normalized Storage**: Automatic object deduplication with `addTypename` and `canonizeResults`
+
+#### **Cache Management** (`client/src/utils/cacheUtils.js`)
+```javascript
+// Smart cache utilities for common operations
+updatePostCache()        // Updates specific post fields
+refreshPostQueries()     // Triggers cache updates for relevant queries  
+evictPostFromCache()     // Removes posts with nested array handling
+addPostToCache()         // Adds new posts to existing cached queries
+deletePostFromCache()    // Complete deletion with count updates + GC
+```
+
+#### **Query Strategies**
+- **cache-first**: Fast initial loads from cache
+- **cache-and-network**: Background refresh after cache hit
+- **network-only**: Force server fetch when needed
+- **Pagination**: Custom merge functions handle infinite scroll seamlessly
+
+#### **Mutation Integration**
+- **Create Posts**: Automatically adds to cache with count updates
+- **Delete Posts**: Removes from cache, updates counts, triggers garbage collection
+- **Like/Share**: Real-time field updates without full refetch
+- **Auth Changes**: Cache reset on login/logout for user-specific data accuracy
+
+#### **Performance Benefits**
+- ⚡ **Instant UI Updates**: Optimistic responses for user interactions
+- 🔄 **Smart Invalidation**: Selective cache updates, not full refreshes  
+- 📱 **Offline Support**: Cached data available during network issues
+- 🎯 **Normalized Sharing**: Same data objects shared across multiple queries
+
 ## 🚧 Development Setup
 
 ### Prerequisites

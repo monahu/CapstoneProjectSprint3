@@ -26,6 +26,7 @@ const RestaurantCard = ({
   isOwner = false,
   className = '',
   priority = false,
+  url, // New prop for the restaurant URL
 }) => {
   const navigate = useNavigate()
 
@@ -41,7 +42,7 @@ const RestaurantCard = ({
   })
 
   const handleViewDetail = () => {
-    navigate(`/post/${id}`)
+    navigate(url)
   }
 
   // Prefer imageUrls.desktop if available, fallback to image, then default

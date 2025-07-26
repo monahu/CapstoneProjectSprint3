@@ -33,6 +33,19 @@ export const useNavbar = () => {
   const hideLogoRoutes = NAVIGATION.hideLogoRoutes
   const protectedRoutes = NAVIGATION.protectedRoutes
 
+  // Check if current path is protected (handles dynamic routes)
+  const isProtectedRoute = (pathname) => {
+    return protectedRoutes.some(route => {
+      // Handle exact matches
+      if (route === pathname) return true
+      // Handle dynamic routes like /restaurant/:slug
+      if (route === ROUTES.POST_DETAIL && pathname.startsWith('/restaurant/')) return true
+      // Handle edit routes like /edit/:id  
+      if (route === ROUTES.EDIT && pathname.startsWith('/edit/')) return true
+      return false
+    })
+  }
+
   // Navigation logic - runs when location or user changes
   useEffect(() => {
     if (user) {
@@ -42,7 +55,7 @@ export const useNavbar = () => {
       }
     } else {
       // Only redirect if they're trying to access protected routes
-      if (protectedRoutes.includes(location.pathname)) {
+      if (isProtectedRoute(location.pathname)) {
         navigate(ROUTES.LOGIN)
       }
     }

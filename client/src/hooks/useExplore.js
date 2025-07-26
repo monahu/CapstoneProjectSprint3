@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router'
 import { useSearchPosts, useTags } from './usePost'
 import { useClassNames } from './useClassNames'
 import { useTagSelection } from './useTagSelection'
+import { TAGS_CONFIG } from '../utils/constants/tags'
 
 export const useExplore = () => {
   const [searchParams] = useSearchParams()
@@ -69,8 +70,8 @@ export const useExplore = () => {
   }
 
   // Get tags for display (limit to 10 unless showing all)
-  const tagsToDisplay = showAllTags ? dbTags : dbTags.slice(0, 10)
-  const hasMoreTags = dbTags.length > 10
+  const tagsToDisplay = showAllTags ? dbTags : dbTags.slice(0, TAGS_CONFIG.DISPLAY_LIMIT)
+  const hasMoreTags = dbTags.length > TAGS_CONFIG.DISPLAY_LIMIT
 
   return {
     // Search state

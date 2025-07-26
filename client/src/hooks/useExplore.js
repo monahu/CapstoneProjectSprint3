@@ -42,17 +42,14 @@ export const useExplore = () => {
 
   // Execute search when search parameters change
   useEffect(() => {
-    const hasSearchParams = searchTerm || tags.length > 0 || location
+    // Create a key for current search parameters
+    const currentSearchKey = JSON.stringify({ searchTerm, tags, location })
 
-    if (hasSearchParams) {
-      // Create a key for current search parameters
-      const currentSearchKey = JSON.stringify({ searchTerm, tags, location })
-
-      // Only search if parameters have actually changed
-      if (currentSearchKey !== lastSearchRef.current) {
-        lastSearchRef.current = currentSearchKey
-        searchPosts(searchTerm, { tags, location })
-      }
+    // Only search if parameters have actually changed
+    if (currentSearchKey !== lastSearchRef.current) {
+      lastSearchRef.current = currentSearchKey
+      // Always call searchPosts, even with empty params to trigger clear logic
+      searchPosts(searchTerm, { tags, location })
     }
   }, [searchTerm, tags, location])
 

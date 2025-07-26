@@ -50,10 +50,13 @@ const Navbar = ({ setSidebarOpen }) => {
             </Link>
           </div>
 
-          <SearchForm
-            className='hidden md:grid'
-            id='navbar-search-input'
-          />
+          {/* Hide search form on explore page since it has its own search */}
+          {location.pathname !== '/explore' && (
+            <SearchForm
+              className='hidden md:grid'
+              id='navbar-search-input'
+            />
+          )}
         </>
       )}
 

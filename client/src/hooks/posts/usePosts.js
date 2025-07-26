@@ -23,6 +23,9 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
     }
   )
 
+  // Only show loading for initial load or when there's no cached data
+  const isActuallyLoading = loading && (!data || !data.posts)
+
   const loadMore = () => {
     fetchMore({
       variables: {
@@ -62,7 +65,7 @@ export const usePosts = (limit = 10, offset = 0, filter = {}, options = {}) => {
 
   return {
     posts, // Return filtered posts
-    loading,
+    loading: isActuallyLoading, // Use smart loading state
     error,
     loadMore,
     refetch,

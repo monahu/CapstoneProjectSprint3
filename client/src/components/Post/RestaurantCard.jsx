@@ -76,8 +76,8 @@ const RestaurantCard = ({
             </p>
           </div>
           <div className='order-1 text-center md:text-left md:order-2 w-full h-fit my-auto'>
-            <p className='text-sm text-gray-600'>{location}</p>
-            <h2 className='font-semibold text-3xl sm:text-2xl text-gray-900'>
+            <p className='text-sm md:text-base text-gray-600'>{location}</p>
+            <h2 className='font-semibold text-3xl md:text-4xl text-gray-900'>
               {title}
             </h2>
           </div>

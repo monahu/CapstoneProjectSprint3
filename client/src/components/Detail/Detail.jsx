@@ -1,5 +1,6 @@
 import { useParams, useNavigate } from 'react-router'
 import { usePost } from '../../hooks/usePost'
+import { extractIdFromRestaurantUrl } from '../../utils/slugUtils'
 import heroImage from '../../assets/img/detail_hero1.webp'
 import Hero from '../Hero'
 import LoadingState from '../LoadingState'
@@ -8,8 +9,9 @@ import RestaurantDetail from './RestaurantDetail'
 import { UI_TEXT } from '../../utils/constants/ui'
 
 const Detail = () => {
-  const { id } = useParams()
+  const { slug } = useParams()
   const navigate = useNavigate()
+  const id = extractIdFromRestaurantUrl(slug)
   const { post, loading, error, refetch } = usePost(id)
 
   // Loading state

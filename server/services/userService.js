@@ -1,5 +1,6 @@
 const Post = require('../models/posts')
 const WantToGo = require('../models/WantToGo')
+const { buildPostAggregationPipeline } = require('../utils/aggregationPipelines')
 
 // Service to get user profile with posts and wantToGo data
 const getUserProfile = async (currentUser) => {
@@ -17,42 +18,38 @@ const getUserProfile = async (currentUser) => {
     updatedAt: currentUser.updatedAt,
   }
 
-  // Get user's posts with author info
-  const posts = await Post.find({ userId: currentUser._id })
-    .sort({ createdAt: -1 })
-    .populate('userId', 'displayName photoURL')
+  // Get user's posts with all related data using aggregation pipeline
+  const posts = await Post.aggregate(
+    buildPostAggregationPipeline(
+      { userId: currentUser._id }, 
+      currentUser._id, 
+      { skipPagination: true }
+    )
+  )
 
-  // Get user's wantToGoPosts list with all post data populated
-  const wantToGoPosts = await WantToGo.find({
+  // Get user's wantToGoPosts with full post data using aggregation pipeline
+  const wantToGoEntries = await WantToGo.find({
     userId: currentUser._id,
-  }).populate({
-    path: 'postId',
-    populate: [
-      {
-        path: 'userId',
-        select: 'displayName photoURL',
-      },
-      {
-        path: 'ratingId',
-      },
-    ],
   })
+  
+  let wantToGoPosts = []
+  if (wantToGoEntries.length > 0) {
+    const postIds = wantToGoEntries.map((entry) => entry.postId)
+    
+    // Get full post data using aggregation pipeline
+    wantToGoPosts = await Post.aggregate(
+      buildPostAggregationPipeline(
+        { _id: { $in: postIds } },
+        currentUser._id,
+        { skipPagination: true }
+      )
+    )
+  }
 
   return {
     ...userInfo,
     posts,
-    wantToGoPosts: wantToGoPosts.map((item) => ({
-      id: item._id,
-      userId: item.userId._id,
-      postId: item.postId._id,
-      post: {
-        id: item.postId._id,
-        title: item.postId.title,
-        user: {
-          displayName: item.postId.userId.displayName,
-        },
-      },
-    })),
+    wantToGoPosts,
   }
 }
 

@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import LoadingState from './LoadingState'
 import Browse from './Browse'
 import Home from './Home'
+import ScrollToTop from './ScrollToTop'
 import { UI_TEXT } from '../utils/constants/ui'
 
 // Lazy load heavy components
@@ -23,14 +24,18 @@ const Body = () => {
   const appRouter = createBrowserRouter([
     {
       path: '/',
-      element: <Browse />,
+      element: (
+        <ScrollToTop>
+          <Browse />
+        </ScrollToTop>
+      ),
       children: [
         {
           index: true,
           element: <Home />,
         },
         {
-          path: 'post/:id',
+          path: 'restaurant/:slug',
           element: (
             <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Detail />

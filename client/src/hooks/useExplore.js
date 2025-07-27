@@ -3,6 +3,7 @@ import { useSearchParams, useNavigate } from 'react-router'
 import { useSearchPosts, useTags } from './usePost'
 import { useClassNames } from './useClassNames'
 import { useTagSelection } from './useTagSelection'
+import { TAGS_CONFIG } from '../utils/constants/tags'
 
 export const useExplore = () => {
   const [searchParams] = useSearchParams()
@@ -41,17 +42,14 @@ export const useExplore = () => {
 
   // Execute search when search parameters change
   useEffect(() => {
-    const hasSearchParams = searchTerm || tags.length > 0 || location
+    // Create a key for current search parameters
+    const currentSearchKey = JSON.stringify({ searchTerm, tags, location })
 
-    if (hasSearchParams) {
-      // Create a key for current search parameters
-      const currentSearchKey = JSON.stringify({ searchTerm, tags, location })
-
-      // Only search if parameters have actually changed
-      if (currentSearchKey !== lastSearchRef.current) {
-        lastSearchRef.current = currentSearchKey
-        searchPosts(searchTerm, { tags, location })
-      }
+    // Only search if parameters have actually changed
+    if (currentSearchKey !== lastSearchRef.current) {
+      lastSearchRef.current = currentSearchKey
+      // Always call searchPosts, even with empty params to trigger clear logic
+      searchPosts(searchTerm, { tags, location })
     }
   }, [searchTerm, tags, location])
 
@@ -69,8 +67,8 @@ export const useExplore = () => {
   }
 
   // Get tags for display (limit to 10 unless showing all)
-  const tagsToDisplay = showAllTags ? dbTags : dbTags.slice(0, 10)
-  const hasMoreTags = dbTags.length > 10
+  const tagsToDisplay = showAllTags ? dbTags : dbTags.slice(0, TAGS_CONFIG.DISPLAY_LIMIT)
+  const hasMoreTags = dbTags.length > TAGS_CONFIG.DISPLAY_LIMIT
 
   return {
     // Search state

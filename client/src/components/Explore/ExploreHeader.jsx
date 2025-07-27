@@ -1,5 +1,6 @@
-import { ArrowLeft } from "lucide-react"
-import { UI_TEXT } from "../../utils/constants/ui"
+import { ArrowLeft } from 'lucide-react'
+import { UI_TEXT } from '../../utils/constants/ui'
+import { SearchForm } from '../SearchForm'
 
 const ExploreHeader = ({
   navigate,
@@ -12,49 +13,59 @@ const ExploreHeader = ({
   classNames,
 }) => {
   return (
-    <div className="mt-6 bg-white shadow-sm rounded-lg">
+    <div className='mt-6 bg-white shadow-sm rounded-lg'>
       <div>
-        <div className="container mx-auto px-4 py-2">
-          <div className="flex items-center gap-4 mb-0">
+        <div className='container mx-auto px-4 md:px-8 lg:px-12 py-2'>
+          <div className='flex items-center gap-4 mb-0'>
             <button
               onClick={() => navigate(-1)}
-              className="p-2 hover:bg-gray-100 transition-colors"
-              aria-label="Go back"
+              className='p-2 hover:bg-gray-100 transition-colors'
+              aria-label='Go back'
             >
-              <div className="flex items-center gap-2">
-                <ArrowLeft className="w-5 h-5 text-gray-600" />
-                <span className="text-gray-600">
+              <div className='flex items-center gap-2'>
+                <ArrowLeft className='w-5 h-5 text-gray-600' />
+                <span className='text-gray-600'>
                   {UI_TEXT.explore.backButton}
                 </span>
               </div>
             </button>
           </div>
 
-          {/* Mobile Tags Section */}
-          <div className="lg:hidden mt-2">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              <span className="text-pink-500">{UI_TEXT.explore.tagsTitle}</span>{" "}
-              <span className="text-cyan-400">
+          {/* Search Form */}
+          <div className='mt-4 mb-4'>
+            <SearchForm />
+          </div>
+
+          {/* Tags Section */}
+          <div className='mt-2'>
+            <h3 className='text-lg font-semibold text-gray-900 mb-4'>
+              <span className='text-pink-500'>{UI_TEXT.explore.tagsTitle}</span>{' '}
+              <span className='text-cyan-400'>
                 {UI_TEXT.explore.tagsSubtitle}
               </span>
             </h3>
 
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className='flex flex-wrap gap-2 mb-4'>
               {tagsToDisplay.map((tag) => {
                 const isSelected = tags.includes(tag.name)
                 return (
-                  <button
+                  <div
                     key={tag.id || tag.name}
-                    onClick={() => handleTagClick(tag.name)}
-                    className={classNames(
-                      "px-4 py-2 rounded-full text-sm font-medium transition-colors",
-                      isSelected
-                        ? "bg-info text-black"
-                        : "bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200"
-                    )}
+                    className='tooltip tooltip-bottom'
+                    data-tip='Click to toggle search tags'
                   >
-                    #{tag.name}
-                  </button>
+                    <button
+                      onClick={() => handleTagClick(tag.name)}
+                      className={classNames(
+                        'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+                        isSelected
+                          ? 'bg-info text-black'
+                          : 'bg-gray-100 text-gray-700 border border-gray-300 hover:bg-gray-200'
+                      )}
+                    >
+                      #{tag.name}
+                    </button>
+                  </div>
                 )
               })}
             </div>
@@ -63,7 +74,7 @@ const ExploreHeader = ({
             {hasMoreTags && (
               <button
                 onClick={() => setShowAllTags(!showAllTags)}
-                className="text-purple-600 text-sm font-medium underline hover:text-purple-800 transition-colors"
+                className='text-purple-600 text-sm font-medium underline hover:text-purple-800 transition-colors'
               >
                 {showAllTags
                   ? UI_TEXT.explore.lessButton

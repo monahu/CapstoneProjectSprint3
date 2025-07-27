@@ -157,7 +157,7 @@ const Profile = () => {
                                             <tr
                                                 key={post.id}
                                                 onClick={() =>
-                                                    navigate(`/post/${post.id}`)
+                                                    navigate(post.url)
                                                 }
                                                 className="cursor-pointer odd:bg-gray-50 even:bg-gray-100 hover:bg-gray-200 transition"
                                             >
@@ -284,9 +284,7 @@ const Profile = () => {
                                                 <td className="px-4 py-3 text-right">
                                                     <button
                                                         onClick={() =>
-                                                            navigate(
-                                                                `/post/${item.id}`
-                                                            )
+                                                            navigate(item.url)
                                                         }
                                                         className="cursor-pointer bg-purple-700 hover:bg-purple-800 text-white text-xs px-4 py-1 rounded-full"
                                                     >
@@ -318,7 +316,7 @@ const Profile = () => {
                                         key={item.id}
                                         className="flex justify-between items-center p-4 odd:bg-gray-50 even:bg-gray-200"
                                         onClick={() =>
-                                            navigate(`/post/${item.id}`)
+                                            navigate(item.url)
                                         }
                                     >
                                         <div className="w-3/4">

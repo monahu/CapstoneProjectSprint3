@@ -14,15 +14,18 @@ const postQueries = {
     /**
      * Get all posts with pagination and filtering
      */
-    posts: async (_, { limit = 10, offset = 0, filter = {} }) => {
-        return await getPosts(limit, offset, filter, { withCount: true });
+    posts: async (_, { limit = 10, offset = 0, filter = {} }, { currentUser }) => {
+        return await getPosts(limit, offset, filter, { 
+            withCount: true, 
+            currentUserId: currentUser?._id 
+        });
     },
 
     /**
      * Get a single post by its ID
      */
-    post: async (_, { id }) => {
-        return await getPostById(id);
+    post: async (_, { id }, { currentUser }) => {
+        return await getPostById(id, currentUser?._id);
     },
 
     /**
@@ -33,14 +36,14 @@ const postQueries = {
             throw new Error("Authentication required");
         }
 
-        return await getPostsByUserId(currentUser._id);
+        return await getPostsByUserId(currentUser._id, currentUser._id);
     },
 
     /**
      * Search posts by tag names
      */
-    searchPostsByTags: async (_, { tags, limit = 10, offset = 0 }) => {
-        return await searchPostsByTags(tags, limit, offset);
+    searchPostsByTags: async (_, { tags, limit = 10, offset = 0 }, { currentUser }) => {
+        return await searchPostsByTags(tags, limit, offset, currentUser?._id);
     },
 
     /**
@@ -49,9 +52,10 @@ const postQueries = {
      */
     searchPosts: async (
         _,
-        { searchTerm, tags, location, limit = 10, offset = 0 }
+        { searchTerm, tags, location, limit = 10, offset = 0 },
+        { currentUser }
     ) => {
-        return await searchPosts(searchTerm, tags, location, limit, offset);
+        return await searchPosts(searchTerm, tags, location, limit, offset, currentUser?._id);
     },
     myWantToGoPosts: async (_, __, { models, currentUser }) => {
         if (!currentUser) {
@@ -63,11 +67,17 @@ const postQueries = {
         });
         const postIds = wantToGoEntries.map((entry) => entry.postId);
 
-        const posts = await models.Post.find({
-            _id: { $in: postIds },
-        }).populate("userId", "displayName photoURL firstName lastName email");
+        if (postIds.length === 0) return [];
 
-        return posts;
+        // Use aggregation pipeline for want-to-go posts
+        const { buildPostAggregationPipeline } = require("../../utils/aggregationPipelines");
+        const pipeline = buildPostAggregationPipeline(
+            { _id: { $in: postIds } },
+            currentUser._id,
+            { skipPagination: true }
+        );
+
+        return await models.Post.aggregate(pipeline);
     },
 };
 

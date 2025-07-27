@@ -54,10 +54,10 @@ const Login = () => {
             <img
               alt={APP_CONFIG.name}
               src={APP_CONFIG.logo}
-              className='mx-auto w-auto my-logo'
+              className='mx-auto w-auto my-logo h-20 md:h-24'
             />
           </Link>
-          <h2 className='mt-6 text-center text-2xl/9 font-bold tracking-tight text-gray-900'>
+          <h2 className='mt-6 text-center text-2xl md:text-3xl font-bold tracking-tight text-gray-900'>
             {isSignInForm ? UI_TEXT.login.signIn : UI_TEXT.login.signUp}{' '}
             {UI_TEXT.login.toAccount}
           </h2>

@@ -4,6 +4,7 @@ import { useTags } from './usePost'
 import { useClassNames } from './useClassNames'
 import { useTagSelection } from './useTagSelection'
 import { NAVIGATION } from '../utils/constants/navigation'
+import { TAGS_CONFIG } from '../utils/constants/tags'
 
 export const useSidebar = (user) => {
   const location = useLocation()
@@ -24,9 +25,9 @@ export const useSidebar = (user) => {
   // Use database tags if available, fallback to hardcoded tags
   const tagsToShow = dbTags.length > 0 ? dbTags : NAVIGATION.tags
 
-  // Get tags for display (limit to 10 unless showing all)
-  const tagsToDisplay = showAllTags ? tagsToShow : tagsToShow.slice(0, 10)
-  const hasMoreTags = tagsToShow.length > 10
+  // Get tags for display (limit to DISPLAY_LIMIT unless showing all)
+  const tagsToDisplay = showAllTags ? tagsToShow : tagsToShow.slice(0, TAGS_CONFIG.DISPLAY_LIMIT)
+  const hasMoreTags = tagsToShow.length > TAGS_CONFIG.DISPLAY_LIMIT
 
   // Map tags with current state
   const tags = useMemo(() => {

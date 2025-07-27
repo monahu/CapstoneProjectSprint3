@@ -1,3 +1,4 @@
+// Import necessary libraries and components
 import { useSelector } from "react-redux";
 import { useMyPosts } from "../hooks/useMyPosts";
 import { useMyWantToGoPosts } from "../hooks/useMyWantToGoPosts";

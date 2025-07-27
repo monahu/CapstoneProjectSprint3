@@ -22,10 +22,10 @@ const ExploreResults = ({
   onLoadMore,
 }) => {
   return (
-    <div className='container mx-auto px-4 py-8'>
+    <div className='container mx-auto px-2 py-2 md:py-8'>
       {/* Initial state - no search yet */}
       {!hasActiveSearch && !hasSearched && (
-        <div className='text-center py-20'>
+        <div className='text-center py-10 md:py-20'>
           <Search className='w-16 h-16 text-gray-300 mx-auto mb-4' />
           <h2 className='text-xl font-semibold text-gray-600 mb-2'>
             {UI_TEXT.explore.startExploringTitle}

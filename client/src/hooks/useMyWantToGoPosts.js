@@ -1,5 +1,6 @@
 import { useQuery } from "@apollo/client";
 import { GET_MY_WANT_TO_GO_POSTS } from "../utils/graphql/post";
+import { generateRestaurantUrl } from "../utils/slugUtils";
 
 export const useMyWantToGoPosts = () => {
     const { data, loading, error, refetch } = useQuery(
@@ -13,8 +14,14 @@ export const useMyWantToGoPosts = () => {
         }
     );
 
+    // Add URLs to posts
+    const goingList = (data?.myWantToGoPosts || []).map(post => ({
+        ...post,
+        url: generateRestaurantUrl(post)
+    }))
+
     return {
-        goingList: data?.myWantToGoPosts || [],
+        goingList,
         loading,
         error,
         refetch,

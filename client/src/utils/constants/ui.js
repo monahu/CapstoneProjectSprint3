@@ -98,8 +98,12 @@ export const UI_TEXT = {
     noResultsDescription: 'Try adjusting your search terms or filters',
     placesDiscovered: 'places discovered',
     searchFor: 'for',
-    moreButton: 'more',
-    lessButton: 'less',
+    moreButton: 'show more',
+    lessButton: 'show less',
+  },
+  sidebarExplore: {
+    moreButton: 'show more',
+    lessButton: 'show less',
   },
   searchForm: {
     searchPlaceholder: 'Search restaurants, places, or tags...',
@@ -145,14 +149,16 @@ export const UI_TEXT = {
     deletePost: {
       type: 'delete',
       title: 'Delete Post',
-      message: 'Are you sure you want to delete this restaurant post? This action cannot be undone and all associated data will be permanently removed.',
+      message:
+        'Are you sure you want to delete this restaurant post? This action cannot be undone and all associated data will be permanently removed.',
       confirmText: 'Delete Post',
       cancelText: 'Keep Post',
     },
     deletePostFromProfile: {
       type: 'delete',
       title: 'Delete Post',
-      message: 'Are you sure you want to delete this post? This action cannot be undone.',
+      message:
+        'Are you sure you want to delete this post? This action cannot be undone.',
       confirmText: 'Delete Post',
       cancelText: 'Cancel',
     },

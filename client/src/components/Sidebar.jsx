@@ -10,6 +10,7 @@ import { APP_CONFIG } from '../utils/constants/app'
 import { SearchForm } from './SearchForm'
 import { useSelector } from 'react-redux'
 import { useSidebar } from '../hooks'
+import { UI_TEXT } from '../utils/constants/ui'
 
 const iconMap = {
   House,
@@ -171,7 +172,7 @@ const SidebarContent = ({ user }) => {
                 </div>
                 <ul
                   role='list'
-                  className='-mx-2 mt-2 space-y-2 flex flex-row gap-x-3 flex-wrap'
+                  className='-mx-4 mt-2 space-y-2 flex flex-row gap-x-3 flex-wrap'
                 >
                   {tags.map((tag) => (
                     <li key={tag.name}>
@@ -207,7 +208,9 @@ const SidebarContent = ({ user }) => {
                       onClick={() => setShowAllTags(!showAllTags)}
                       className='text-purple-600 text-sm font-medium underline hover:text-purple-800 transition-colors'
                     >
-                      {showAllTags ? 'less' : 'more'}
+                      {showAllTags
+                        ? UI_TEXT.sidebarExplore.lessButton
+                        : UI_TEXT.sidebarExplore.moreButton}
                     </button>
                   </div>
                 )}

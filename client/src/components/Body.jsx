@@ -35,7 +35,7 @@ const Body = () => {
           element: <Home />,
         },
         {
-          path: 'post/:id',
+          path: 'restaurant/:slug',
           element: (
             <Suspense fallback={<LoadingState type={UI_TEXT.loadingTypes.COMPONENT} />}>
               <Detail />

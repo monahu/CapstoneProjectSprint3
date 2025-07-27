@@ -1,7 +1,9 @@
 import { useLazyQuery } from '@apollo/client'
+import { useState } from 'react'
 import { SEARCH_POSTS } from '../../utils/graphql/post'
 
 export const useSearchPosts = () => {
+  const [searchResults, setSearchResults] = useState(null)
   const [
     executeSearch,
     { data, loading, error, called, fetchMore, networkStatus },
@@ -10,6 +12,9 @@ export const useSearchPosts = () => {
     fetchPolicy: 'cache-and-network',
     onError: (error) => {
       console.error('SEARCH_POSTS error:', error)
+    },
+    onCompleted: (data) => {
+      setSearchResults(data)
     },
   })
 
@@ -21,6 +26,8 @@ export const useSearchPosts = () => {
     const hasLocation = location?.trim()
 
     if (!hasSearchTerm && !hasTags && !hasLocation) {
+      // Clear results when no search criteria
+      setSearchResults(null)
       return
     }
 
@@ -62,7 +69,7 @@ export const useSearchPosts = () => {
     })
   }
 
-  const posts = data?.searchPosts || []
+  const posts = searchResults?.searchPosts || []
   const isLoadingMore = networkStatus === 3
   const hasMoreResults = posts.length > 0 && posts.length % 20 === 0 // Assuming limit of 20
 

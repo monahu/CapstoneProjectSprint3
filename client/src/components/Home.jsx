@@ -132,6 +132,7 @@ const Home = () => {
             isOwner={post.isOwner || false}
             className='mt-10 max-w-full md:max-w-5xl lg:max-w-4xl'
             priority={index === 0}
+            url={post.url}
           />
         ))}
 

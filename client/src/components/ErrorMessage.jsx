@@ -30,16 +30,16 @@ const ErrorMessage = ({ error, onRetry }) => {
 
   return (
     <div className='text-center py-20 px-4'>
-      <div className='max-w-md mx-auto bg-orange-50 border-l-4 border-orange-400 p-6 rounded-lg'>
+      <div className='max-w-md mx-auto bg-error/10 border-l-4 border-error p-6 rounded-lg'>
         <div className='flex items-center mb-4'>
-          <div className='text-orange-400 text-2xl mr-3'>⚠️</div>
-          <h3 className='text-lg font-medium text-orange-800'>Oops!</h3>
+          <div className='text-error text-2xl mr-3'>⚠️</div>
+          <h2 className='text-lg font-medium text-error'>Oops!</h2>
         </div>
-        <p className='text-orange-700 mb-4'>{getFriendlyErrorMessage(error)}</p>
+        <p className='text-black-700 mb-4'>{getFriendlyErrorMessage(error)}</p>
         {onRetry && (
           <button
             onClick={onRetry}
-            className='bg-orange-500 text-white px-4 py-2 rounded hover:bg-orange-600 transition-colors'
+            className='bg-warning text-gray-900 px-4 py-2 rounded hover:bg-warning/80 transition-colors'
           >
             Try Again
           </button>

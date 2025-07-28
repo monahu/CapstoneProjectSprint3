@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router'
+import { useSelector } from 'react-redux'
 import { usePostActions } from '../../hooks/usePostActions'
 import LoadingState from '../LoadingState'
 import ErrorMessage from '../ErrorMessage'
@@ -12,11 +13,14 @@ import AttendeesList from './AttendeesList'
 import MapView from './MapView'
 import RichTextDisplay from '../Post/RichTextDisplay'
 import PostManipulation from './PostManipulation'
+import ConfirmDialog from '../ConfirmDialog'
 
 const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
 
 const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
   const navigate = useNavigate()
+  const user = useSelector((store) => store.user.data)
+  const isLoggedIn = !!user
 
   const postActions = usePostActions({
     postId: post?.id,
@@ -26,8 +30,9 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
     initialIsLiked: post?.isLiked || false,
     initialIsWantToGo: post?.isWantToGo || false,
     isOwner: post?.isOwner || false,
+    placeName: post?.placeName, // Pass placeName for URL generation
   })
-  console.log('post.isOwner:', post.isOwner)
+
   // Loading state - use shared component
   if (loading) {
     return (
@@ -89,14 +94,49 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
         </div>
 
         <PostDate createdAt={post.createdAt} />
-        <PostManipulation
-          isOwner={post.isOwner || false}
-          postId={post._id || post.id}
-          navigate={navigate}
-        />
+
+        {/* Only show post manipulation for logged-in users */}
+        {isLoggedIn && (
+          <PostManipulation
+            isOwner={post.isOwner || false}
+            postId={post._id || post.id}
+            navigate={navigate}
+          />
+        )}
+
         <PostActions {...postActions} />
 
-        {/* More Info Section */}
+        {/* Confirm Dialog for Share and other actions */}
+        <ConfirmDialog {...postActions.confirmDialogProps} />
+
+        {/* Call-to-Action for Visitors */}
+        {!isLoggedIn && (
+          <div className='mt-8 p-6 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl border border-blue-200'>
+            <h3 className='text-xl font-semibold text-gray-900 mb-3 text-center'>
+              Join RestJAM to Connect with Food Lovers!
+            </h3>
+            <p className='text-gray-600 text-center mb-4'>
+              Sign up to like posts, join restaurant visits, and share your own
+              food experiences.
+            </p>
+            <div className='flex flex-col sm:flex-row gap-3 justify-center'>
+              <button
+                onClick={() => navigate('/login')}
+                className='btn btn-primary text-white px-6 py-2 rounded-lg hover:bg-primary-focus transition-colors'
+              >
+                Sign In
+              </button>
+              <button
+                onClick={() => navigate('/login')}
+                className='btn btn-outline btn-primary px-6 py-2 rounded-lg hover:bg-primary hover:text-white transition-colors'
+              >
+                Sign Up
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* More Info Section - Always show basic info */}
         <div className='mt-12'>
           <div className='text-gray-600 text-base mb-4 divider'>More Info</div>
           <h3 className='text-lg font-semibold text-gray-900 mb-3 px-2 lg:px-20'>
@@ -108,7 +148,29 @@ const RestaurantDetail = ({ post, loading, error, className, refetch }) => {
           />
         </div>
 
-        <AttendeesList attendees={post.attendees} />
+        {/* Only show attendees for logged-in users */}
+        {isLoggedIn && <AttendeesList attendees={post.attendees} />}
+
+        {/* Attendees teaser for visitors */}
+        {!isLoggedIn && post.attendees && post.attendees.length > 0 && (
+          <div className='mt-6 px-2 lg:px-20'>
+            <h3 className='text-lg font-semibold text-gray-900 mb-3'>
+              {post.attendees.length}{' '}
+              {post.attendees.length === 1 ? 'Person' : 'People'} Want to Go
+            </h3>
+            <div className='p-4 bg-gray-50 rounded-lg text-center'>
+              <p className='text-gray-600 mb-3'>
+                See who else is interested in this restaurant
+              </p>
+              <button
+                onClick={() => navigate('/login')}
+                className='btn btn-sm btn-primary text-white'
+              >
+                Sign In to View
+              </button>
+            </div>
+          </div>
+        )}
 
         <MapView
           placeName={post.placeName}

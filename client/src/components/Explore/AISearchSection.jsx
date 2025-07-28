@@ -18,17 +18,17 @@ const AISearchSection = ({
   // Check if AI features are enabled via environment variable (default: false if not set)
   const envValue = import.meta.env.VITE_ENABLE_AI_SEARCH
   const isAIEnabled = envValue === 'true'
-  
+
   // Debug logging
-  console.log('AI Environment Check:', { 
+  /*  console.log('AI Environment Check:', { 
     envValue, 
     isAIEnabled, 
     envType: typeof envValue 
-  })
-  
+  }) */
+
   // Early return if AI is disabled
   if (!isAIEnabled) {
-    console.log('AI component hidden - environment variable not enabled')
+    // console.log('AI component hidden - environment variable not enabled')
     return null
   }
   // AI Search functionality
@@ -47,20 +47,20 @@ const AISearchSection = ({
   } = useAISearch()
 
   // Check if we should show AI Assistant button
-  const shouldShowAIButton = 
+  const shouldShowAIButton =
     isBackendAvailable && // Backend AI is available
     searchType === 'text' && // Only for text searches, not tag searches
-    searchTerm && 
+    searchTerm &&
     searchTerm.trim().split(/\s+/).length >= 2 && // 2+ words
-    hasSearched && 
-    !loading && 
-    !error && 
+    hasSearched &&
+    !loading &&
+    !error &&
     posts.length === 0 && // No regular results
     !aiHasSearched // Haven't tried AI yet
 
   const handleAISearch = async () => {
     if (!searchTerm || aiLoading) return
-    
+
     try {
       console.log(`Starting AI search for: "${searchTerm}"`)
       await performAISearch(searchTerm)
@@ -98,7 +98,8 @@ const AISearchSection = ({
               Try AI-Enhanced Search
             </h3>
             <p className='text-gray-600 text-sm mb-4'>
-              Our AI can understand your query better and find hidden gems that match your craving!
+              Our AI can understand your query better and find hidden gems that
+              match your craving!
             </p>
             <button
               onClick={handleAISearch}
@@ -133,9 +134,7 @@ const AISearchSection = ({
         <div className='bg-red-50 rounded-lg p-4 max-w-md mx-auto'>
           <div className='flex items-center gap-2'>
             <AlertCircle className='w-5 h-5 text-red-500' />
-            <p className='text-red-800 text-sm'>
-              AI search failed: {aiError}
-            </p>
+            <p className='text-red-800 text-sm'>AI search failed: {aiError}</p>
           </div>
         </div>
       )}
@@ -157,7 +156,9 @@ const AISearchSection = ({
                 image={post.imageUrls?.desktop || post.imageUrls}
                 user={{
                   name: post.author?.displayName,
-                  avatar: post.author?.photoURL || 'https://img.daisyui.com/images/profile/demo/2@94.webp',
+                  avatar:
+                    post.author?.photoURL ||
+                    'https://img.daisyui.com/images/profile/demo/2@94.webp',
                 }}
                 location={post.location}
                 title={post.title}
@@ -183,9 +184,7 @@ const AISearchSection = ({
       {/* AI No Results */}
       {aiIsEmpty && aiSearchMessage && (
         <div className='bg-blue-50 rounded-lg p-4 max-w-lg mx-auto'>
-          <p className='text-blue-800 text-sm mb-2'>
-            {aiSearchMessage}
-          </p>
+          <p className='text-blue-800 text-sm mb-2'>{aiSearchMessage}</p>
           {aiSearchSuggestions && aiSearchSuggestions.length > 0 && (
             <div className='flex flex-wrap gap-2 mt-3'>
               <span className='text-blue-700 text-xs font-medium'>Try:</span>

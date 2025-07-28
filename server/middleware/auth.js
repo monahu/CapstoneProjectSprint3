@@ -62,6 +62,7 @@ const smartAuth = async (req, res, next) => {
   const isPublicQuery =
     operationName?.toLowerCase() === 'posts' ||
     operationName === 'GetAllPosts' ||
+    operationName === 'GetPostById' || // Allow visitors to view post details
     operationName === 'GetAllTags' ||
     operationName === 'IntrospectionQuery'
 

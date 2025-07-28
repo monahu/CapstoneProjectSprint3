@@ -44,6 +44,25 @@
   /* Modern browsers */
 }
 
+
+/* Hero responsive background images */
+.hero-responsive-bg {
+  background-image: var(--hero-bg-mobile, none);
+}
+
+@media (min-width: 769px) {
+  .hero-responsive-bg {
+    background-image: var(--hero-bg-tablet, var(--hero-bg-mobile, none));
+  }
+}
+
+@media (min-width: 1025px) {
+  .hero-responsive-bg {
+    background-image: var(--hero-bg-desktop, var(--hero-bg-tablet, var(--hero-bg-mobile, none)));
+  }
+}
+
+
 /* CSS feature detection for older browsers */
 @supports not (color: var(--test)) {
   .primary-color {

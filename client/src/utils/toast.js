@@ -25,7 +25,7 @@ export const showToast = (message, type = 'success', duration = 3000) => {
     color: white;
     font-weight: 500;
     z-index: 9999;
-    max-width: 300px;
+    max-width: 50vw;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     transition: all 0.3s ease;
     transform: translate(-50%, -50%);

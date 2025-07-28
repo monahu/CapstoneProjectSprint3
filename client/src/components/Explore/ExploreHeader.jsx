@@ -39,12 +39,12 @@ const ExploreHeader = ({
 
           {/* Tags Section */}
           <div className='mt-2'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-4'>
-              <span className='text-pink-500'>{UI_TEXT.explore.tagsTitle}</span>{' '}
-              <span className='text-cyan-400'>
+            <p className='text-lg font-semibold text-gray-900 mb-4'>
+              <span className='text-pink-700'>{UI_TEXT.explore.tagsTitle}</span>{' '}
+              <span className='text-cyan-700'>
                 {UI_TEXT.explore.tagsSubtitle}
               </span>
-            </h3>
+            </p>
 
             <div className='flex flex-wrap gap-2 mb-4'>
               {tagsToDisplay.map((tag) => {

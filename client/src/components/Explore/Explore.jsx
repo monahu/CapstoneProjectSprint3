@@ -43,7 +43,7 @@ const Explore = () => {
         showButton={false}
         title={UI_TEXT.exploreHero.title}
         description={UI_TEXT.exploreHero.description}
-        className='min-h-[30vh]'
+        className='min-h-[30vh] max-h-[60vh] h-fit'
       />
 
       <ExploreHeader

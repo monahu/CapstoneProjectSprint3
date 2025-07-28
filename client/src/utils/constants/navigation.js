@@ -7,14 +7,19 @@ export const NAVIGATION = {
     { name: UI_TEXT.buttons.signOut, href: '#', hasAction: true },
   ],
   hideLogoRoutes: [ROUTES.LOGIN],
-  protectedRoutes: [ROUTES.PROFILE, ROUTES.CREATE, ROUTES.EXPLORE, ROUTES.EDIT, ROUTES.POST_DETAIL],
+  protectedRoutes: [ROUTES.PROFILE, ROUTES.CREATE, ROUTES.EXPLORE, ROUTES.EDIT],
   sidebar: [
     { name: 'Home', href: ROUTES.HOME, icon: 'House', current: true },
     { name: 'Create', href: ROUTES.CREATE, icon: 'SquarePen', current: false },
     { name: 'Profile', href: ROUTES.PROFILE, icon: 'Settings', current: false },
   ],
   footer: [
-        { name: 'Buy me a coffee', href: ROUTES.DONATE, icon: 'coffee', current: false },
+    {
+      name: 'Buy me a coffee',
+      href: ROUTES.DONATE,
+      icon: 'coffee',
+      current: false,
+    },
   ],
   sidebarVisitor: [
     { name: 'Home', href: ROUTES.HOME, icon: 'House', current: true },

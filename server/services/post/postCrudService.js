@@ -1,6 +1,8 @@
 const Post = require('../../models/posts')
 const mongoose = require('mongoose')
-const { buildPostAggregationPipeline } = require('../../utils/aggregationPipelines')
+const {
+  buildPostAggregationPipeline,
+} = require('../../utils/aggregationPipelines')
 const { addTagsToPost } = require('./postTagService')
 
 /**
@@ -13,7 +15,7 @@ const { addTagsToPost } = require('./postTagService')
  */
 const createPost = async (input, userId) => {
   const session = await mongoose.startSession()
-  
+
   try {
     let savedPost
     await session.withTransaction(async () => {
@@ -49,7 +51,7 @@ const updatePost = async (postId, input) => {
  */
 const deletePost = async (postId) => {
   const session = await mongoose.startSession()
-  
+
   try {
     return await session.withTransaction(async () => {
       // Get the post first to verify it exists
@@ -82,25 +84,21 @@ const deletePost = async (postId) => {
  * Get posts with pagination and filtering
  */
 const getPosts = async (limit = 10, offset = 0, filter = {}, options = {}) => {
-  const { currentUserId = null } = options
-  
-  const pipeline = buildPostAggregationPipeline(
-    filter,
-    currentUserId,
-    { limit, offset }
-  )
+  const { currentUserId = null, withCount = false } = options
+
+  const pipeline = buildPostAggregationPipeline(filter, currentUserId, {
+    limit,
+    offset,
+  })
 
   const posts = await Post.aggregate(pipeline)
-  
-  // Get total count for pagination
-  const totalPipeline = buildPostAggregationPipeline(filter, currentUserId, { count: true })
-  const totalResult = await Post.aggregate(totalPipeline)
-  const totalCount = totalResult.length > 0 ? totalResult[0].count : 0
 
-  return {
-    posts,
-    totalCount,
+  if (withCount) {
+    const totalCount = await Post.countDocuments(filter)
+    return { posts, totalCount }
   }
+
+  return posts
 }
 
 /**
@@ -108,7 +106,7 @@ const getPosts = async (limit = 10, offset = 0, filter = {}, options = {}) => {
  */
 const getPostById = async (postId, currentUserId = null) => {
   const pipeline = buildPostAggregationPipeline(
-    { _id: mongoose.Types.ObjectId(postId) },
+    { _id: new mongoose.Types.ObjectId(postId) },
     currentUserId
   )
 
@@ -121,7 +119,7 @@ const getPostById = async (postId, currentUserId = null) => {
  */
 const getPostsByUserId = async (userId, currentUserId = null) => {
   const pipeline = buildPostAggregationPipeline(
-    { userId: mongoose.Types.ObjectId(userId) },
+    { userId: new mongoose.Types.ObjectId(userId) },
     currentUserId
   )
 

@@ -54,6 +54,10 @@ export const useExplore = () => {
       } else if (tags.length > 0) {
         // Use tag-based search with pagination support
         tagSearch.searchByTags(tags)
+      } else {
+        // Clear both search results when no search criteria
+        basicSearch.searchPosts('')
+        tagSearch.searchByTags([])
       }
     }
   }, [searchTerm, tags])

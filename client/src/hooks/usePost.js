@@ -2,10 +2,16 @@
 // Import from new organized structure
 
 // Posts (CRUD operations)
-export { usePosts, usePost, useProgressivePosts, useCreatePost, useDeletePost } from './posts'
+export {
+  usePosts,
+  usePost,
+  useProgressivePosts,
+  useCreatePost,
+  useDeletePost,
+} from './posts'
 
-// Search functionality  
-export { useSearchPosts, useSearchPostsByTags } from './search'
+// Search functionality
+export { useSearchPostsByTags, useBasicSearch } from './search'
 
 // Tags functionality
 export { useTags } from './tags'

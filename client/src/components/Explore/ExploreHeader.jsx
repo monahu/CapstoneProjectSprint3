@@ -11,6 +11,7 @@ const ExploreHeader = ({
   setShowAllTags,
   hasMoreTags,
   classNames,
+  onSearch,
 }) => {
   return (
     <div className='mt-6 bg-white shadow-sm rounded-lg'>
@@ -33,7 +34,7 @@ const ExploreHeader = ({
 
           {/* Search Form */}
           <div className='mt-4 mb-4'>
-            <SearchForm />
+            <SearchForm onSearch={onSearch} />
           </div>
 
           {/* Tags Section */}

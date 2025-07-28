@@ -1,17 +1,17 @@
 import { useLazyQuery } from '@apollo/client'
 import { useState } from 'react'
-import { SEARCH_POSTS } from '../../utils/graphql/post'
+import { BASIC_SEARCH } from '../../utils/graphql/post'
 
-export const useSearchPosts = () => {
+export const useBasicSearch = () => {
   const [searchResults, setSearchResults] = useState(null)
   const [
     executeSearch,
     { data, loading, error, called, fetchMore, networkStatus },
-  ] = useLazyQuery(SEARCH_POSTS, {
+  ] = useLazyQuery(BASIC_SEARCH, {
     notifyOnNetworkStatusChange: true,
     fetchPolicy: 'cache-and-network',
     onError: (error) => {
-      console.error('SEARCH_POSTS error:', error)
+      console.error('BASIC_SEARCH error:', error)
     },
     onCompleted: (data) => {
       setSearchResults(data)
@@ -19,23 +19,16 @@ export const useSearchPosts = () => {
   })
 
   const searchPosts = (searchTerm, options = {}) => {
-    const { tags, location, limit = 20, offset = 0 } = options
+    const { limit = 10, offset = 0 } = options
 
-    const hasSearchTerm = searchTerm?.trim()
-    const hasTags = tags?.length > 0
-    const hasLocation = location?.trim()
-
-    if (!hasSearchTerm && !hasTags && !hasLocation) {
-      // Clear results when no search criteria
+    if (!searchTerm?.trim()) {
       setSearchResults(null)
       return
     }
 
     return executeSearch({
       variables: {
-        searchTerm: hasSearchTerm || null,
-        tags: hasTags ? tags : null,
-        location: hasLocation || null,
+        searchTerm: searchTerm.trim(),
         limit,
         offset,
       },
@@ -43,16 +36,14 @@ export const useSearchPosts = () => {
   }
 
   const loadMoreResults = (currentSearchTerm, currentOptions = {}) => {
-    if (!data?.searchPosts) return
+    if (!data?.basicSearch) return
 
-    const currentLength = data.searchPosts.length
-    const { tags, location, limit = 20 } = currentOptions
+    const currentLength = data.basicSearch.length
+    const { limit = 20 } = currentOptions
 
     return fetchMore({
       variables: {
-        searchTerm: currentSearchTerm?.trim() || null,
-        tags: tags?.length > 0 ? tags : null,
-        location: location?.trim() || null,
+        searchTerm: currentSearchTerm?.trim(),
         limit,
         offset: currentLength,
       },
@@ -60,18 +51,18 @@ export const useSearchPosts = () => {
         if (!fetchMoreResult) return previousResult
 
         return {
-          searchPosts: [
-            ...(previousResult.searchPosts || []),
-            ...(fetchMoreResult.searchPosts || []),
+          basicSearch: [
+            ...(previousResult.basicSearch || []),
+            ...(fetchMoreResult.basicSearch || []),
           ],
         }
       },
     })
   }
 
-  const posts = searchResults?.searchPosts || []
+  const posts = searchResults?.basicSearch || []
   const isLoadingMore = networkStatus === 3
-  const hasMoreResults = posts.length > 0 && posts.length % 20 === 0 // Assuming limit of 20
+  const hasMoreResults = posts.length > 0 && posts.length % 20 === 0
 
   return {
     searchPosts,

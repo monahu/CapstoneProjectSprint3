@@ -4,12 +4,18 @@ const {
   createPost,
   updatePost,
   deletePost,
+} = require('../../services/post/postCrudService')
+
+const {
   toggleWantToGo,
   toggleLike,
   incrementShareCount,
+} = require('../../services/post/postInteractionService')
+
+const {
   addTagToPost,
   removeTagFromPost,
-} = require('../../services/postService')
+} = require('../../services/post/postTagService')
 
 /**
  * Post Mutation Resolvers

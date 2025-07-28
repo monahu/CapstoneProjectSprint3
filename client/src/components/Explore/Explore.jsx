@@ -1,47 +1,38 @@
 import Hero from '../Hero'
 import ExploreHeader from './ExploreHeader'
-import ActiveFilters from './ActiveFilters'
 import ExploreResults from './ExploreResults'
 import { useExplore } from '../../hooks'
 import heroImage from '../../assets/img/explore_hero1.webp'
 import { UI_TEXT } from '../../utils/constants/ui'
 
 const Explore = () => {
-  const {
-    // Search state
-    searchTerm,
-    tags,
-    location,
-    posts,
-    loading,
-    error,
-    hasSearched,
-    hasActiveSearch,
+  const exploreData = useExplore()
 
-    // Pagination state
-    isLoadingMore,
-    hasMoreResults,
-    showLoadMoreButton,
-
-    // Tag management
-    tagsToDisplay,
-    hasMoreTags,
-    showAllTags,
-    setShowAllTags,
-
-    // Actions
-    navigate,
-    clearAllFilters,
-    handleTagClick,
-    searchPosts,
-    handleLoadMore,
-    classNames,
-  } = useExplore()
-
-  // Retry function for failed searches
   const handleRetry = () => {
-    if (hasActiveSearch) {
-      searchPosts(searchTerm, { tags, location })
+    const {
+      hasActiveSearch,
+      searchType,
+      searchPosts,
+      searchTerm,
+      tags,
+      navigate,
+    } = exploreData
+    if (!hasActiveSearch) return
+
+    if (searchType === 'text') {
+      searchPosts(searchTerm)
+    } else if (searchType === 'tags' && tags.length > 0) {
+      const params = new URLSearchParams()
+      params.set('tags', tags.join(','))
+      navigate(`/explore?${params.toString()}`, { replace: true })
+    }
+  }
+
+  const handleSearch = (searchTerm) => {
+    if (searchTerm?.trim()) {
+      exploreData.navigate(
+        `/explore?q=${encodeURIComponent(searchTerm.trim())}`
+      )
     }
   }
 
@@ -52,42 +43,23 @@ const Explore = () => {
         showButton={false}
         title={UI_TEXT.exploreHero.title}
         description={UI_TEXT.exploreHero.description}
-        className='min-h-[30vh]'
+        className='min-h-[30vh] max-h-[60vh] h-fit'
       />
 
       <ExploreHeader
-        navigate={navigate}
-        tagsToDisplay={tagsToDisplay}
-        tags={tags}
-        handleTagClick={handleTagClick}
-        showAllTags={showAllTags}
-        setShowAllTags={setShowAllTags}
-        hasMoreTags={hasMoreTags}
-        classNames={classNames}
+        {...exploreData}
+        onSearch={handleSearch}
       />
 
-      <ActiveFilters
-        hasActiveSearch={hasActiveSearch}
-        searchTerm={searchTerm}
-        tags={tags}
-        location={location}
-        clearAllFilters={clearAllFilters}
-      />
+      {/*       <ActiveFilters
+        {...exploreData}
+      /> */}
 
       <ExploreResults
-        hasActiveSearch={hasActiveSearch}
-        hasSearched={hasSearched}
-        loading={loading}
-        error={error}
-        posts={posts}
-        searchTerm={searchTerm}
-        tags={tags}
-        location={location}
+        {...exploreData}
         onRetry={handleRetry}
-        isLoadingMore={isLoadingMore}
-        hasMoreResults={hasMoreResults}
-        showLoadMoreButton={showLoadMoreButton}
-        onLoadMore={handleLoadMore}
+        onSearch={exploreData.searchPosts}
+        onLoadMore={exploreData.handleLoadMore}
       />
     </div>
   )

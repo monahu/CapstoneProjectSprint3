@@ -6,6 +6,7 @@ import PostTags from './PostTags'
 import RichTextDisplay from './RichTextDisplay'
 import { useNavigate } from 'react-router'
 import { usePostActions } from '../../hooks/usePostActions'
+import ConfirmDialog from '../ConfirmDialog'
 
 const RestaurantCard = ({
   id,
@@ -39,6 +40,7 @@ const RestaurantCard = ({
     initialIsLiked: isLiked,
     initialIsWantToGo: isWantToGo,
     isOwner: isOwner || false,
+    placeName: placeName, // Add placeName for URL generation
   })
 
   const handleViewDetail = () => {
@@ -107,6 +109,9 @@ const RestaurantCard = ({
         />
 
         <PostActions {...postActions} />
+
+        {/* Confirm Dialog for Share and other actions */}
+        <ConfirmDialog {...postActions.confirmDialogProps} />
       </div>
     </div>
   )

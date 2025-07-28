@@ -1,9 +1,11 @@
+import React from 'react'
 import { Search } from 'lucide-react'
 import RestaurantCard from '../Post/RestaurantCard'
+import { generateRestaurantUrl } from '../../utils/slugUtils'
 import LoadingState from '../LoadingState'
 import ErrorMessage from '../ErrorMessage'
-import EmptyState from '../EmptyState'
 import LoadMoreSection from '../LoadMoreSection'
+import AISearchSection from './AISearchSection'
 import { UI_TEXT } from '../../utils/constants/ui'
 
 const ExploreResults = ({
@@ -20,6 +22,8 @@ const ExploreResults = ({
   hasMoreResults,
   showLoadMoreButton,
   onLoadMore,
+  searchType, // 'text' | 'tags' | 'none'
+  onSearch, // Function to handle new searches
 }) => {
   return (
     <div className='container mx-auto px-2 py-2 md:py-8'>
@@ -93,14 +97,27 @@ const ExploreResults = ({
 
           {/* No results found */}
           {posts.length === 0 ? (
-            <div className='text-center py-20'>
+            <div className='text-center py-12'>
               <Search className='w-16 h-16 text-gray-300 mx-auto mb-4' />
               <h2 className='text-xl font-semibold text-gray-600 mb-2'>
                 {UI_TEXT.explore.noResultsTitle}
               </h2>
-              <p className='text-gray-500'>
-                {UI_TEXT.explore.noResultsDescription}
+              <p className='text-gray-500 mb-6'>
+                {searchTerm
+                  ? `No results found for "${searchTerm}"`
+                  : UI_TEXT.explore.noResultsDescription}
               </p>
+
+              {/* AI Search Section */}
+              <AISearchSection
+                searchTerm={searchTerm}
+                searchType={searchType}
+                hasSearched={hasSearched}
+                loading={loading}
+                error={error}
+                posts={posts}
+                onSearch={onSearch}
+              />
             </div>
           ) : (
             <>
@@ -131,6 +148,7 @@ const ExploreResults = ({
                     isLiked={post.isLiked}
                     isOwner={post.isOwner || false}
                     className='max-w-full md:max-w-5/6 lg:max-w-3/4 mx-auto'
+                    url={generateRestaurantUrl(post)}
                   />
                 ))}
               </div>

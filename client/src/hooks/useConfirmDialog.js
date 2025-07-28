@@ -30,7 +30,7 @@ export const useConfirmDialog = () => {
     if (resolvePromise) {
       resolvePromise(true)
       setResolvePromise(null)
-      
+
       // Show success toast if provided
       if (options.successMessage) {
         showSuccessToast(options.successMessage)
@@ -42,7 +42,7 @@ export const useConfirmDialog = () => {
     setIsOpen(false)
     if (resolvePromise) {
       resolvePromise(false)
-      setResolvePromise(null) 
+      setResolvePromise(null)
     }
   }
 
@@ -56,25 +56,27 @@ export const useConfirmDialog = () => {
       cancelText: UI_TEXT.dialogs.deletePost.cancelText,
     },
     deletePostFromProfile: {
-      type: 'delete', 
+      type: 'delete',
       title: UI_TEXT.dialogs.deletePostFromProfile.title,
       message: UI_TEXT.dialogs.deletePostFromProfile.message,
       confirmText: UI_TEXT.dialogs.deletePostFromProfile.confirmText,
       cancelText: UI_TEXT.dialogs.deletePostFromProfile.cancelText,
-    }
+    },
   }
 
   // Helper methods for common actions
-  const confirmDelete = (message) => confirm({ 
-    ...presets.deletePost, 
-    message,
-    successMessage: 'Post deleted successfully!'
-  })
-  const confirmDeleteFromProfile = (message) => confirm({ 
-    ...presets.deletePostFromProfile, 
-    message,
-    successMessage: 'Post deleted successfully!'
-  })
+  const confirmDelete = (message) =>
+    confirm({
+      ...presets.deletePost,
+      message,
+      successMessage: 'Post deleted successfully!',
+    })
+  const confirmDeleteFromProfile = (message) =>
+    confirm({
+      ...presets.deletePostFromProfile,
+      message,
+      successMessage: 'Post deleted successfully!',
+    })
 
   return {
     // Core functionality
@@ -83,12 +85,12 @@ export const useConfirmDialog = () => {
     options,
     handleConfirm,
     handleCancel,
-    
+
     // Presets
     presets,
     confirmDelete,
     confirmDeleteFromProfile,
-    
+
     // Dialog props (spread this into ConfirmDialog component)
     dialogProps: {
       isOpen,
@@ -100,6 +102,7 @@ export const useConfirmDialog = () => {
       confirmText: options.confirmText,
       cancelText: options.cancelText,
       loading: options.loading,
-    }
+      showOverlay: options.showOverlay,
+    },
   }
 }

@@ -1,6 +1,5 @@
 import { Search, X } from 'lucide-react'
 import { useSearchForm } from '../../hooks'
-import AdvancedFilters from './AdvancedFilters'
 import VoiceInput from '../Speech/VoiceInput'
 import { UI_TEXT } from '../../utils/constants/ui'
 
@@ -9,17 +8,12 @@ export default function SearchForm({
   onSearch,
   placeholder = UI_TEXT.searchForm.searchPlaceholder,
   mobilePlaceholder = UI_TEXT.searchForm.mobileSearchPlaceholder,
-  showAdvanced = false,
   hideClearButton = false,
   id = 'search-input',
 }) {
   const {
     searchTerm,
     setSearchTerm,
-    isAdvancedOpen,
-    setIsAdvancedOpen,
-    advancedFilters,
-    setAdvancedFilters,
     hasActiveFilters,
     handleSubmit,
     clearSearch,
@@ -51,7 +45,7 @@ export default function SearchForm({
               }
               aria-label='Search'
               className={`block w-full bg-white pl-10 py-3 text-base text-gray-900 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder:text-gray-400    [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden ${
-                hasActiveFilters && !hideClearButton ? 'pr-24' : 'pr-16'
+                searchTerm && !hideClearButton ? 'pr-24' : 'pr-16'
               }`}
             />
             <Search
@@ -63,12 +57,12 @@ export default function SearchForm({
             <VoiceInput
               onTranscript={setSearchTerm}
               className={`absolute top-1/2 -translate-y-1/2 ${
-                hasActiveFilters && !hideClearButton ? 'right-14' : 'right-3'
+                searchTerm && !hideClearButton ? 'right-14' : 'right-3'
               }`}
             />
 
             {/* Clear Button */}
-            {hasActiveFilters && !hideClearButton && (
+            {searchTerm && !hideClearButton && (
               <button
                 type='button'
                 onClick={clearSearch}
@@ -88,14 +82,6 @@ export default function SearchForm({
             Search
           </button>
         </div>
-
-        <AdvancedFilters
-          isOpen={isAdvancedOpen}
-          onToggle={() => setIsAdvancedOpen(!isAdvancedOpen)}
-          filters={advancedFilters}
-          onFiltersChange={setAdvancedFilters}
-          showAdvanced={showAdvanced}
-        />
       </form>
     </div>
   )

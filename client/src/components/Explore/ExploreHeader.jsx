@@ -11,6 +11,7 @@ const ExploreHeader = ({
   setShowAllTags,
   hasMoreTags,
   classNames,
+  onSearch,
 }) => {
   return (
     <div className='mt-6 bg-white shadow-sm rounded-lg'>
@@ -33,17 +34,17 @@ const ExploreHeader = ({
 
           {/* Search Form */}
           <div className='mt-4 mb-4'>
-            <SearchForm />
+            <SearchForm onSearch={onSearch} />
           </div>
 
           {/* Tags Section */}
           <div className='mt-2'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-4'>
-              <span className='text-pink-500'>{UI_TEXT.explore.tagsTitle}</span>{' '}
-              <span className='text-cyan-400'>
+            <p className='text-lg font-semibold text-gray-900 mb-4'>
+              <span className='text-pink-700'>{UI_TEXT.explore.tagsTitle}</span>{' '}
+              <span className='text-cyan-700'>
                 {UI_TEXT.explore.tagsSubtitle}
               </span>
-            </h3>
+            </p>
 
             <div className='flex flex-wrap gap-2 mb-4'>
               {tagsToDisplay.map((tag) => {

@@ -35,12 +35,10 @@ export const useNavbar = () => {
 
   // Check if current path is protected (handles dynamic routes)
   const isProtectedRoute = (pathname) => {
-    return protectedRoutes.some(route => {
+    return protectedRoutes.some((route) => {
       // Handle exact matches
       if (route === pathname) return true
-      // Handle dynamic routes like /restaurant/:slug
-      if (route === ROUTES.POST_DETAIL && pathname.startsWith('/restaurant/')) return true
-      // Handle edit routes like /edit/:id  
+      // Handle edit routes like /edit/:id
       if (route === ROUTES.EDIT && pathname.startsWith('/edit/')) return true
       return false
     })

@@ -6,7 +6,7 @@ export { AuthManager } from './AuthManager'
 // Post-related hooks (new structure)
 export * from './posts'
 export * from './postActions'
-export * from './search'  
+export * from './search'
 export * from './tags'
 
 // UI hooks
@@ -20,7 +20,7 @@ export { useVoiceInput } from './useVoiceInput'
 export { useUserProfile, useSyncUser, useUpdateUserProfile } from './useUser'
 
 // Backward compatibility - re-export old usePost exports
-export { usePost, useSearchPosts, useTags } from './usePost'
+export { usePost, useTags } from './usePost'
 export { usePostActions } from './usePostActions'
 export { useSearchForm } from './useSearchForm'
 export { useTagSelection } from './useTagSelection'

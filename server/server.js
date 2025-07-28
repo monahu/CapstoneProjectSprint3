@@ -77,6 +77,10 @@ app.use('/api/ratings', ratingsRouter)
 const postRoute = require('./routes/post')
 app.use('/api/posts', postRoute)
 
+// AI Search route
+const aiSearchRoute = require('./routes/aiSearch')
+app.use('/api', aiSearchRoute)
+
 // Create Apollo Server
 const server = new ApolloServer({
   typeDefs,

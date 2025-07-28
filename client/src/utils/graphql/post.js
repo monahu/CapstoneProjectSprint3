@@ -79,7 +79,7 @@ export const GET_MY_WANT_TO_GO_POSTS = gql`
       isWantToGo
     }
   }
-`;
+`
 
 export const GET_POST_BY_ID = gql`
   query GetPostById($id: ID!) {
@@ -131,7 +131,6 @@ export const GET_POST_BY_ID = gql`
   }
 `
 
-
 export const GET_MY_POSTS = gql`
   query GetMyPosts {
     myPosts {
@@ -178,7 +177,12 @@ export const SEARCH_POSTS_BY_TAGS = gql`
       placeName
       content
       location
-      imageUrl
+      imageUrls {
+        desktop
+        mobile
+        mobile2x
+        tablet
+      }
       createdAt
       shareCount
       tags {
@@ -210,21 +214,9 @@ export const SEARCH_POSTS_BY_TAGS = gql`
   }
 `
 
-export const SEARCH_POSTS = gql`
-  query SearchPosts(
-    $searchTerm: String
-    $tags: [String]
-    $location: String
-    $limit: Int
-    $offset: Int
-  ) {
-    searchPosts(
-      searchTerm: $searchTerm
-      tags: $tags
-      location: $location
-      limit: $limit
-      offset: $offset
-    ) {
+export const BASIC_SEARCH = gql`
+  query BasicSearch($searchTerm: String!, $limit: Int, $offset: Int) {
+    basicSearch(searchTerm: $searchTerm, limit: $limit, offset: $offset) {
       id
       title
       placeName
@@ -238,10 +230,6 @@ export const SEARCH_POSTS = gql`
       }
       createdAt
       shareCount
-      tags {
-        id
-        name
-      }
       author {
         id
         displayName
